@@ -14,13 +14,15 @@ int main()
 {
 	TCT::sample	dummyDUT;       // define DUT
 
+	std::cout << dummyDUT << std::endl;
+
   	// analyser
  	//TCT::vdrift_ana vdrift;
 
 
 
 	// print out method for analysers?!
-	std::cout << "dummy" << std::endl;
+	//std::cout << "dummy" << std::endl;
 
   return 0;
 }
