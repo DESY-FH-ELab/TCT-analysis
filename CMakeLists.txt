@@ -36,7 +36,7 @@ IF(NOT SOURCE_PACKAGE)
       IF("${TCTANALYSIS_LIB_BASEVERSION}" VERSION_LESS "${TCTANALYSIS_VERSION_MAJOR}.${TCTANALYSIS_VERSION_MINOR}.${TCTANALYSIS_VERSION_PATCH}")
 	MESSAGE(WARNING "Your do not seem to have fetched the latest tags in your git repository -- please consider running 'git fetch' for the main remote repository.")
       ENDIF("${TCTANALYSIS_LIB_BASEVERSION}" VERSION_LESS "${TCTANALYSIS_VERSION_MAJOR}.${TCTANALYSIS_VERSION_MINOR}.${TCTANALYSIS_VERSION_PATCH}")
-      EXEC_PROGRAM(git ARGS status --porcelain ${CMAKE_CURRENT_SOURCE_DIR}/main OUTPUT_VARIABLE TCTANALYSIS_MAIN_STATUS)
+      EXEC_PROGRAM(git ARGS status --porcelain ${CMAKE_CURRENT_SOURCE_DIR}/src OUTPUT_VARIABLE TCTANALYSIS_MAIN_STATUS)
       IF(TCTANALYSIS_MAIN_STATUS STREQUAL "")
 	MESSAGE(STATUS "Main TCT-Analysis library directory is clean (all changes have been commited).")
       ELSE(TCTANALYSIS_MAIN_STATUS STREQUAL "")
@@ -110,7 +110,7 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 
 # build main TCT-ANALYSIS executable
 add_executable(tct-analysis  src/main.cxx )
-target_link_libraries(tct-analysis   ) # include later maybe: ${ROOT_LIBRARIES}
+target_link_libraries(tct-analysis ${PROJECT_NAME}) # include later maybe: ${ROOT_LIBRARIES}
 # now set up the installation directory
 INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
   RUNTIME DESTINATION bin
