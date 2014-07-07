@@ -51,7 +51,7 @@ namespace TCT {
 		std::string & sampleID() {return _sampleID;}
 		const std::string & sampleID() const {return _sampleID;}
 
-		void ReadSampleCard(std::string _folder){};
+		void ReadSampleCard(std::string folder);
 	};
 
 }
