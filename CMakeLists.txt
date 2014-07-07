@@ -2,12 +2,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
 ########################################################
 # project name
-PROJECT( tctanalysis )
+PROJECT( TCTAnalysis )
 
 # project version
-SET( ${PROJECT_NAME}_VERSION_MAJOR 0 )
-SET( ${PROJECT_NAME}_VERSION_MINOR 1 )
-SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
+SET( TCTANALYSIS_VERSION_MAJOR 0 )
+SET( TCTANALYSIS_VERSION_MINOR 1 )
+SET( TCTANALYSIS_VERSION_PATCH 0 )
 
 # some macros are redefined to keep compatability with CMake 2.6
 include(${PROJECT_SOURCE_DIR}/cmake/CMakeCompatibility.cmake)
@@ -28,7 +28,7 @@ IF(NOT SOURCE_PACKAGE)
     EXECUTE_PROCESS(COMMAND ${GIT_EXECUTABLE} describe --tags HEAD WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_VARIABLE TCTANALYSIS_LIB_VERSION ERROR_VARIABLE GIT_ERROR)
     IF(GIT_ERROR) # git execution resulted in error message -- cannot trust result but construct version from hard-set variable
       MESSAGE(WARNING "Could not determine TCT-Analysis version from git -- git execution resulted in error: ${GIT_ERROR}")
-      SET(TCTANALYSIS_LIB_VERSION ${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH})
+      SET(TCTANALYSIS_LIB_VERSION ${TCTANALYSIS_VERSION_MAJOR}.${TCTANALYSIS_VERSION_MINOR}.${TCTANALYSIS_VERSION_PATCH})
     ELSE(GIT_ERROR)
       STRING(REGEX REPLACE "([v0-9.]+[-a-zA-Z0-9]+)-([0-9]+)-([A-Za-z0-9]+)" "\\1+\\2~\\3" TCTANALYSIS_LIB_VERSION ${TCTANALYSIS_LIB_VERSION})
       STRING(REGEX REPLACE "\n" "" TCTANALYSIS_LIB_VERSION ${TCTANALYSIS_LIB_VERSION}) # remove potential line breaks
