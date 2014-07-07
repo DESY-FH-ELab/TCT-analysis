@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include "sample.h"
+#include "config.h"
 //#inculde "anaylyser.h" // class or methods of sample ?
 
 //using namespace TCT; // namespace of TCT_analysis is "TCT"
@@ -13,6 +14,8 @@
 int main()
 {
 	TCT::sample	dummyDUT;       // define DUT
+
+	std::cout << "This is " << PACKAGE_NAME << " version " << PACKAGE_VERSION << std::endl;
 
 	std::cout << dummyDUT << std::endl;
 
