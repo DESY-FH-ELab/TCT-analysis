@@ -14,10 +14,13 @@
 int main()
 {
 	TCT::sample	dummyDUT;       // define DUT
+	std::cout << dummyDUT << std::endl;	// print basic parameters of the sample
 
 	std::cout << "This is " << PACKAGE_NAME << " version " << PACKAGE_VERSION << std::endl;
 
-	std::cout << dummyDUT << std::endl;
+	std::string folder = "/home/hjansen/Sensors/testSensor";
+
+	dummyDUT.ReadSampleCard(folder);	// read SampleCard and set parameters accordingly
 
   	// analyser
  	//TCT::vdrift_ana vdrift;
