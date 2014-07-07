@@ -21,6 +21,7 @@ int main()
 	std::string folder = "/home/hjansen/Sensors/testSensor";
 
 	dummyDUT.ReadSampleCard(folder);	// read SampleCard and set parameters accordingly
+	std::cout << dummyDUT << std::endl;
 
   	// analyser
  	//TCT::vdrift_ana vdrift;
