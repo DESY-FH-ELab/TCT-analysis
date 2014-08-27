@@ -13,6 +13,7 @@ lib/*
 
 # ignore vim autosaves
 .*.swp
+*.cc.swo
 
 # ignore git mergetool backup files
 *.orig

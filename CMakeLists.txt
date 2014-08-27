@@ -93,10 +93,10 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 
 
 # Should we ever need ROOT uncomment here...
-#FIND_PACKAGE( ROOT REQUIRED )
-#INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIR} )
+FIND_PACKAGE( ROOT REQUIRED )
+INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIR} )
 #OPTIONAL: add preprocessor defines to be able to check for ROOT in the code
-#ADD_DEFINITIONS(-DROOT_FOUND)
+ADD_DEFINITIONS(-DROOT_FOUND)
 
 # include directories
 INCLUDE_DIRECTORIES( ./include )
@@ -110,7 +110,7 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 
 # build main TCT-ANALYSIS executable
 add_executable(tct-analysis  src/main.cxx )
-target_link_libraries(tct-analysis ${PROJECT_NAME}) # include later maybe: ${ROOT_LIBRARIES}
+target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES}) # include later maybe: ${ROOT_LIBRARIES}
 # now set up the installation directory
 INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
   RUNTIME DESTINATION bin
