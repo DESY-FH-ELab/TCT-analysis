@@ -23,20 +23,20 @@ namespace TCT {
 	class sample {
 
 	private :
-		std::string _sampleID;	// identifier for sample
-		std::string _folder;	// folder where data from the sample is stored
+		std::string _SampleID;	// identifier for sample
+		std::string _Folder;	// folder where data from the sample is stored
 		//std::string _file;	// all measurement files belong to measurement class, not to sample class
-		double _thickness;
-		void SetThickness(double thickness){ _thickness = thickness;}
+		double _Thickness;
+		void SetThickness(double thickness){ _Thickness = thickness;}
 
 
 	public :
 
 		// the empty constructor sets a dummy strong and a dummy thickness
 		sample() : 
-		_sampleID("DummyString"),
-		_thickness(-1){
-		}
+			_SampleID("DummyString"),
+			_Thickness(-1)
+		{}
 
 		// Default copy constructer should be fine
 		sample(const sample &)               = default;
@@ -45,11 +45,11 @@ namespace TCT {
 		// Dectructor
 		~sample() = default;
 
-		double & GetThickness(){ return _thickness;}
-		const double & GetThickness() const{ return _thickness;}
+		double & Thickness(){ return _Thickness;}
+		const double & Thickness() const{ return _Thickness;}
 
-		std::string & sampleID() {return _sampleID;}
-		const std::string & sampleID() const {return _sampleID;}
+		std::string & SampleID() {return _SampleID;}
+		const std::string & SampleID() const {return _SampleID;}
 
 		void ReadSampleCard(std::string folder);
 	};
@@ -57,7 +57,7 @@ namespace TCT {
 }
 
 inline std::ostream & operator << (std::ostream & os, const TCT::sample & sam) {
-	return os 	<< "\n This sample is called " << sam.sampleID()
-			<< "\n   - thickness = " << sam.GetThickness() << std::endl;
+	return os 	<< "\n This sample is called \n" << sam.SampleID()
+			<< "   - thickness = " << sam.Thickness() << std::endl;
 }
 #endif
