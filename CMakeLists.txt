@@ -104,6 +104,8 @@ INCLUDE_DIRECTORIES( ./include )
 # CORE LIBRARY:
 SET(LIB_SOURCE_FILES
   "src/sample.cc"
+  "src/acquisition.cc"
+  "src/measurement.cc"
   )
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 
