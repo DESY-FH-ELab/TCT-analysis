@@ -48,8 +48,8 @@ int main(int argc, char **argv)
   c->Update();
    */
 
-  std::string DataFolder = "/home/hjansen/Diamond/data/S57/295k/500V/";
-  std::string OutFolder = "/home/hjansen/Diamond/results";
+  std::string DataFolder = "/home/hjansen/TCT/TCT-analysis/testdata/S57/295K/500V/";
+  std::string OutFolder = "/home/hjansen/TCT/TCT-analysis/results";
   std::string SensorFolder = "/home/hjansen/Sensors/testSensor/";
 
   TCT::sample dummyDUT2(SensorFolder);       // define DUT
