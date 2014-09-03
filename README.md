@@ -1,4 +1,5 @@
 Content:
+=======
 
 1 - Requirements
 
@@ -9,12 +10,13 @@ Content:
 
 
 1. Requirements
+---------------
 
 Minimal requirements are: a C++11 compliant compiler, ROOT v5.x, and CMake 2.8.x.
 
 
-
 2. Installation instructions
+----------------------------
 
   * Install CMake.
   * Install ROOT. 
@@ -32,7 +34,7 @@ The program assumes the following folder structure for the data files to be read
 
 The program assumes the following folder structure for the results to be written:
 `<path-to-results>`
-here, a subfolder structure is created: <sample-name>/<temperature>/<root-file.root>
+here, a subfolder structure is created: `<sample-name>/<temperature>/<root-file.root>`
 
 Look at the header of the sample files included in the repository.
 If your headers differ from that, change the Read() method in acquisition.cc accordingly
@@ -46,6 +48,7 @@ or if executed from /TCT-analysis/build
 
 
 3. Test files, Test Sensor data
+-------------------------------
 
 The test data files are located at .../TCT-analysis/testdata/S57/295K/500V/.
 The test sensor files are located at .../TCT-analysis/testsensor/.
