@@ -2,7 +2,7 @@ Content:
 
 0 - Requirements
 1 - Installation instructions
-2 - Test files
+2 - Test files, Test sensor data
 
 
 
@@ -39,11 +39,16 @@ Look at the header of the sample files included in the repository.
 If your headers differ from that, change the Read() method in acquisition.cc accordingly
 
 Execute the binary:
-> ./tct-analysis
+> ./tct-analysis -r <path-to-project-directory>
+e.g.
+> ./tct-analysis -r /home/<user>/<my-path>/TCT-analysis/
+or if executed from /TCT-analysis/build
+> ./tct-analysis -r ..
 
 
 
-2 - Test files
+2 - Test files, Test Sensor data
 
-The test data files are located at ../TCT-analysis/testdata/S57/295K/500V/.
+The test data files are located at .../TCT-analysis/testdata/S57/295K/500V/.
+The test sensor files are located at .../TCT-analysis/testsensor/.
 

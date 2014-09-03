@@ -26,12 +26,10 @@
 //using namespace TCT; // namespace of TCT_analysis is "TCT"
 //using namespace std;
 
-int main(int argc, char **argv)
+int main(int argc, char* argv[])
 {
   std::cout << "This is " << PACKAGE_NAME << " version " << PACKAGE_VERSION << std::endl;
 
-  //std::regex e("[0-9]");
-  std::smatch sm; std::regex e ("(sub)(.*)");
   /*
   //TApplication theApp("App", 0, 0);
   TCanvas* c;  
@@ -46,14 +44,36 @@ int main(int argc, char **argv)
 
   c->Modified();
   c->Update();
-   */
+  */
 
-  std::string DataFolder = "/home/hjansen/TCT/TCT-analysis/testdata/S57/295K/500V/";
-  std::string OutFolder = "/home/hjansen/TCT/TCT-analysis/results";
-  std::string SensorFolder = "/home/hjansen/Sensors/testSensor/";
+  if(argc == 1){
+    std::cout << " No root folder specified. Please execute with path to projcet: > ./tct-analysis -r /home/<user>/<my-path>/TCT-analysis/" << std::endl;
+    return 1;
+  }
+
+  std::string proj_folder;
+  for (int i = 1; i < argc; i++) {
+    // Setting number of expected ROCs:
+    if (!strcmp(argv[i],"-r")) {
+      //std::cout << argv[++i] << std::endl;
+      proj_folder = argv[++i];
+      std::cout << "Root folder of TCT project is " << proj_folder << std::endl;
+    }
+    // Maximum events:
+    /*if (!strcmp(argv[i],"-e")) {
+      max_events = atoi(argv[++i]);
+      std::cout << "Decoding a maximum number of " << max_events << "
+	events." << std::endl;
+    }*/
+  }
+
+
+  std::string DataFolder	= proj_folder + "/testdata/S57/295K/500V/";
+  std::string OutFolder		= proj_folder + "/results";
+  std::string SensorFolder	= proj_folder + "/testSensor";
 
   TCT::sample dummyDUT2(SensorFolder);       // define DUT
-  std::cout << dummyDUT2 << std::endl;	// print basic parameters of the sample
+  //std::cout << dummyDUT2 << std::endl;	// print basic parameters of the sample
   dummyDUT2.ReadSampleCard();	// read SampleCard and set parameters accordingly
 
   std::string sampleID = "S57";
