@@ -5,6 +5,7 @@
 
 //  includes from standard libraries
 #include <iostream>
+#include <regex>
 
 //  includes from TCT classes
 #include "sample.h"
@@ -29,7 +30,8 @@ int main(int argc, char **argv)
 {
   std::cout << "This is " << PACKAGE_NAME << " version " << PACKAGE_VERSION << std::endl;
 
-
+  //std::regex e("[0-9]");
+  std::smatch sm; std::regex e ("(sub)(.*)");
   /*
   //TApplication theApp("App", 0, 0);
   TCanvas* c;  
@@ -44,50 +46,58 @@ int main(int argc, char **argv)
 
   c->Modified();
   c->Update();
-  */
+   */
 
-  // !! for all file : 	AllTests->Add((BMTest *)pulse);	create vector of acqs
-
-  std::string MeasFolder = "/home/hjansen/Diamond/data/S57/295k/500V/";
+  std::string DataFolder = "/home/hjansen/Diamond/data/S57/295k/500V/";
+  std::string OutFolder = "/home/hjansen/Diamond/results";
   std::string SensorFolder = "/home/hjansen/Sensors/testSensor/";
 
-  TCT::sample dummyDUT;       // define DUT
   TCT::sample dummyDUT2(SensorFolder);       // define DUT
   std::cout << dummyDUT2 << std::endl;	// print basic parameters of the sample
   dummyDUT2.ReadSampleCard();	// read SampleCard and set parameters accordingly
 
-  std::string sampleID = "DummySample1";
+  std::string sampleID = "S57";
   dummyDUT2.SetSampleID(sampleID); 
   std::cout << dummyDUT2 << std::endl;
 
-  TCT::acquisition_single acq0; 
-  acq0.SetBiasVolt(600.);
-  std::cout << acq0.BiasVolt() << std::endl;
-
   std::vector<TCT::acquisition_single> AllAcqs;
-  //AllAcqs.push_back(acq0);
-  
-  //for (uint32_t i = 0; i < 4; i++{
-  //  AllAcqs.push_back()
- // }
-  // analyser
-  //TCT::vdrift_ana vdrift;
+
 
   //TCT::param param;
 
-  TCT::measurement meas(MeasFolder);
+  TCT::measurement meas(DataFolder, OutFolder);
   std::cout << meas << std::endl;
 
-  meas.AcqsLoader(AllAcqs);//, 4); // change to take parameter from param
+  if(!meas.AcqsLoader(&AllAcqs)) return 1;//, 4); // change to take parameter from param
+  // !! analyser functions belong to measurement class a.t.m., disentangle ?
 
+  // now create instance of avg acquisition using Nsamples from loaded files
+  TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
 
+  //now analysis all acquisitions
+  int Nselected = 0;
+  std::cout << AllAcqs.size() << std::endl;
+  for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
+    std::cout << " - Start with Acq #" << i_acq << std::endl;
 
-  // print out method for analysers?!
-  //std::cout << "dummy" << std::endl;
+    TCT::acquisition_single acq = AllAcqs[i_acq];
+    std::cout << acq << std::endl;
+
+    meas.AcqsAnalyser(&acq, i_acq, &AcqAvg);
+    if( meas.AcqsSelecter(&acq) ) Nselected++;
+    meas.AcqsProfileFiller(&acq, &AcqAvg);
+
+  }
+
+  meas.AcqsWriter(&dummyDUT2, &AllAcqs, &AcqAvg);
+
+  std::cout << "Nselected = " << Nselected << std::endl;
+  std::cout << "ratio of selected acqs = " << (float)Nselected/AllAcqs.size()*100. << "%" << std::endl;
+
 
 
   //theApp.Run(kTRUE); 
-  char key = getchar();
+  //char key = getchar();
 
   std::cout << "end " << PACKAGE_NAME << std::endl;
   //theApp.Terminate();

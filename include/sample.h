@@ -24,10 +24,9 @@ namespace TCT {
 
 	private :
 		std::string _SampleID;	// identifier for sample
-		std::string _Folder;	// folder where data from the sample is stored
+		std::string _Folder;	// folder where data (property, not measurement of the sample is stored
 		//std::string _file;	// all measurement files belong to measurement class, not to sample class
 		double _Thickness;
-		void SetThickness(double thickness){ _Thickness = thickness;}
 
 
 	public :
@@ -35,6 +34,12 @@ namespace TCT {
 		// the empty constructor sets a dummy strong and a dummy thickness
 		sample() : 
 			_SampleID("DummyString"),
+			_Thickness(-1)
+		{}
+
+
+		sample(std::string folder) : 
+			_Folder(folder),
 			_Thickness(-1)
 		{}
 
@@ -51,13 +56,22 @@ namespace TCT {
 		std::string & SampleID() {return _SampleID;}
 		const std::string & SampleID() const {return _SampleID;}
 
-		void ReadSampleCard(std::string folder);
+		void SetThickness(double thick) { _Thickness = thick;}
+		void SetSampleID(std::string sampleID) { _SampleID = sampleID;}
+
+
+		void SetFolder(std::string folder) {_Folder = folder;}
+		std::string & Folder() { return _Folder;}
+		const std::string & Folder() const { return _Folder;}
+
+		void ReadSampleCard();
 	};
 
 }
 
 inline std::ostream & operator << (std::ostream & os, const TCT::sample & sam) {
-	return os 	<< "\n This sample is called \n" << sam.SampleID()
-			<< "   - thickness = " << sam.Thickness() << std::endl;
+	return os 	<< "\n This sample is called " << sam.SampleID()
+			<< "\n   - SampleCardFolder = " << sam.Folder() 
+			<< "\n   - thickness = " << sam.Thickness() << std::endl;
 }
 #endif

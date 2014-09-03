@@ -9,11 +9,17 @@
 
 namespace TCT {
 
-	void sample::ReadSampleCard(std::string folder){
-	
-	//read file from folder, fill thickness, effective doping etc
-		
-		std::cout << "reading SampleCard from " << folder << std::endl;
-		_Thickness = 500.0;
-	}
+  void sample::ReadSampleCard(){
+
+    //read file from folder. fill name, thickness, effective doping etc
+
+    std::cout << "reading SampleCard from " << _Folder << std::endl;
+    double thick = 320.; // rad this from card
+    SetThickness(thick);
+
+    std::string sampleID = "DummySample1"; // read this from card
+    SetSampleID(sampleID); 
+  }
+
+
 }

@@ -22,10 +22,12 @@ namespace TCT {
 			float _S2nRef;
 			float _S2nCut;
 
+			float _Polarity;
+
 		public :
 
 			param() :
-				_MaxAcqs(300),
+				_MaxAcqs(4),
 				_MaxPulses(10),
 				_S2nRef(2),
 				_S2nCut(3)
@@ -36,28 +38,33 @@ namespace TCT {
 			// Dectructor
 			~param() = default;
 
-			uint32_t & GetMaxAcqs(){ return _MaxAcqs;}
-			const uint32_t & GetMaxAcqs() const { return _MaxAcqs;}
+			uint32_t & MaxAcqs(){ return _MaxAcqs;}
+			const uint32_t & MaxAcqs() const { return _MaxAcqs;}
 
-			uint32_t & GetMaxPulses(){ return _MaxPulses;}
-			const uint32_t & GetMaxPulses() const { return _MaxPulses;}
+			uint32_t & MaxPulses(){ return _MaxPulses;}
+			const uint32_t & MaxPulses() const { return _MaxPulses;}
 
-			float & GetS2nRef(){ return _S2nRef;}
-			const float & GetS2nRef() const { return _S2nRef;}
+			float & S2nRef(){ return _S2nRef;}
+			const float & S2nRef() const { return _S2nRef;}
 			
-			float & GetS2nCut(){ return _S2nCut;}
-			const float & GetS2nCut() const { return _S2nCut;}
-			
+			float & S2nCut(){ return _S2nCut;}
+			const float & S2nCut() const { return _S2nCut;}
+
+			float & Polarity(){ return _Polarity;}
+			const float & Polarity() const { return _Polarity;}		
+
+			//float & (){ return _;}
+			//const float & () const { return _;}		
 
 		};
 }
 
 inline std::ostream & operator << (std::ostream & os, const TCT::param & param) {
 	return os	<< "\n List of parameters \n"
-			<< " MaxAcqs = " 	<< param.GetMaxAcqs()
-			<< " MaxPulses = " 	<< param.GetMaxPulses()
-			<< " S2nRef = " 	<< param.GetS2nRef()
-			<< " S2nCut = " 	<< param.GetS2nCut() << std::endl;
+			<< " MaxAcqs = " 	<< param.MaxAcqs()
+			<< " MaxPulses = " 	<< param.MaxPulses()
+			<< " S2nRef = " 	<< param.S2nRef()
+			<< " S2nCut = " 	<< param.S2nCut() << std::endl;
 
 }
 #endif
