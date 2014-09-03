@@ -64,6 +64,7 @@ namespace TCT {
 	if (nfiles > MaxAcqs && MaxAcqs > 0) break;
       }
     }
+    gSystem->FreeDirectory(dir);
     //std::cout << "end read in" << std::endl;
     //char key = getchar();
 
@@ -219,9 +220,18 @@ namespace TCT {
   std::string outtemp = std::to_string((int)acqAvg->Temp());
   std::string outvolt = std::to_string((int)acqAvg->BiasVolt());
 
-  std::string filename = outfolder + "/" + outsample + "/" + outtemp + "K/" + outsample + "_" + outtemp + "K_" + outvolt + "V.root";
-  std::cout << "\n *** outfile written to: " << filename << " *** " << std::endl;
-  TFile* hfile = new TFile(filename.c_str(),"RECREATE","TCTanalyser");
+
+  std::string outpath  = outfolder + "/" + outsample + "/" + outtemp + "K";
+  std::string outpath1 = outfolder + "/" + outsample + "/";
+  std::string pathandfilename = outpath  + "/" + outsample + "_" + outtemp + "K_" + outvolt + "V.root";
+
+  gSystem->MakeDirectory(outpath1.c_str());
+  //if(gSystem->MakeDirectory(outpath.c_str()) == -1) std::cout << "couldnt create directory" << std::endl;
+  gSystem->MakeDirectory(outpath.c_str());
+
+  std::cout << "\n *** outfile written to: " << pathandfilename << " *** " << std::endl;
+
+  TFile* hfile = new TFile(pathandfilename.c_str(),"RECREATE","TCTanalyser");
 
   hfile->cd();
   acqAvg->N_tuple()->Write();
@@ -239,8 +249,8 @@ namespace TCT {
 
   hfile->Close();
   std::cout << "end AcqsWriter" << std::endl;
-  return;
 
+  return;
 
   }
 }
