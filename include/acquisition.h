@@ -40,6 +40,7 @@ namespace TCT {
       float _Temp;	// in K
       float _BiasVolt;	// in Volt
       float _SampleInterval;	// in ns
+      float _PrePulseInterval;	// in ns. !! By how much should be translated can be inferred from Delay(), or from the trigger position written in the scope header
 
     public :
     
@@ -49,7 +50,8 @@ namespace TCT {
 	_Nsamples(-1),
 	_Nsamples_start(10),
 	_Nsamples_end(10),
-	_SampleInterval(0.1)
+	_SampleInterval(0.1),
+	_PrePulseInterval(20.)
     {};
 
       /*acquisition_base(float bias) :
@@ -67,7 +69,8 @@ namespace TCT {
 	_Nsamples(nsamples),
 	_Nsamples_start(50),
 	_Nsamples_end(50),
-	_SampleInterval(0.1)
+	_SampleInterval(0.1),
+	_PrePulseInterval(20.)
     {};   
 
       // Default copy constructer should be fine
@@ -92,8 +95,13 @@ namespace TCT {
       uint32_t & Nsamples_end(){ return _Nsamples_end;}
       const uint32_t & Nsamples_end() const{ return _Nsamples_end;}
 
-      float & SampleInterval(){ return _SampleInterval;}
+      float SampleInterval(){ return _SampleInterval;}
+      void SetSampleInterval(float interval){ _SampleInterval = interval;}
       const float & SampleInterval() const{ return _SampleInterval;}
+
+      float PrePulseInterval(){ return _PrePulseInterval;}
+      void SetPrePulseInterval(float interval){ _PrePulseInterval = interval;}
+      const float & PrePulseInterval() const{ return _PrePulseInterval;}
 
       std::vector<double> volt; // encapsulate ??
       std::vector<double> time;
@@ -144,9 +152,9 @@ namespace TCT {
 	  _G_s2n_evo->SetNameTitle("S2Noise Evolution","S2Noise Evolution");
 	  _G_s2n_evo->SetMarkerStyle(2);
 	  _N_tuple 	= new TNtuple("ntuple","pulse ntuple","rise:rise1090:fall:width:delay:delayfilt:ampl:avg:s2nval");
-	  _H2_acqs2D 	= new TH2F("acqs2D","acqs2D", Nsamples(), -SampleInterval()*0.5, (Nsamples()-1-0.5)*SampleInterval(), 560, -1., 1.); // ?? 560 is what?
-	  _Profile 	= new TProfile("avgAcq","avgAcq",Nsamples(), -SampleInterval()*0.5, (Nsamples()-1-0.5)*SampleInterval(),-1,1," ");
-	  _ProfileFILTERED = new TProfile("avgAcq_f","avgAcq_f",Nsamples(), -SampleInterval()*0.5, (Nsamples()-1-0.5)*SampleInterval(),-1,1," ");
+	  _H2_acqs2D 	= new TH2F("acqs2D","acqs2D", Nsamples(), -SampleInterval()*0.5-PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval(), 560, -1., 1.); // ?? 560 is what?
+	  _Profile 	= new TProfile("avgAcq","avgAcq",Nsamples(), -SampleInterval()*0.5-PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval(),-1,1," ");
+	  _ProfileFILTERED = new TProfile("avgAcq_f","avgAcq_f",Nsamples(), -SampleInterval()*0.5-PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval(),-1,1," ");
 	  _H2_delay_width = new TH2F("delay_width","delay_width",120,0,120,100,0,50);
 	  _H2_ampl_width  = new TH2F("ampl_width","ampl_width",100,0,0.4,100,0,50);
 	  _H2_delay_ampl  = new TH2F("delay_ampl","delay_ampl",120,0,120,100,0,0.4);

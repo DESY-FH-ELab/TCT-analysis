@@ -69,10 +69,8 @@ namespace TCT {
 
     SetName("SingleAcq");
     //     pulse->Print();
-    //AllTests->Add((BMTest *)pulse);	 	 
 
 
-    //std::cout << "->return " << std::endl;
     return kTRUE;
   }
 
@@ -397,6 +395,7 @@ namespace TCT {
       if ( i >  (int)((Delay() + 2.*Width() + 2.)*10.)) if (volt[i] > Amplposlate() ) SetAmplposlate((volt[i]+volt[i+1]+volt[i-1]+volt[i+2]+volt[i-2]-5.*Offset())/5.);
       //std::cout << s2n << "	";
     } 
+
 
     return;
   }

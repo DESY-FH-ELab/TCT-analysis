@@ -4,12 +4,14 @@
  */
 
 #include<string>
+#include <list>
+
 #include "measurement.h"
 #include "acquisition.h"
-#include "TFile.h"
 
 //  includes from ROOT libraries
 #include "TSystem.h"
+#include "TFile.h"
 
 namespace TCT {
 
@@ -68,7 +70,7 @@ namespace TCT {
     //std::cout << "end read in" << std::endl;
     //char key = getchar();
 
-    
+
 
     if(nfiles == 0) { 
       std::cout << " no files read, exiting..." << std::endl; return false;
@@ -94,6 +96,7 @@ namespace TCT {
 
     std::cout << "SF" << std::endl;
     acq->SignalFinder(acqAvg);
+    std::cout << " HERE " << *acq << std::endl;
 
     std::cout << "FillNt" << std::endl;
     acq->FillNtuple(acqAvg); // !! this is w/o selection cuts
@@ -105,9 +108,9 @@ namespace TCT {
     // amount of delayfilt depends on steepness, hence needs shifting now
 
     /*float meanfilt = 0.;
-    for(Int_t i = 0; i<300; i++){
-      //cout << ",  " << hProffilt->GetBinContent(i);
-      meanfilt += hProffilt->GetBinContent(i+1);
+      for(Int_t i = 0; i<300; i++){
+    //cout << ",  " << hProffilt->GetBinContent(i);
+    meanfilt += hProffilt->GetBinContent(i+1);
     }
     meanfilt = meanfilt / 300.;
     cout << "Meanfilt = " << meanfilt << endl;
@@ -123,11 +126,11 @@ namespace TCT {
     float limit = 3.*2*sqrt(30)*noisefilt + meanfilt;
     cout << "limit = " << limit << endl;
     while(hProffilt->GetBinContent(count) + hProffilt->GetBinContent(count+1) + hProffilt->GetBinContent(count+2) < limit){
-      count++;
-      if(count >  1000) {
-	cout <<"problem for hProffilt" <<endl;
-	break;
-      }
+    count++;
+    if(count >  1000) {
+    cout <<"problem for hProffilt" <<endl;
+    break;
+    }
 
     }
     cout << "count = " << count << endl;
@@ -136,23 +139,23 @@ namespace TCT {
 
 
 
-  */
+     */
     return;	
   }
 
   bool measurement::AcqsSelecter(TCT::acquisition_single *acq){
 
     int debug = 10;
-    if (debug > 9) std::cout << " selects acquisition based on certain criteria" << std::endl;
+    if (debug > 9) std::cout << " selects acquisition based on certain criteria\n" << std::endl;
 
     bool select = true;
 
     if(acq->SelectionRan()) return acq->Select();
     else {
-    	if(acq->Noise() > Noise_Cut()) {
-	  select = false;
-	  std::cout << " noise too high: " << acq->Noise() << " Noise cut = " << Noise_Cut() << std::endl;
-	}
+      if(acq->Noise() > Noise_Cut()) {
+	select = false;
+	std::cout << " noise too high: " << acq->Noise() << " Noise cut = " << Noise_Cut() << std::endl;
+      }
     }
 
     acq->SetSelectionRan(true);
@@ -185,72 +188,59 @@ namespace TCT {
 
   void measurement::AcqsWriter(TCT::sample *sample, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
 
-  
-
-  // write results
-  //string outhelp;
-
-  //string outfolder = folder; 
-
-  //std::cout << "size " <<   filedirstring.size() << std::endl;
-  //string str1 = filedirstring.substr(0,filedirstring.size()-1);
-  //string outvolt = str1.substr(str1.rfind("/")+1);
-  //std::cout << outvolt << std::endl;
-  //string outvolt = std::to_string(BiasVolt());
-
-  //string str2 = str1.substr(0,str1.rfind("/"));
-  //string outtemp = str2.substr(str2.rfind("/")+1);
-  //std::cout << outtemp << std::endl;
-  //string outtemp = std::to_string(Temp());
-
-  //string sample = "S57_23";
-
-  //outhelp = outfolder + "/" + sample + "/" + outtemp + "/" + sample + "_" + outtemp + "_" + outvolt + ".root";
-  //std::cout << "outfile name: " << outhelp << std::endl;
+    std::string outfolder = OutFolder(); 
+    std::string outsample = sample->SampleID();
+    std::string outtemp = std::to_string((int)acqAvg->Temp());
+    std::string outvolt = std::to_string((int)acqAvg->BiasVolt());
 
 
-  //WriteRoot(sdt::string folder, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg); // ?? Does this make sense? Or call WriteRoot from main directly?
+    std::string outpath  = outfolder + "/" + outsample + "/" + outtemp + "K";
+    std::string outpath1 = outfolder + "/" + outsample + "/";
+    std::string pathandfilename = outpath  + "/" + outsample + "_" + outtemp + "K_" + outvolt + "V.root";
 
-  //if(nvolt > 1 || ntemp > 1){
-  //std::cout << "		clearing root" << std::endl;
-  //ClearRoot();
+    gSystem->MakeDirectory(outpath1.c_str());
+    //if(gSystem->MakeDirectory(outpath.c_str()) == -1) std::cout << "couldnt create directory" << std::endl;
+    gSystem->MakeDirectory(outpath.c_str());
 
-  std::string outfolder = OutFolder(); 
-  std::string outsample = sample->SampleID();
-  std::string outtemp = std::to_string((int)acqAvg->Temp());
-  std::string outvolt = std::to_string((int)acqAvg->BiasVolt());
+    std::cout << "\n *** outfile written to: " << pathandfilename << " *** " << std::endl;
+
+    TFile* f_rootfile = new TFile(pathandfilename.c_str(),"RECREATE","TCTanalyser");
+
+    f_rootfile->cd();
+    acqAvg->N_tuple()->Write();
+    acqAvg->H2_acqs2D()->Write();
+    acqAvg->Profile()->Write();
+    //acqAvg->ProfileFILTERED()->Write();
+    acqAvg->H2_delay_width()->Write();
+    acqAvg->H2_ampl_width()->Write();
+    acqAvg->H2_delay_ampl()->Write();
+    acqAvg->H2_rise1090_ampl()->Write();
+    acqAvg->H_noise()->Write();
+    acqAvg->G_noise_evo()->Write();
+    acqAvg->G_s2n_evo()->Write();
+
+    // now write the single pulses into the file !! add option -save_all for switch
+    f_rootfile->mkdir("single_acqs");
+    f_rootfile->cd("single_acqs");
+
+    //std::cout << allAcqs->at(0) << std::endl;
+    for(uint32_t i_acq = 0; i_acq < allAcqs->size(); i_acq++){
+
+      TCT::acquisition_single* acq = &allAcqs->at(i_acq);
+      acq->Hacq()->Write();
+
+      //std::cout << *acq << std::endl;
 
 
-  std::string outpath  = outfolder + "/" + outsample + "/" + outtemp + "K";
-  std::string outpath1 = outfolder + "/" + outsample + "/";
-  std::string pathandfilename = outpath  + "/" + outsample + "_" + outtemp + "K_" + outvolt + "V.root";
+    }
+    //for ( TCT::acquisition_single acq : &allAcqs) {
+    //  std::cout << acq << std::endl;
+    //}
 
-  gSystem->MakeDirectory(outpath1.c_str());
-  //if(gSystem->MakeDirectory(outpath.c_str()) == -1) std::cout << "couldnt create directory" << std::endl;
-  gSystem->MakeDirectory(outpath.c_str());
+    f_rootfile->Close();
+    std::cout << "end AcqsWriter" << std::endl;
 
-  std::cout << "\n *** outfile written to: " << pathandfilename << " *** " << std::endl;
-
-  TFile* hfile = new TFile(pathandfilename.c_str(),"RECREATE","TCTanalyser");
-
-  hfile->cd();
-  acqAvg->N_tuple()->Write();
-  acqAvg->H2_acqs2D()->Write();
-  acqAvg->Profile()->Write();
-  //acqAvg->ProfileFILTERED()->Write();
-  acqAvg->H2_delay_width()->Write();
-  acqAvg->H2_ampl_width()->Write();
-  acqAvg->H2_delay_ampl()->Write();
-  acqAvg->H2_rise1090_ampl()->Write();
-  acqAvg->H_noise()->Write();
-  acqAvg->G_noise_evo()->Write();
-  acqAvg->G_s2n_evo()->Write();
-  
-
-  hfile->Close();
-  std::cout << "end AcqsWriter" << std::endl;
-
-  return;
+    return;
 
   }
 }

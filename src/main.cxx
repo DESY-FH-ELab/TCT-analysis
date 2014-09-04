@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
   c->Modified();
   c->Update();
-  */
+   */
 
   if(argc == 1){
     std::cout << " No root folder specified. Please execute with path to projcet: > ./tct-analysis -r /home/<user>/<my-path>/TCT-analysis/" << std::endl;
@@ -63,8 +63,8 @@ int main(int argc, char* argv[])
     /*if (!strcmp(argv[i],"-e")) {
       max_events = atoi(argv[++i]);
       std::cout << "Decoding a maximum number of " << max_events << "
-	events." << std::endl;
-    }*/
+      events." << std::endl;
+      }*/
   }
 
 
@@ -100,15 +100,24 @@ int main(int argc, char* argv[])
   for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
     std::cout << " - Start with Acq #" << i_acq << std::endl;
 
-    TCT::acquisition_single acq = AllAcqs[i_acq];
-    std::cout << acq << std::endl;
+    TCT::acquisition_single* acq = &AllAcqs[i_acq];
 
-    meas.AcqsAnalyser(&acq, i_acq, &AcqAvg);
-    if( meas.AcqsSelecter(&acq) ) Nselected++;
-    meas.AcqsProfileFiller(&acq, &AcqAvg);
+    meas.AcqsAnalyser(acq, i_acq, &AcqAvg);
+    std::cout << *acq << std::endl;
+
+    if( meas.AcqsSelecter(acq) ) Nselected++;
+    meas.AcqsProfileFiller(acq, &AcqAvg);
 
   }
 
+  /*std::cout << AllAcqs.size() << std::endl;
+  for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
+    std::cout << " - Start with Acq #" << i_acq << std::endl;
+
+    acq = AllAcqs[i_acq];
+    std::cout << acq << std::endl;
+
+  }*/
   meas.AcqsWriter(&dummyDUT2, &AllAcqs, &AcqAvg);
 
   std::cout << "Nselected = " << Nselected << std::endl;
