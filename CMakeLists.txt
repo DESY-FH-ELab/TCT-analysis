@@ -7,7 +7,7 @@ PROJECT( TCTAnalysis )
 # project version
 SET( TCTANALYSIS_VERSION_MAJOR 0 )
 SET( TCTANALYSIS_VERSION_MINOR 1 )
-SET( TCTANALYSIS_VERSION_PATCH 0 )
+SET( TCTANALYSIS_VERSION_PATCH 1 )
 
 # some macros are redefined to keep compatability with CMake 2.6
 include(${PROJECT_SOURCE_DIR}/cmake/CMakeCompatibility.cmake)
@@ -34,7 +34,7 @@ IF(NOT SOURCE_PACKAGE)
       STRING(REGEX REPLACE "\n" "" TCTANALYSIS_LIB_VERSION ${TCTANALYSIS_LIB_VERSION}) # remove potential line breaks
       STRING(REGEX REPLACE "v([v0-9.]+)(.*)" "\\1" TCTANALYSIS_LIB_BASEVERSION ${TCTANALYSIS_LIB_VERSION})
       IF("${TCTANALYSIS_LIB_BASEVERSION}" VERSION_LESS "${TCTANALYSIS_VERSION_MAJOR}.${TCTANALYSIS_VERSION_MINOR}.${TCTANALYSIS_VERSION_PATCH}")
-	MESSAGE(WARNING "Your do not seem to have fetched the latest tags in your git repository -- please consider running 'git fetch' for the main remote repository.")
+	MESSAGE(WARNING "You do not seem to have fetched the latest tags in your git repository -- please consider running 'git fetch' for the main remote repository.")
       ENDIF("${TCTANALYSIS_LIB_BASEVERSION}" VERSION_LESS "${TCTANALYSIS_VERSION_MAJOR}.${TCTANALYSIS_VERSION_MINOR}.${TCTANALYSIS_VERSION_PATCH}")
       EXEC_PROGRAM(git ARGS status --porcelain ${CMAKE_CURRENT_SOURCE_DIR}/src OUTPUT_VARIABLE TCTANALYSIS_MAIN_STATUS)
       IF(TCTANALYSIS_MAIN_STATUS STREQUAL "")
@@ -112,7 +112,7 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 
 # build main TCT-ANALYSIS executable
 add_executable(tct-analysis  src/main.cxx )
-target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES}) # include later maybe: ${ROOT_LIBRARIES}
+target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES})
 # now set up the installation directory
 INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
   RUNTIME DESTINATION bin
