@@ -240,7 +240,7 @@ namespace TCT {
 	_Maxamplitude(-1.),
 	_Amplneg(1.),
 	_Amplpos(-1.),
-	_Amplneglate(-1.),
+	_Amplneglate(1.),
 	_Amplposlate(-1.),
 	_Avg(-1.),
 	_Avgshort(-1.),
