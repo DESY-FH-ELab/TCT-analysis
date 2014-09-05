@@ -389,10 +389,10 @@ namespace TCT {
     }
 
     for (Int_t i=0; i<Nsamples()-5; i++){
-      if (i>2 && i < (int)(10*Delay()) ) if (volt[i] < Amplneg() ) SetAmplneg((volt[i]+volt[i+1]+volt[i-1])/3.);
-      if (i>2 && i < (int)(10*Delay()) ) if (volt[i] > Amplpos() ) SetAmplpos((volt[i]+volt[i+1]+volt[i-1])/3.);
-      if ( i >  (int)((Delay() + 2.*Width() + 2.)*10.)) if (volt[i] < Amplneglate() ) SetAmplneglate((volt[i]+volt[i+1]+volt[i-1]+volt[i+2]+volt[i-2])/5.);
-      if ( i >  (int)((Delay() + 2.*Width() + 2.)*10.)) if (volt[i] > Amplposlate() ) SetAmplposlate((volt[i]+volt[i+1]+volt[i-1]+volt[i+2]+volt[i-2]-5.*Offset())/5.);
+      if (i>2 && i < (int)(Delay()/SampleInterval()) ) if (volt[i] < Amplneg() ) SetAmplneg((volt[i]+volt[i+1]+volt[i-1])/3.);
+      if (i>2 && i < (int)(Delay()/SampleInterval()) ) if (volt[i] > Amplpos() ) SetAmplpos((volt[i]+volt[i+1]+volt[i-1])/3.);
+      if ( i >  (int)((Delay() + 2.*Width() + 2.)/SampleInterval())) if (volt[i] < Amplneglate() ) SetAmplneglate((volt[i]+volt[i+1]+volt[i-1]+volt[i+2]+volt[i-2])/5.);
+      if ( i >  (int)((Delay() + 2.*Width() + 2.)/SampleInterval())) if (volt[i] > Amplposlate() ) SetAmplposlate((volt[i]+volt[i+1]+volt[i-1]+volt[i+2]+volt[i-2]-5.*Offset())/5.);
       //std::cout << s2n << "	";
     } 
 
