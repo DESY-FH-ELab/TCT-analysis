@@ -148,20 +148,62 @@ namespace TCT {
     int debug = 10;
     if (debug > 9) std::cout << " selects acquisition based on certain criteria\n" << std::endl;
 
-    bool select = true;
+    bool ok = true;
 
     if(acq->SelectionRan()) return acq->Select();
     else {
       if(acq->Noise() > Noise_Cut()) {
-	select = false;
-	std::cout << " noise too high: " << acq->Noise() << " Noise cut = " << Noise_Cut() << std::endl;
+	ok = false;
+	std::cout << " acq too noisy: " << acq->Noise() << " Noise cut = " << Noise_Cut() << std::endl;
+      }
+      if (acq->Maxamplitude() < .0) {
+	ok = kFALSE;
+	std::cout << "no pulse found " << std::endl;
+	return ok;
+      }
+      if (acq->Noise_end() > 0.004) {
+	ok = kFALSE;
+	std::cout << "pulse end too noisy -> pick-up" << std::endl;
+	return ok;
+      }
+      /*if (acq->S2nval() < S2N_Cut_select){
+	ok = kFALSE;
+	std::cout << "s2n too small: " << acq->S2nval() << std::endl;
+	return ok;
+      }*/
+      if (acq->Width() < 3.0){
+	if (acq->Width()*acq->Maxamplitude() < 0.15){
+	  ok = kFALSE;
+	  std::cout << "area too small: " << acq->Width()*acq->Maxamplitude()*1000.0 << " mVs" << std::endl;
+	  return ok;
+	}
+      }
+      if (acq->Amplneglate() < -0.02) {
+	ok = kFALSE;
+	std::cout << "pulse had big neg component after pulse" << acq->Amplneglate() <<  std::endl;
+	return ok;
+      }
+      if (acq->Amplposlate() > 0.01) {
+	ok = kFALSE;
+	std::cout << "pulse had big pos component after pulse" << std::endl;
+	return ok;
+      }
+      if (acq->Amplpos() > 0.02) {
+	ok = kFALSE;
+	std::cout << "pulse had big pos component before pulse" << std::endl;
+	return ok;
+      }
+      if (acq->Amplneg() < -0.02) {
+	ok = kFALSE;
+	std::cout << "pulse had big neg component before pulse" << std::endl;
+	return ok;
       }
     }
 
     acq->SetSelectionRan(true);
-    acq->SetSelect(select);
+    acq->SetSelect(ok);
 
-    return select;
+    return ok;
   }
 
   void measurement::AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg) {
