@@ -35,3 +35,6 @@ lib/*
 # ignore OS files
 Thumbs.db
 *.lnk
+
+#ignore certain template files
+src/template.cc
