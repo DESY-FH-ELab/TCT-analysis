@@ -12,7 +12,7 @@ Content:
 1. Requirements
 ---------------
 
-Minimal requirements are: a C++11 compliant compiler, ROOT v5.x, and CMake 2.8.x.
+Minimal requirements are: a C++11 compliant compiler, ROOT v5.x or later (including v6.x), and CMake 2.6.x or later.
 
 
 2. Installation instructions
