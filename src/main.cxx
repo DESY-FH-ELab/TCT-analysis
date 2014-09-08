@@ -6,6 +6,7 @@
 //  includes from standard libraries
 #include <iostream>
 #include <regex>
+#include <fstream>
 
 //  includes from TCT classes
 #include "sample.h"
@@ -13,6 +14,8 @@
 #include "param.h"
 #include "acquisition.h"
 #include "measurement.h"
+#include "util.h"
+#include "analysis.h"
 
 //  includes from ROOT libraries
 #include "TCanvas.h"
@@ -21,14 +24,10 @@
 #include "TSystem.h"
 #include "TApplication.h"
 
-//#inculde "anaylyser.h" // inherits from class sample/measurement?
-
-//using namespace TCT; // namespace of TCT_analysis is "TCT"
-//using namespace std;
 
 int main(int argc, char* argv[])
 {
-  std::cout << "This is " << PACKAGE_NAME << " version " << PACKAGE_VERSION << std::endl;
+  std::cout << "\n  This is " << PACKAGE_NAME << " version " << PACKAGE_VERSION << std::endl;
 
   /*
   //TApplication theApp("App", 0, 0);
@@ -51,14 +50,24 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  TCT::util util;
+
   std::string proj_folder;
   for (int i = 1; i < argc; i++) {
-    // Setting number of expected ROCs:
     if (!strcmp(argv[i],"-r")) {
       //std::cout << argv[++i] << std::endl;
       proj_folder = argv[++i];
       std::cout << "Root folder of TCT project is " << proj_folder << std::endl;
     }
+    if (!strcmp(argv[i],"-af")) {
+      std::cout << argv[++i] << std::endl;
+      std::ifstream ana_file (argv[i]);
+      //ts_file = argv[++i];
+      std::cout << "Analysis file is " << argv[i] << std::endl;
+      util.parse(ana_file);
+    }
+    // !! add check for certain vital options, if not passed, break
+
     // Maximum events:
     /*if (!strcmp(argv[i],"-e")) {
       max_events = atoi(argv[++i]);
@@ -67,9 +76,14 @@ int main(int argc, char* argv[])
       }*/
   }
 
+  TCT::analysis ana(util.ID_val());
+  std::cout << ana << std::endl;
+
+
+
 
   std::string DataFolder	= proj_folder + "/testdata/S57/295K/500V/";
-  std::string OutFolder		= proj_folder + "/results";
+  //std::string OutFolder		= proj_folder + "/results";
   std::string SensorFolder	= proj_folder + "/testSensor";
 
   TCT::sample dummyDUT2(SensorFolder);       // define DUT
@@ -85,7 +99,7 @@ int main(int argc, char* argv[])
 
   //TCT::param param;
 
-  TCT::measurement meas(DataFolder, OutFolder);
+  TCT::measurement meas(DataFolder);
   std::cout << meas << std::endl;
 
   if(!meas.AcqsLoader(&AllAcqs)) return 1;//, 4); // change to take parameter from param
@@ -102,11 +116,11 @@ int main(int argc, char* argv[])
 
     TCT::acquisition_single* acq = &AllAcqs[i_acq];
 
-    meas.AcqsAnalyser(acq, i_acq, &AcqAvg);
+    ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
     std::cout << *acq << std::endl;
 
-    if( meas.AcqsSelecter(acq) ) Nselected++;
-    meas.AcqsProfileFiller(acq, &AcqAvg);
+    if( ana.AcqsSelecter(acq) ) Nselected++;
+    ana.AcqsProfileFiller(acq, &AcqAvg);
 
   }
 
@@ -118,7 +132,7 @@ int main(int argc, char* argv[])
     std::cout << acq << std::endl;
 
   }*/
-  meas.AcqsWriter(&dummyDUT2, &AllAcqs, &AcqAvg);
+  ana.AcqsWriter(&dummyDUT2, &AllAcqs, &AcqAvg);
 
   std::cout << "Nselected = " << Nselected << std::endl;
   std::cout << "ratio of selected acqs = " << (float)Nselected/AllAcqs.size()*100. << "%" << std::endl;
