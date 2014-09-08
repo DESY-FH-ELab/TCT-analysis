@@ -10,7 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-//#include <ifstream>
+#include <fstream>
 #include <stdexcept>
 #include <map>
 
@@ -21,13 +21,15 @@ namespace TCT {
 
   class util {
 
-    //private :
-
-    public:
+    private :
 
       std::map<std::string, std::string> _id_val;
 
+    public:
+
       void parse(std::ifstream & cfgfile); 
+      std::map<std::string, std::string> ID_val() {return _id_val;}
+
   };
 }
 #endif
