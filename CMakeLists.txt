@@ -106,6 +106,8 @@ SET(LIB_SOURCE_FILES
   "src/sample.cc"
   "src/acquisition.cc"
   "src/measurement.cc"
+  "src/util.cc"
+  "src/analysis.cc"
   )
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 
