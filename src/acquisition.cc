@@ -3,8 +3,14 @@
  * \brief Implementation of acquisition methods
  */
 
+// STD includes
 #include<string>
+
+// TCT includes
 #include "acquisition.h"
+#include "analysis.h"
+
+// ROOT includes
 #include "TMath.h" 
 
 namespace TCT {
@@ -187,7 +193,8 @@ namespace TCT {
     return;
   }
 
-  void acquisition_single::SignalFinder(TCT::acquisition_avg *acqAvg){
+  //void acquisition_single::SignalFinder(TCT::acquisition_avg *acqAvg, TCT::analysis ana){
+  void acquisition_single::SignalFinder(TCT::acquisition_avg *acqAvg, float Width_Cut, float Amplitude_Cut){
 
     std::cout << "start SignalFinder() " << std::endl;
 
@@ -255,12 +262,13 @@ namespace TCT {
 
     NFound =0;
 
-    int MinLength = 10; // !! Get MinLength from Analysis class
-    float SigCut = 0.01; // in V, !! Get MinLength from Analysis class
+    //int MinLengthSample = (int)(ana.Width_Cut()/SampleInterval(); // !! Get MinLength from Analysis class
+    //int MinLengthSample = 10; // !! Get MinLength from Analysis class
+    //float SigCut = 0.01; // in V, !! Get MinLength from Analysis class
 
     for (Int_t i=0; i<temp_Found; i++) {
 
-      if ( (temp_end[i]-temp_start[i]) >= MinLength) {
+      if ( (temp_end[i]-temp_start[i]) >= Width_Cut/SampleInterval()) {
 
 	// get amplitude
 	Float_t old_amp = -999;
@@ -274,7 +282,7 @@ namespace TCT {
 	temp_sig[i] = (volt[MaxSigPos-1]+volt[MaxSigPos]+volt[MaxSigPos+1])/3.;
 
 	// check is signal is larger than cut
-	if (temp_sig[i] > SigCut) {
+	if (temp_sig[i] > Amplitude_Cut) {
 	  start[NFound] = temp_start[i]-1;
 	  end[NFound] = temp_end[i];
 	  sig[NFound] = temp_sig[i];

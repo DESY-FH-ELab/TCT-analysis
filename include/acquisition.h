@@ -6,16 +6,19 @@
 #ifndef __ACQUISITION_H__
 #define __ACQUISITION_H__ 1
 
-//#include "laser.h" // not needed, acq doesnt need to know frmo which laser it was produced
-
-// Standard includes
+// STD includes
 #include <iostream>
 #include <vector>
+
+// ROOT includes
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TProfile.h"
 #include "TNtuple.h"
 #include "TGraph.h"
+
+// TCT includes
+//#include "analysis.h"
 
 namespace TCT {
 
@@ -84,15 +87,15 @@ namespace TCT {
       virtual double GetSNR() const = 0;
 
       void SetNsamples(uint32_t nsamples) { _Nsamples = nsamples;}
-      uint32_t & Nsamples(){ return _Nsamples;}
+      uint32_t Nsamples(){ return _Nsamples;}
       const uint32_t & Nsamples() const{ return _Nsamples;}
 
       void SetNsamples_start(uint32_t nsamples) { _Nsamples_start = nsamples;}
-      uint32_t & Nsamples_start(){ return _Nsamples_start;}
+      uint32_t Nsamples_start(){ return _Nsamples_start;}
       const uint32_t & Nsamples_start() const{ return _Nsamples_start;}
 
       void SetNsamples_end(uint32_t nsamples) { _Nsamples_end = nsamples;}
-      uint32_t & Nsamples_end(){ return _Nsamples_end;}
+      uint32_t Nsamples_end(){ return _Nsamples_end;}
       const uint32_t & Nsamples_end() const{ return _Nsamples_end;}
 
       float SampleInterval(){ return _SampleInterval;}
@@ -277,7 +280,7 @@ namespace TCT {
       bool Read(FILE *infile, uint32_t iFile);
       bool Read(FILE *infile, uint32_t iFile, TCT::acquisition_avg *avg); 
       void FillNtuple(TCT::acquisition_avg *avg);
-      void SignalFinder(TCT::acquisition_avg *avg);
+      void SignalFinder(TCT::acquisition_avg *avg, float, float );
       void SignalManipulator();
       void ClearStruct();
       void SetName(std::string name);
