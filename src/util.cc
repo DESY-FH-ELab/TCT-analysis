@@ -32,14 +32,14 @@ namespace TCT {
       }
       else{ cfgfile >> eq >> val;
 
-	//std::cout << "ID: " << id << "   eq: " << eq << "   val: " << val << std::endl;
-	std::cout << "ID: " << id  << "   val: " << val << std::endl;
 	if (eq != "=") throw std::runtime_error("Parse error");
 
 	_id_val[id] = val;
       }
 
     }
+
+    std::cout << "\n identifiers and values from analysis file" << std::endl; 
     for(auto i : _id_val) {
       std::cout << i.first << " " << i.second << " " << "\n";
     }

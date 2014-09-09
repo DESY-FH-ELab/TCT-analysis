@@ -13,7 +13,7 @@ namespace TCT {
 
     //read file from folder. fill name, thickness, effective doping etc
 
-    std::cout << "reading SampleCard from " << _Folder << std::endl;
+    std::cout << "\n reading SampleCard from " << _Folder << std::endl;
     double thick = 320.; // rad this from card
     SetThickness(thick);
 

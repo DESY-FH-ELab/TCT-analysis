@@ -20,9 +20,14 @@ namespace TCT {
     //if(debug) std::cout << "start PulseCheck" << std::endl;
 
     if(MaxAcqs == 0) {
-      std::cout << "MaxAcqs is defaulted to zero, stopping " << std::endl;
+      std::cout << "MaxAcqs is zero, stopping " << std::endl;
       return false;
     }
+    if(MaxAcqs == -1) {
+      std::cout << "MaxAcqs is -1, reading all files " << std::endl;
+    }
+
+    //std::cout << " MaxAcqs = " << MaxAcqs << std:: endl;
 
     const char* filedir = _DataInFolder.c_str(); // !! change to encapsulation 
     /*
@@ -63,7 +68,7 @@ namespace TCT {
 	nfiles++;
 	//std::cout << "nfiles: " << nfiles;
 	allAcqs->push_back(acq);
-	if (nfiles > MaxAcqs && MaxAcqs > 0) break;
+	if (nfiles > MaxAcqs-1) break;
       }
     }
     gSystem->FreeDirectory(dir);
@@ -75,7 +80,7 @@ namespace TCT {
     if(nfiles == 0) { 
       std::cout << " no files read, exiting..." << std::endl; return false;
     } else {
-      std::cout << "Found " << allAcqs->size() << "acquision, proceed with analysis\n" <<std::endl;
+      std::cout << "   -> Found " << allAcqs->size() << " acquisitions, proceed with analysis\n" <<std::endl;
     }
 
     return true;
