@@ -9,6 +9,7 @@
 // TCT includes
 #include "acquisition.h"
 #include "analysis.h"
+//#include "util.h"
 
 // ROOT includes
 #include "TMath.h" 
@@ -17,9 +18,10 @@ namespace TCT {
 
   bool acquisition_single::Read(FILE *infile, uint32_t iFile){
 
-    int debug = 8;
-    // read input file
-    if(debug>9) std::cout << "start reading"  << std::endl;
+    #ifdef DEBUG 
+    std::cout << "start ACQ_single::Read"  << std::endl;
+    #endif
+
 
     int ret=0;
     float t_off=0;
@@ -76,6 +78,10 @@ namespace TCT {
     SetName("SingleAcq");
     //     pulse->Print();
 
+    #ifdef DEBUG 
+    std::cout << "end ACQ_single::Read"  << std::endl;
+    #endif
+
 
     return kTRUE;
   }
@@ -88,7 +94,9 @@ namespace TCT {
 
   void acquisition_single::FillNtuple(TCT::acquisition_avg *acqAvg) {
 
-    std::cout << "start FillNtuple " << std::endl;
+    #ifdef DEBUG 
+    std::cout << "start ACQ_single::FillNtuple " << std::endl;
+    #endif
 
     float par[9];
     par[0] = _Rise;
@@ -101,16 +109,22 @@ namespace TCT {
     par[7] = _Avg;
     par[8] = _S2nval;
 
-    std::cout << "fill ntuple " << std::endl;
     (acqAvg->N_tuple())->Fill(par);
 
-    std::cout << "end FillNtuple " << std::endl;
+    #ifdef DEBUG 
+    std::cout << "end ACQ_single::FillNtuple " << std::endl;
+    #endif
+
     return;
   }
 
   void acquisition_single::GetOffsetNoise(uint32_t iAcq, TCT::acquisition_avg *acqAvg){
 
-    std::cout << "start GON" << std::endl;
+    #ifdef DEBUG 
+    std::cout << "start ACQ_single::GetOffsetNoise " << std::endl;
+    #endif
+
+    //if(debug > 0) std::cout << "start GON" << std::endl;
     //std:: cout << Nsamples() << std::endl;
     //std:: cout << Nsamples_start() << std::endl;
     //std:: cout << Nsamples_end() << std::endl;
@@ -157,18 +171,27 @@ namespace TCT {
     (acqAvg->G_noise_evo())->SetPoint(iAcq,iAcq,Noise());
     // std::cout << "Noise: " << Noise << std::endl;
 
+    #ifdef DEBUG 
+
     std::cout 	<< "Offset = " << Offset()
     		<< "Noise = "  << Noise()
     		<< "Offset_end = " << Offset_end()
     		<< "Noise_end = "  << Noise_end() <<
     std::endl;
+    #endif
 
-    std::cout << "GON - return " << std::endl;
+    #ifdef DEBUG 
+    std::cout << "end ACQ_single::GetOffsetNoise " << std::endl;
+    #endif
     return;
 
   }
 
   void acquisition_single::FillHacqs(){
+
+    #ifdef DEBUG 
+    std::cout << "start ACQ_single::FillHacqs " << std::endl;
+    #endif
 
     for (Int_t j=0; j< Nsamples(); j++) (Hacq())->SetBinContent(j+1, volt[j] - Offset());
     for (Int_t j=0; j< Nsamples(); j++) {
@@ -180,23 +203,36 @@ namespace TCT {
 	(HacqFILTERED())->SetBinContent(j+1, (Hacq())->GetBinContent(j+1));
     }
 
+    #ifdef DEBUG 
+    std::cout << "start ACQ_single::FillHacqs " << std::endl;
+    #endif
+
     return;
   }
 
   void acquisition_single::Fill2DHistos(TCT::acquisition_avg *acqAvg){
+
+    #ifdef DEBUG 
+    std::cout << "start ACQ_single::Fill2DHistos " << std::endl;
+    #endif
 
     (acqAvg->H2_delay_width())	->Fill(Delay(), Width());
     (acqAvg->H2_ampl_width())	->Fill(Maxamplitude(), Width());
     (acqAvg->H2_delay_ampl())	->Fill(Delay(), Maxamplitude());
     (acqAvg->H2_rise1090_ampl())	->Fill(Rise1090(), Maxamplitude());
 
+    #ifdef DEBUG 
+    std::cout << "end ACQ_single::Fill2DHistos " << std::endl;
+    #endif
+
     return;
   }
 
-  //void acquisition_single::SignalFinder(TCT::acquisition_avg *acqAvg, TCT::analysis ana){
   void acquisition_single::SignalFinder(TCT::acquisition_avg *acqAvg, float Width_Cut, float Amplitude_Cut){
 
-    std::cout << "start SignalFinder() " << std::endl;
+    #ifdef DEBUG 
+    std::cout << "start ACQ_single::SignalFinder " << std::endl;
+    #endif
 
     Float_t s2n[Nsamples()];
     Int_t temp_start[1000];
@@ -306,10 +342,18 @@ namespace TCT {
       }   
     }
 
+
+    #ifdef DEBUG 
+    std::cout << "Numner of pulses found in acquisition = " << NFound << std::endl;
+    #endif
+
     if (NFound) {
 
       SetDelay(time[start[MaxSigLoc]]);
+      
+      #ifdef DEBUG 
       std::cout << "delay = " << time[start[MaxSigLoc]] << std::endl;
+      #endif
 
       int count = start[MaxSigLoc]-20;
       while(HacqFILTERED()->GetBinContent(count) + HacqFILTERED()->GetBinContent(count+1) + HacqFILTERED()->GetBinContent(count+2) < 3.*S2nCut*Noise()){
@@ -323,7 +367,10 @@ namespace TCT {
       SetDelayfilt(((float)count)/10.);
 
       SetWidth(time[end[MaxSigLoc]]-time[start[MaxSigLoc]]);
+
+      #ifdef DEBUG 
       std::cout << "Width = " <<  Width() << std::endl;
+      #endif
 
       SetMaxamplitude(sig[MaxSigLoc]);
 
@@ -404,9 +451,13 @@ namespace TCT {
       //std::cout << s2n << "	";
     } 
 
+    #ifdef DEBUG 
+    std::cout << "end ACQ_single::SignalFinder " << std::endl;
+    #endif
+
 
     return;
-  }
+  } // end signal finder
 
   void acquisition_single::SignalManipulator(){
 

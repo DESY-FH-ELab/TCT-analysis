@@ -9,6 +9,7 @@
 // TCT includes
 #include "analysis.h"
 #include "acquisition.h"
+//#include "util.h"
 
 //  ROOT includes
 #include "TSystem.h"
@@ -18,10 +19,11 @@ namespace TCT {
 
   void analysis::SetParameters(std::map<std::string, std::string> id_val){
 
-    std::cout << " Read and set parameters from input map" << std::endl;
+    #ifdef DEBUG 
+    std::cout << " start ANA::SetParameterd: Read and set parameters from input map" << std::endl; 
+    #endif
 
     for( auto i : id_val){
-      std::cout << i.first << " " << i.second << " " << "\n";
       //if(i.first == "") _ = atof((i.second).c_str());
       if(i.first == "AmplNegLate_Cut") _AmplNegLate_Cut = atof((i.second).c_str());
       if(i.first == "AmplPosLate_Cut") _AmplPosLate_Cut = atof((i.second).c_str());
@@ -34,12 +36,18 @@ namespace TCT {
       if(i.first == "S2n_Ref") _S2n_Ref = atof((i.second).c_str());
     }
 
+    #ifdef DEBUG 
+    std::cout << " end ANA::SetParameters" << std::endl; 
+    #endif
+
+    return;
   }
 
   bool analysis::AcqsSelecter(TCT::acquisition_single *acq){
 
-    int debug = 10;
-    if (debug > 9) std::cout << " selects acquisition based on certain criteria\n" << std::endl;
+    #ifdef DEBUG
+    std::cout << " start ANA::AcqsSelecter" << std::endl;
+    #endif
 
     bool ok = true;
 
@@ -56,7 +64,7 @@ namespace TCT {
       }
       if (acq->Noise_end() > NoiseEnd_Cut()) {
 	ok = kFALSE;
-	std::cout << "pulse end too noisy -> pick-up" << std::endl;
+	std::cout << "pulse end too noisy -> pick-up or acquisition window too narrow" << std::endl;
 	return ok;
       }
       if (acq->S2nval() < S2n_Cut()){
@@ -99,8 +107,9 @@ namespace TCT {
 
   void analysis::AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg){
 
-    int debug = 10;
-    if(debug) std::cout << "start AcqsAnalyser" << std::endl;
+    #ifdef DEBUG
+    std::cout << "start ANA::AcqsAnalyser" << std::endl;
+    #endif
 
     //std::cout << "GOF" << std::endl;
     acq->GetOffsetNoise(iAcq, acqAvg);
@@ -152,11 +161,20 @@ namespace TCT {
 
 
 
-     */
+    */   
+
+    #ifdef DEBUG
+    std::cout << "end ANA::AcqsAnalyser" << std::endl;
+    #endif
+
     return;	
   }
  
   void analysis::AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg) {
+
+    #ifdef DEBUG
+    std::cout << "start ANA::AcqsProfileFiller" << std::endl;
+    #endif
 
     if (acq->Select()){
       Float_t tmp_t = -1.0;
@@ -174,11 +192,20 @@ namespace TCT {
       }
 
     } 
+
+    #ifdef DEBUG
+    std::cout << "end ANA::AcqsProfileFiller" << std::endl;
+    #endif
+
     return;
 
   }
 
     void analysis::AcqsWriter(TCT::sample *sample, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
+
+    #ifdef DEBUG
+    std::cout << "start ANA::AcqsWriter" << std::endl;
+    #endif
 
     std::string outfolder = OutFolder(); 
     std::string outsample = sample->SampleID();
@@ -230,7 +257,10 @@ namespace TCT {
     //}
 
     f_rootfile->Close();
-    std::cout << "end AcqsWriter" << std::endl;
+
+    #ifdef DEBUG
+    std::cout << "end ANA::AcqsWriter" << std::endl;
+    #endif
 
     return;
 
