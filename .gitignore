@@ -38,3 +38,4 @@ Thumbs.db
 
 #ignore certain template files
 src/template.cc
+testdata/*
