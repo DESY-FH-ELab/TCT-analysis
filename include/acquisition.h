@@ -205,10 +205,10 @@ namespace TCT {
       std::string _Name;
       uint32_t _iAcq;
       float _Maxamplitude;	// this is the amplitude of a single pulse, at MaxSigLocation
-      float _Amplneg;		// most neg value before rising edge
-      float _Amplpos;		// most pos value before rising edge
-      float _Amplneglate;	// most neg value after falling edge
-      float _Amplposlate;	// most neg value after falling edge
+      float _AmplNegEarly;		// most neg value before rising edge
+      float _AmplPosEarly;		// most pos value before rising edge
+      float _AmplNegLate;	// most neg value after falling edge
+      float _AmplPosLate;	// most neg value after falling edge
       float _Avg;		// between edges for alpha 
       float _Avgshort;		// avg shortly after risind edge (beta,p,...)
       float _Delay;		// from acq start to start of RE, start of RE is defined by S2nRef in param.h
@@ -241,10 +241,10 @@ namespace TCT {
 	_Name("single"),
 	_iAcq(iAcq),
 	_Maxamplitude(-1.),
-	_Amplneg(1.),
-	_Amplpos(-1.),
-	_Amplneglate(1.),
-	_Amplposlate(-1.),
+	_AmplNegEarly(1.),
+	_AmplPosEarly(-1.),
+	_AmplNegLate(1.),
+	_AmplPosLate(-1.),
 	_Avg(-1.),
 	_Avgshort(-1.),
 	_Delay(-1.),
@@ -325,17 +325,17 @@ namespace TCT {
       void SetMaxamplitude(float amp) { _Maxamplitude = amp;}
       const float & Maxamplitude() const { return _Maxamplitude;}
 
-      float Amplneg() { return _Amplneg;}
-      void SetAmplneg(float amp) { _Amplneg = amp;}
+      float AmplNegEarly() { return _AmplNegEarly;}
+      void SetAmplNegEarly(float amp) { _AmplNegEarly = amp;}
 
-      float Amplpos() { return _Amplpos;}
-      void SetAmplpos(float amp) { _Amplpos = amp;}
+      float AmplPosEarly() { return _AmplPosEarly;}
+      void SetAmplPosEarly(float amp) { _AmplPosEarly = amp;}
 
-      float Amplneglate() { return _Amplneglate;}
-      void SetAmplneglate(float amp) { _Amplneglate = amp;}
+      float AmplNegLate() { return _AmplNegLate;}
+      void SetAmplNegLate(float amp) { _AmplNegLate = amp;}
 
-      float Amplposlate() { return _Amplposlate;}
-      void SetAmplposlate(float amp) { _Amplposlate = amp;}
+      float AmplPosLate() { return _AmplPosLate;}
+      void SetAmplPosLate(float amp) { _AmplPosLate = amp;}
 
       float Rise() { return _Rise;}
       void SetRise(float time) { _Rise = time;}

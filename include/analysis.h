@@ -31,6 +31,10 @@ namespace TCT {
       float _S2n_Ref;
       float _Amplitude_Cut;	// in V
       float _Width_Cut;	// in ns
+      float _AmplPosEarly_Cut;	// in V
+      float _AmplNegEarly_Cut;	// in V
+      float _AmplPosLate_Cut;	// in V
+      float _AmplNegLate_Cut;	// in V
 
       std::string _OutFolder; // Folder, where the root file is writen to !! move to Analysis class
 
@@ -45,6 +49,10 @@ namespace TCT {
 	_S2n_Ref(2.),
 	_Amplitude_Cut(0.01),
 	_Width_Cut(3.0),
+	_AmplPosEarly_Cut(0.02),
+	_AmplNegEarly_Cut(-0.02),
+	_AmplPosLate_Cut(0.01),
+	_AmplNegLate_Cut(-0.02),
 	_OutFolder("../results/")
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
@@ -79,6 +87,22 @@ namespace TCT {
       float Amplitude_Cut() { return _Amplitude_Cut;}
       void SetAmplitude_Cut(float cut_value) { _Amplitude_Cut = cut_value;}
       const float & Amplitude_Cut() const { return _Amplitude_Cut;}
+
+      float AmplPosEarly_Cut() { return _AmplPosEarly_Cut;}
+      void SetAmplPosEarly_Cut(float cut_value) { _AmplPosEarly_Cut = cut_value;}
+      const float & AmplPosEarly_Cut() const { return _AmplPosEarly_Cut;}
+
+      float AmplNegEarly_Cut() { return _AmplNegEarly_Cut;}
+      void SetAmplNegEarly_Cut(float cut_value) { _AmplNegEarly_Cut = cut_value;}
+      const float & AmplNegEarly_Cut() const { return _AmplNegEarly_Cut;}
+
+      float AmplPosLate_Cut() { return _AmplPosLate_Cut;}
+      void SetAmplPosLate_Cut(float cut_value) { _AmplPosLate_Cut = cut_value;}
+      const float & AmplPosLate_Cut() const { return _AmplPosLate_Cut;}
+
+      float AmplNegLate_Cut() { return _AmplNegLate_Cut;}
+      void SetAmplNegLate_Cut(float cut_value) { _AmplNegLate_Cut = cut_value;}
+      const float & AmplNegLate_Cut() const { return _AmplNegLate_Cut;}
 
       void SetParameters(std::map<std::string, std::string> id_val);
       bool AcqsSelecter(TCT::acquisition_single *acq);

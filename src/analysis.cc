@@ -23,8 +23,13 @@ namespace TCT {
     for( auto i : id_val){
       std::cout << i.first << " " << i.second << " " << "\n";
       //if(i.first == "") _ = atof((i.second).c_str());
+      if(i.first == "AmplNegLate_Cut") _AmplNegLate_Cut = atof((i.second).c_str());
+      if(i.first == "AmplPosLate_Cut") _AmplPosLate_Cut = atof((i.second).c_str());
+      if(i.first == "AmplNegEarly_Cut") _AmplNegEarly_Cut = atof((i.second).c_str());
+      if(i.first == "AmplPosEarly_Cut") _AmplPosEarly_Cut = atof((i.second).c_str());
       if(i.first == "Outfolder") _OutFolder = i.second;
       if(i.first == "Noise_Cut") _Noise_Cut = atof((i.second).c_str());
+      if(i.first == "NoiseEnd_Cut") _NoiseEnd_Cut = atof((i.second).c_str());
       if(i.first == "S2n_Cut") _S2n_Cut = atof((i.second).c_str());
       if(i.first == "S2n_Ref") _S2n_Ref = atof((i.second).c_str());
     }
@@ -59,27 +64,27 @@ namespace TCT {
 	std::cout << "s2n too small: " << acq->S2nval() << std::endl;
 	return ok;
       }
-      if (acq->Width() < Width_Cut()){
+      //if (acq->Width() < Width_Cut()){
+      //  ok = kFALSE;
+      //  std::cout << "width too small: " << acq->Width()" << std::endl;
+      //  return ok;
+      //} // check width already during SignalFinder
+      if (acq->AmplNegLate() < AmplNegLate_Cut()) {
 	ok = kFALSE;
-	std::cout << "area too small: " << acq->Width()*acq->Maxamplitude()*1000.0 << " mVs" << std::endl;
+	std::cout << "pulse had big neg component after pulse" << acq->AmplNegLate() <<  std::endl;
 	return ok;
       }
-      if (acq->Amplneglate() < -0.02) {
-	ok = kFALSE;
-	std::cout << "pulse had big neg component after pulse" << acq->Amplneglate() <<  std::endl;
-	return ok;
-      }
-      if (acq->Amplposlate() > 0.01) {
+      if (acq->AmplPosLate() > AmplPosLate_Cut()) {
 	ok = kFALSE;
 	std::cout << "pulse had big pos component after pulse" << std::endl;
 	return ok;
       }
-      if (acq->Amplpos() > 0.02) {
+      if (acq->AmplPosEarly() > AmplPosEarly_Cut()) {
 	ok = kFALSE;
 	std::cout << "pulse had big pos component before pulse" << std::endl;
 	return ok;
       }
-      if (acq->Amplneg() < -0.02) {
+      if (acq->AmplNegEarly() < AmplNegEarly_Cut()) {
 	ok = kFALSE;
 	std::cout << "pulse had big neg component before pulse" << std::endl;
 	return ok;
