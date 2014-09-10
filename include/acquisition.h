@@ -44,6 +44,7 @@ namespace TCT {
       float _BiasVolt;	// in Volt
       float _SampleInterval;	// in ns
       float _PrePulseInterval;	// in ns. !! By how much should be translated can be inferred from Delay(), or from the trigger position written in the scope header
+      float _Polarity;
 
     public :
     
@@ -51,11 +52,12 @@ namespace TCT {
         _Temp(295.),
 	_BiasVolt(500.),
 	_Nsamples(-1),
-	_Nsamples_start(10),
-	_Nsamples_end(10),
+	_Nsamples_start(50),
+	_Nsamples_end(50),
 	_SampleInterval(0.1),
-	_PrePulseInterval(20.)
-    {};
+	_PrePulseInterval(20.),
+	_Polarity(.0)
+      {};
 
       /*acquisition_base(float bias) :
 	_BiasVolt(bias),
@@ -66,15 +68,11 @@ namespace TCT {
 	{};*/
 
       acquisition_base(uint32_t nsamples) :
-        _Temp(295.),
-	_BiasVolt(500.),
-	_IsMIP(false), // !! Get this from measurement class
-	_Nsamples(nsamples),
-	_Nsamples_start(50),
-	_Nsamples_end(50),
-	_SampleInterval(0.1),
-	_PrePulseInterval(20.)
-    {};   
+        acquisition_base() 
+      {   
+	_IsMIP = false; // !! Get this from measurement class
+	_Nsamples = nsamples;
+      };
 
       // Default copy constructer should be fine
       acquisition_base(const acquisition_base &)               = default;
@@ -106,7 +104,7 @@ namespace TCT {
       void SetPrePulseInterval(float interval){ _PrePulseInterval = interval;}
       const float & PrePulseInterval() const{ return _PrePulseInterval;}
 
-      std::vector<double> volt; // encapsulate ??
+      std::vector<double> volt; // ?? encapsulate?
       std::vector<double> time;
 
       void SetBiasVolt(float volt) { _BiasVolt = volt;}
@@ -119,6 +117,10 @@ namespace TCT {
 
       bool IsMIP() { return _IsMIP;}
       void SetIsMIP(bool Is) { _IsMIP = Is;}
+
+      void SetPolarity(float pol) { _Polarity = pol;}
+      float Polarity() {return _Polarity;}
+      const float & Polarity() const { return _Polarity;}
 
   }; // end of class acquisition_base
 
@@ -155,8 +157,8 @@ namespace TCT {
 	  _G_s2n_evo->SetNameTitle("S2Noise Evolution","S2Noise Evolution");
 	  _G_s2n_evo->SetMarkerStyle(2);
 	  _N_tuple 	= new TNtuple("ntuple","pulse ntuple","rise:rise1090:fall:width:delay:delayfilt:ampl:avg:s2nval");
-	  _H2_acqs2D 	= new TH2F("acqs2D","acqs2D", Nsamples(), -SampleInterval()*0.5-PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval(), 560, -1., 1.); // ?? 560 is what?
-	  _Profile 	= new TProfile("avgAcq","avgAcq",Nsamples(), -SampleInterval()*0.5-PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval(),-1,1," ");
+	  _H2_acqs2D 	= new TH2F("acqs2D","acqs2D", Nsamples(), -SampleInterval()*0.5 - PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval() - PrePulseInterval(), 5000, -1., 1.); 
+	  _Profile 	= new TProfile("avgAcq","avgAcq",Nsamples(), -SampleInterval()*0.5 - PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval() - PrePulseInterval() ,-1,1," ");
 	  _ProfileFILTERED = new TProfile("avgAcq_f","avgAcq_f",Nsamples(), -SampleInterval()*0.5-PrePulseInterval(), (Nsamples()-1-0.5)*SampleInterval(),-1,1," ");
 	  _H2_delay_width = new TH2F("delay_width","delay_width",120,0,120,100,0,50);
 	  _H2_ampl_width  = new TH2F("ampl_width","ampl_width",100,0,0.4,100,0,50);
@@ -230,14 +232,18 @@ namespace TCT {
       bool _SelectionRan;
       bool _Selected;
 
+      uint32_t _NFound;
+
 
     public :
       acquisition_single() : 
 	_Name("single"),
 	acquisition_base(500.),
-	_SelectionRan(false){};
+	_SelectionRan(false),
+	_NFound(0){};
 
       acquisition_single(uint32_t iAcq) : 
+	acquisition_base(500.),
 	_Name("single"),
 	_iAcq(iAcq),
 	_Maxamplitude(-1.),
@@ -253,8 +259,8 @@ namespace TCT {
 	_Rise(-1.),
 	_Rise1090(-1.),
 	_Fall(-1.),
-	acquisition_base(500.),
-	_SelectionRan(false){};
+	_SelectionRan(false),
+	_NFound(0){};
 
 
       // Default copy constructer should be fine
@@ -280,7 +286,7 @@ namespace TCT {
       bool Read(FILE *infile, uint32_t iFile);
       bool Read(FILE *infile, uint32_t iFile, TCT::acquisition_avg *avg); 
       void FillNtuple(TCT::acquisition_avg *avg);
-      void SignalFinder(TCT::acquisition_avg *avg, float, float );
+      void SignalFinder(TCT::acquisition_avg *avg, float, float, float );
       void SignalManipulator();
       void ClearStruct();
       void SetName(std::string name);
@@ -294,15 +300,21 @@ namespace TCT {
       TH1F* Hacq() { return _H_acquisition;}
       TH1F* HacqFILTERED() { return _H_acquisitionFILTERED;}
 
-      void SetOffset(float offset) { _Offset = offset;}
-      void SetOffset_end(float offset) { _Offset_end = offset;}
       float Offset() { return _Offset;}
-      float Offset_end() { return _Offset_end;}
+      void SetOffset(float offset) { _Offset = offset;}
+      const float & Offset() const { return _Offset;}
 
-      void SetNoise(float noise) { _Noise = noise;}
-      void SetNoise_end(float noise) { _Noise_end = noise;}
+      float Offset_end() { return _Offset_end;}
+      void SetOffset_end(float offset) { _Offset_end = offset;}
+      const float & Offset_end() const { return _Offset_end;}
+
       float Noise() { return _Noise;}
+      void SetNoise(float noise) { _Noise = noise;}
+      const float & Noise() const { return _Noise;}
+
       float Noise_end() { return _Noise_end;}
+      void SetNoise_end(float noise) { _Noise_end = noise;}
+      const float & Noise_end() const { return _Noise_end;}
 
       void SetHalfFilterwidth(uint32_t halfwidth){ _HalfFilterwidth = halfwidth;}
       uint32_t HalfFilterwidth(){ return _HalfFilterwidth;}
@@ -342,18 +354,25 @@ namespace TCT {
 
       float Rise1090() { return _Rise1090;}
       void SetRise1090(float time) { _Rise1090 = time;}
+      const float & Rise1090() const { return _Rise1090;}
 
       float Fall() { return _Fall;}
       void SetFall(float time) { _Fall = time;}
+      const float & Fall() const { return _Fall;}
 
       float S2nval() { return _S2nval;}
       void SetS2nval(float time) { _S2nval = time;}
+      const float & S2nval() const { return _S2nval;}
 
       float Avg() { return _Avg;}
       void SetAvg(float avg) { _Avg = avg;}
 
       float Avgshort() { return _Avg;}
       void SetAvgshort(float avg) { _Avgshort = avg;}
+
+      uint32_t NFound() { return _NFound;}
+      void SetNFound(uint32_t n) { _NFound = n;}
+      const uint32_t & NFound() const { return _NFound;}
 
   }; // end of acquisition_single implementation
 
@@ -412,6 +431,15 @@ inline std::ostream & operator << (std::ostream & os, const TCT::acquisition_sin
     << "\n MaxAmpl " << acq.Maxamplitude()
     << "   Delay " << acq.Delay()
     << "   Width " << acq.Width()
+    << "   Rise1090 " << acq.Rise1090()
+    << "   Fall " << acq.Fall()
+    << "   S2N ratio " << acq.S2nval()
+    << "   Noise " << acq.Noise()
+    << "   Noise_End " << acq.Noise_end()
+    << "   Offset " << acq.Offset()
+    << "   Offset_End " << acq.Offset_end()
+    << "   NFound " << acq.NFound()
+    //<< "    " << acq.()
     << std::endl;
 }
 #endif

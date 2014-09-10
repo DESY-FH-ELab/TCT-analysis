@@ -34,6 +34,7 @@ namespace TCT {
       if(i.first == "NoiseEnd_Cut") _NoiseEnd_Cut = atof((i.second).c_str());
       if(i.first == "S2n_Cut") _S2n_Cut = atof((i.second).c_str());
       if(i.first == "S2n_Ref") _S2n_Ref = atof((i.second).c_str());
+      if(i.first == "PrintEvent") _PrintEvent = atoi((i.second).c_str());
     }
 
     #ifdef DEBUG 
@@ -79,22 +80,22 @@ namespace TCT {
       //} // check width already during SignalFinder
       if (acq->AmplNegLate() < AmplNegLate_Cut()) {
 	ok = kFALSE;
-	std::cout << "pulse had big neg component after pulse" << acq->AmplNegLate() <<  std::endl;
+	std::cout << "pulse " << acq->iAcq() << " had big neg component after pulse" << acq->AmplNegLate() <<  std::endl;
 	return ok;
       }
       if (acq->AmplPosLate() > AmplPosLate_Cut()) {
 	ok = kFALSE;
-	std::cout << "pulse had big pos component after pulse" << std::endl;
+	std::cout << "pulse " << acq->iAcq() << " had big pos component after pulse" << acq->AmplPosLate() <<  std::endl;
 	return ok;
       }
       if (acq->AmplPosEarly() > AmplPosEarly_Cut()) {
 	ok = kFALSE;
-	std::cout << "pulse had big pos component before pulse" << std::endl;
+	std::cout << "pulse " << acq->iAcq() << " had big pos component before pulse" << acq->AmplPosEarly() <<  std::endl;
 	return ok;
       }
       if (acq->AmplNegEarly() < AmplNegEarly_Cut()) {
 	ok = kFALSE;
-	std::cout << "pulse had big neg component before pulse" << std::endl;
+	std::cout << "pulse " << acq->iAcq() << " had big neg component before pulse" << acq->AmplNegEarly() <<   std::endl;
 	return ok;
       }
     }
@@ -118,7 +119,9 @@ namespace TCT {
     acq->FillHacqs();
 
     //std::cout << "SF" << std::endl;
-    acq->SignalFinder(acqAvg, Width_Cut(), Amplitude_Cut());
+    acq->SignalFinder(acqAvg, S2n_Cut(), Width_Cut(), Amplitude_Cut());
+
+    if(acq->iAcq() == PrintEvent()) std::cout << *acq << std::endl;
 
     //std::cout << "FillNt" << std::endl;
     acq->FillNtuple(acqAvg); // !! this is w/o selection cuts
@@ -207,15 +210,17 @@ namespace TCT {
     std::cout << "start ANA::AcqsWriter" << std::endl;
     #endif
 
-    std::string outfolder = OutFolder(); 
-    std::string outsample = sample->SampleID();
-    std::string outtemp = std::to_string((int)acqAvg->Temp());
-    std::string outvolt = std::to_string((int)acqAvg->BiasVolt());
+    std::string outfolder	= OutFolder(); 
+    std::string outsample	= sample->SampleID();
+    std::string outtemp		= std::to_string((int)acqAvg->Temp());
+    std::string outpolarity = "+";
+    if(acqAvg->Polarity() > .0) outpolarity = "-";
+    std::string outvolt 	= std::to_string((int)acqAvg->BiasVolt());
 
 
     std::string outpath  = outfolder + "/" + outsample + "/" + outtemp + "K";
     std::string outpath1 = outfolder + "/" + outsample + "/";
-    std::string pathandfilename = outpath  + "/" + outsample + "_" + outtemp + "K_" + outvolt + "V.root";
+    std::string pathandfilename = outpath  + "/" + outsample + "_" + outtemp + "K_" + outpolarity + outvolt + "V.root";
 
     gSystem->MakeDirectory(outpath1.c_str());
     //if(gSystem->MakeDirectory(outpath.c_str()) == -1) std::cout << "couldnt create directory" << std::endl;

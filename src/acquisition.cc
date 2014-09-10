@@ -9,7 +9,7 @@
 // TCT includes
 #include "acquisition.h"
 #include "analysis.h"
-//#include "util.h"
+#include "util.h"
 
 // ROOT includes
 #include "TMath.h" 
@@ -27,25 +27,53 @@ namespace TCT {
 
     int ret=0;
     float t_off=0;
-    float Polarity = -1.;
-    if(BiasVolt() < 0) Polarity = 1.;
 
-
-    // read header to dummy
     Char_t dummy[20];
-    for(Int_t k=0; k<30;k++){
-      ret = fscanf(infile,"%s",&dummy);
+    // pre-parse to find polarity
+    double in_v, in_t;
+    float minvolt = 1.;
+    float maxvolt = -1.;
+    uint32_t counter = 0;
+    for(Int_t k=0; k<30; k++){
+      ret = fscanf(infile,"%s",dummy);
+      //std::cout << "ret = " << ret << " k = " << k << " " << " dummy = " << dummy << "    ";
+    }
+    while(1)
+    {
+      ret = fscanf(infile,"%lf",&in_t);
+      ret = fscanf(infile,"%lf",&in_v);
+      if(feof(infile)) break;
+      if(in_v > maxvolt) maxvolt = in_v;
+      if(in_v < minvolt) minvolt = in_v;
+
+      if (ret<=0) 
+      {
+	std::cout << "read error voltage block at position i = " << counter << "\n";
+	exit(1);
+      }
+      counter++;
+
+    }
+
+
+    if(maxvolt > fabs(minvolt)) SetPolarity(1.);
+    else SetPolarity(-1.);
+    //if(BiasVolt() < 0) Polarity = 1.;
+
+    rewind(infile);
+    // read header to dummy
+    for(Int_t k=0; k<30; k++){
+      ret = fscanf(infile,"%s",dummy);
       //if(debug>9) std::cout << k << " " << dummy << "    ";
     }
 
     // read pulse waveform
-    float in_v, in_t;
-    uint32_t counter = 0;
+    counter = 0;
     while(1)
     {
       //std::cout << "\n4 " << std::endl;
-      ret = fscanf(infile,"%g",&in_t);
-      ret = fscanf(infile,"%g",&in_v);
+      ret = fscanf(infile,"%lf",&in_t);
+      ret = fscanf(infile,"%lf",&in_v);
       if(feof(infile)) break;
 
       //if(counter < 5) std::cout << counter << " in_t: " << in_t;
@@ -59,7 +87,7 @@ namespace TCT {
       }
 
       time.push_back(t_off+counter*SampleInterval());
-      volt.push_back(Polarity*in_v);
+      volt.push_back(Polarity()*in_v);
       counter++;
     }
 
@@ -163,6 +191,11 @@ namespace TCT {
     rms_end /= (float)Nsamples_end();
     rms_end = TMath::Power(rms_end,0.5);
 
+    #ifdef DEBUG 
+    std::cout << " Baseline_end offset = " << mean_end << std::endl;
+    std::cout << " Baseline_end rms = " << rms_end << std::endl;
+    #endif
+
     SetOffset(mean);
     SetNoise(rms);
 
@@ -175,15 +208,6 @@ namespace TCT {
 
     (acqAvg->G_noise_evo())->SetPoint(iAcq,iAcq,Noise());
     // std::cout << "Noise: " << Noise << std::endl;
-
-    #ifdef DEBUG 
-
-    std::cout 	<< "Offset = " << Offset()
-    		<< "Noise = "  << Noise()
-    		<< "Offset_end = " << Offset_end()
-    		<< "Noise_end = "  << Noise_end() <<
-    std::endl;
-    #endif
 
     #ifdef DEBUG 
     std::cout << "end ACQ_single::GetOffsetNoise " << std::endl;
@@ -233,10 +257,11 @@ namespace TCT {
     return;
   }
 
-  void acquisition_single::SignalFinder(TCT::acquisition_avg *acqAvg, float Width_Cut, float Amplitude_Cut){
+  void acquisition_single::SignalFinder(TCT::acquisition_avg *acqAvg, float S2n_Cut, float Width_Cut, float Amplitude_Cut){
 
     #ifdef DEBUG 
     std::cout << "start ACQ_single::SignalFinder " << std::endl;
+    std::cout << " S2n_Cut = " << S2n_Cut << " Width_Cut = " << Width_Cut << " Amplitude_Cut = " << Amplitude_Cut << std::endl;
     #endif
 
     Float_t s2n[Nsamples()];
@@ -251,7 +276,7 @@ namespace TCT {
 
 
     // init variables
-    Int_t NFound = 0;
+    SetNFound(0);
     for (Int_t i=0; i<1000; i++) 
     {
       start[i] = -1;
@@ -280,16 +305,15 @@ namespace TCT {
     // find start and end of pulses
     Bool_t SigOn = kFALSE;
     Int_t Cnt =0;
-    float S2nCut = 3.0; // !! Get this from Analysis class
     while (Cnt < Nsamples()-50)
     {
-      if ((s2n[Cnt] + s2n[Cnt+1] + s2n[Cnt+2] + s2n[Cnt+3] + s2n[Cnt+4]) > 4.0*S2nCut &&  SigOn == kFALSE)
+      if ((s2n[Cnt] + s2n[Cnt+1] + s2n[Cnt+2] + s2n[Cnt+3] + s2n[Cnt+4]) > 4.0*S2n_Cut &&  SigOn == kFALSE)
       {
 	SigOn = kTRUE;
 	temp_start[temp_Found] = Cnt;
 	//std::cout << "TempStart: " << Cnt;
 	temp_Found++;
-      } else if ((s2n[Cnt] + s2n[Cnt+1] + s2n[Cnt+2] + s2n[Cnt+3] + s2n[Cnt+4] + s2n[Cnt+5]) < 5.0*S2nCut && SigOn == kTRUE) {
+      } else if ((s2n[Cnt] + s2n[Cnt+1] + s2n[Cnt+2] + s2n[Cnt+3] + s2n[Cnt+4] + s2n[Cnt+5]) < 5.0*S2n_Cut && SigOn == kTRUE) {
 	temp_end[temp_Found-1] = Cnt;
 	//std::cout << "TempStop: " << Cnt << std::endl;
 	SigOn = kFALSE;
@@ -300,13 +324,6 @@ namespace TCT {
     //std::cout << "#temp found = " << temp_Found << endl;
 
     // check minimum pulse Length and calculate amplitude
-
-    NFound =0;
-
-    //int MinLengthSample = (int)(ana.Width_Cut()/SampleInterval(); // !! Get MinLength from Analysis class
-    //int MinLengthSample = 10; // !! Get MinLength from Analysis class
-    //float SigCut = 0.01; // in V, !! Get MinLength from Analysis class
-
     for (Int_t i=0; i<temp_Found; i++) {
 
       if ( (temp_end[i]-temp_start[i]) >= Width_Cut/SampleInterval()) {
@@ -324,12 +341,15 @@ namespace TCT {
 
 	// check is signal is larger than cut
 	if (temp_sig[i] > Amplitude_Cut) {
-	  start[NFound] = temp_start[i]-1;
-	  end[NFound] = temp_end[i];
-	  sig[NFound] = temp_sig[i];
-	  AmpMaxPos[NFound] = MaxSigPos;
-	  NFound++;
-	  if (NFound>1000) break;
+	  start[NFound()] = temp_start[i]-1;
+	  end[NFound()] = temp_end[i];
+	  sig[NFound()] = temp_sig[i];
+	  AmpMaxPos[NFound()] = MaxSigPos;
+	  SetNFound(NFound()+1);
+	  if (NFound() > 1000) {
+	    std::cout << "   *** FOUND 1000 temporary pulses, breaking! " << std::endl;
+	    break;
+	  }
 	}
 
       }
@@ -339,7 +359,7 @@ namespace TCT {
     Float_t old_amp = -999;
     Int_t MaxSigLoc = -1;
     Float_t charge = 0.0;
-    for(Int_t i =0;i<NFound;i++) {
+    for(Int_t i =0; i<NFound(); i++) {
       charge = (time[end[i]]-time[start[i]])*sig[i]*0.75;
       if (charge>old_amp) {
 	MaxSigLoc = i;
@@ -348,20 +368,13 @@ namespace TCT {
     }
 
 
-    #ifdef DEBUG 
-    std::cout << "Numner of pulses found in acquisition = " << NFound << std::endl;
-    #endif
-
-    if (NFound) {
+    if (NFound()) {
 
       SetDelay(time[start[MaxSigLoc]]);
-      
-      #ifdef DEBUG 
-      std::cout << "delay = " << time[start[MaxSigLoc]] << std::endl;
-      #endif
+
 
       int count = start[MaxSigLoc]-20;
-      while(HacqFILTERED()->GetBinContent(count) + HacqFILTERED()->GetBinContent(count+1) + HacqFILTERED()->GetBinContent(count+2) < 3.*S2nCut*Noise()){
+      while(HacqFILTERED()->GetBinContent(count) + HacqFILTERED()->GetBinContent(count+1) + HacqFILTERED()->GetBinContent(count+2) < 3.*S2n_Cut*Noise()){
 	count++;
 	if(count >  end[MaxSigLoc]) {
 	  std::cout <<"problem" << std::endl;
@@ -373,9 +386,6 @@ namespace TCT {
 
       SetWidth(time[end[MaxSigLoc]]-time[start[MaxSigLoc]]);
 
-      #ifdef DEBUG 
-      std::cout << "Width = " <<  Width() << std::endl;
-      #endif
 
       SetMaxamplitude(sig[MaxSigLoc]);
 
@@ -403,6 +413,8 @@ namespace TCT {
       SetAvgshort(avgshort/((float)count));
 
       SetS2nval(Avg()/Noise());
+
+
       (acqAvg->G_s2n_evo())->SetPoint(iAcq(),iAcq(),S2nval());
 
       SetRise(time[AmpMaxPos[MaxSigLoc]]-time[start[MaxSigLoc]]);
@@ -455,6 +467,13 @@ namespace TCT {
       if ( i >  (int)((Delay() + 2.*Width() + 2.)/SampleInterval())) if (volt[i] > AmplPosLate() ) SetAmplPosLate((volt[i]+volt[i+1]+volt[i-1]+volt[i+2]+volt[i-2]-5.*Offset())/5.);
       //std::cout << s2n << "	";
     } 
+
+    TCT::util util;
+
+    if(this->NFound() > 1) {
+      std::cout << "more than one pulse found! " << std::endl;
+      std::cout << *this << std::endl;
+    }
 
     #ifdef DEBUG 
     std::cout << "end ACQ_single::SignalFinder " << std::endl;

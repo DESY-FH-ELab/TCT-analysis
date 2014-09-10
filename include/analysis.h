@@ -35,8 +35,9 @@ namespace TCT {
       float _AmplNegEarly_Cut;	// in V
       float _AmplPosLate_Cut;	// in V
       float _AmplNegLate_Cut;	// in V
+      uint32_t _PrintEvent;
 
-      std::string _OutFolder; // Folder, where the root file is writen to !! move to Analysis class
+      std::string _OutFolder; // Folder, where the root file is writen to 
 
 
 
@@ -53,7 +54,8 @@ namespace TCT {
 	_AmplNegEarly_Cut(-0.02),
 	_AmplPosLate_Cut(0.01),
 	_AmplNegLate_Cut(-0.02),
-	_OutFolder("../results/")
+	_OutFolder("../results/"),
+        _PrintEvent(-1)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -104,14 +106,22 @@ namespace TCT {
       void SetAmplNegLate_Cut(float cut_value) { _AmplNegLate_Cut = cut_value;}
       const float & AmplNegLate_Cut() const { return _AmplNegLate_Cut;}
 
+      uint32_t PrintEvent() { return _PrintEvent;}
+      void SetPrintEvent(int num ) { _PrintEvent = num;}
+      const uint32_t & PrintEvent() const { return _PrintEvent;}
+
+      //float () { return _;}
+      //void Set(float ) { _ = ;}
+      //const float & () const { return _;}
+
       void SetParameters(std::map<std::string, std::string> id_val);
       bool AcqsSelecter(TCT::acquisition_single *acq);
       void AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg);
       void AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg);
       void AcqsWriter(TCT::sample* sample, std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
 
-      std::string OutFolder() {return _OutFolder;} // !! move to ana class
-      void SetOutFolder(std::string string) { _OutFolder = string;} // !! move to ana class
+      std::string OutFolder() {return _OutFolder;} 
+      void SetOutFolder(std::string string) { _OutFolder = string;}
       const std::string & OutFolder() const {return _OutFolder;}
       
     };
