@@ -14,6 +14,8 @@
 // ROOT includes
 #include "TMath.h" 
 
+//#define DEBUG
+
 namespace TCT {
 
   bool acquisition_single::Read(FILE *infile, uint32_t iFile){
@@ -132,20 +134,23 @@ namespace TCT {
     float mean, mean_end, rms, rms_end;
 
     mean = .0;
-    //for (uint32_t i = 0; i < Nsamples_start(); i++) 
-    //  mean += volt[i];
-    //mean /= (float)Nsamples_start();
+    for (uint32_t i = 0; i < Nsamples_start(); i++) 
+      mean += volt[i];
+    mean /= (float)Nsamples_start();
     //std::cout << " mean = " << mean << std::endl;
-    if(Nsamples_start() > 0 && Nsamples_start() < Nsamples()) mean = TMath::Mean(Nsamples_start(), &volt[0]);
-    //std::cout << " mean = " << mean << std::endl;
+    //if(Nsamples_start() > 0 && Nsamples_start() < Nsamples()) mean = TMath::Mean(Nsamples_start(), &volt[0]);
 
     rms = .0;
-    //for (uint32_t i = 0; i < Nsamples_start(); i++) 
-    //  rms += (volt[i]-mean)*(volt[i]-mean);
-    //rms /= (float)Nsamples_start();
-    // rms = TMath::Power(rms,0.5)
-    if(Nsamples_start() > 0 && Nsamples_start() < Nsamples()) rms = TMath::RMS(Nsamples_start(), &volt[0]);
-    //std::cout << " rms = " << rms << std::endl;
+    for (uint32_t i = 0; i < Nsamples_start(); i++) 
+      rms += (volt[i]-mean)*(volt[i]-mean);
+    rms /= (float)Nsamples_start();
+    rms = TMath::Power(rms,0.5);
+    //if(Nsamples_start() > 0 && Nsamples_start() < Nsamples()) rms = TMath::RMS(Nsamples_start(), &volt[0]);
+
+    #ifdef DEBUG 
+    std::cout << " Baseline offset = " << mean << std::endl;
+    std::cout << " Baseline rms = " << rms << std::endl;
+    #endif
 
     mean_end = .0;
     for (uint32_t i = Nsamples() - Nsamples_end(); i < Nsamples(); i++) 

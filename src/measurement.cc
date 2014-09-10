@@ -44,7 +44,7 @@ namespace TCT {
     //std::cout << "do read in" << std::endl;
     //char key = getchar();
     FILE *file;
-    while(infile = gSystem->GetDirEntry(dir)) {
+    while((infile = gSystem->GetDirEntry(dir))) {
       if (strstr(infile,".txt") && !strstr(infile,".swp") ) {
 	//printf("file: %s\n",infile);
 	Char_t pathandfile[250];
