@@ -7,6 +7,8 @@
 #include <iostream>
 #include <regex>
 #include <fstream>
+#include <vector>
+#include <map>
 
 //  includes from TCT classes
 #include "sample.h"
@@ -47,7 +49,14 @@ int main(int argc, char* argv[])
    */
 
   if(argc == 1){
-    std::cout << " No root folder specified. Please execute with path to projcet: > ./tct-analysis -r /home/<user>/<my-path>/TCT-analysis/" << std::endl;
+    std::cout	<< " No root folder specified. Please execute with path to projcet: > ./tct-analysis -r /home/<user>/<my-path>/TCT-analysis/" << std::endl;
+    std::cout	<< " Or pass analysis file: > ./tct-analysis -af /home/<user>/<my-path>/TCT-analysis/testanalysis/ana.txt" << std::endl;
+    std::cout	<< " Or like this: > ./tct-analysis -af ../testanalysis/ana.txt" << std::endl;
+    std::cout	<< "\n Options are \n" 
+      << "   -af <analysis file> (see sample analysis file for example)\n"
+      << "   -r <project folder> (e.g. /home/<user>/<my-path>/TCT-analysis/ \n"
+      << "   -sa (to save all single acquisition in root file (blows up root file)" // !! needs implementation
+      << std::endl;
     return 1;
   }
 
@@ -65,13 +74,6 @@ int main(int argc, char* argv[])
       util.parse(ana_file);
     }
     // !! add check for certain vital options, if not passed, break
-
-    // Maximum events:
-    /*if (!strcmp(argv[i],"-e")) {
-      max_events = atoi(argv[++i]);
-      std::cout << "Decoding a maximum number of " << max_events << "
-      events." << std::endl;
-      }*/
   }
 
   uint32_t MaxAcqs= -1;
@@ -88,79 +90,150 @@ int main(int argc, char* argv[])
   if(proj_folder == "default") {
     std::cout << " project folder not specified, neither in command line nor in analysis file!\n\n   ***STOPPING" << std::endl;
     return 1;
-    
+
   }
 
+  // find all subfolders in datafolder
+  std::string DataFolder	= proj_folder + "/testdata/S57";
+  std::cout << "The sample folder is = " << DataFolder << ", searching data in subfolder(s) " <<  std::endl;
+  std::map<std::string, std::vector<std::string>> folder_struc;
+  std::vector<std::string> dirs;
+  std::vector<std::string> dirs2;	// push folder for every subfolder (linearisation of folder matrix)
+  std::vector<std::string> subdirs2;	// push folder for every subfolder (linearisation of folder matrix)
+  std::vector<std::string> pathndirs;
+  std::vector<int> Nsubdirs;
+
+  void *dirp = gSystem->OpenDirectory(DataFolder.c_str());
+  if (!dirp) {
+    std::cout << "Data Folder not found" << std::endl;
+    return 1;
+  }
+  char *direntry;
+  uint32_t counterdir   = 0;
+  uint32_t countersubdir= 0;
+  while ((direntry = (char*)gSystem->GetDirEntry(dirp))) {
+    if ( strstr(direntry,"..") || strstr(direntry,".") ) continue;
+    counterdir++;
+    //std::cout << "- " << direntry << std::endl;
+    dirs.push_back((std::string)direntry);
+
+
+    std::string subDataFolder	= DataFolder + "/" + direntry;
+    //std::cout << "Subdir = " << subDataFolder << std::endl;
+    std::vector<std::string> subdirs;
+    void *subdirp = gSystem->OpenDirectory(subDataFolder.c_str());
+    char *subdirentry;
+    while ((subdirentry = (char*)gSystem->GetDirEntry(subdirp))) {
+      if ( strstr(subdirentry,"..") || strstr(subdirentry,"." ) ) continue;
+      countersubdir++;
+      //std::cout << "-- " << subdirentry << std::endl;
+      subdirs.push_back(subdirentry);
+      dirs2.push_back((std::string)direntry);
+      subdirs2.push_back((std::string)subdirentry);
+      std::string fullpath = DataFolder + "/" + direntry + "/" + subdirentry + "/";
+      //std::cout << fullpath << std::endl;
+      pathndirs.push_back(fullpath);
+
+    }
+    Nsubdirs.push_back(countersubdir);
+    countersubdir = 0;
+
+    folder_struc[dirs[counterdir-1]] = subdirs;
+
+
+  }
+  for (auto i : Nsubdirs) {
+    countersubdir +=i;
+    std::cout << " i = " << i << std::endl;
+  }
+
+  std::cout << " Found the following folder structure: " << std::endl;
+  for(auto i : folder_struc) {
+    for(auto j : i.second)
+      std::cout << i.first << " " <<  j << " " << "\n";
+  }
+
+  std::cout << "Found " << countersubdir << " subfolders " << std::endl;
+
+  // create analysis object to stear the analysis. only one at the moment, no vector of objects. should be sufficient if analysis parameters are the same for every analysed folder
   TCT::analysis ana(util.ID_val());
   //std::cout << ana << std::endl;
 
-
-
-  std::string DataFolder	= proj_folder + "/testdata/S57/295K/500V/";
-  //std::string OutFolder	= proj_folder + "/results";
+  // Folder to read sensor card from. !! to be moved to analysis card
   std::string SensorFolder	= proj_folder + "/testSensor";
 
+  // create smaple object from sample card
   TCT::sample dummyDUT2(SensorFolder);       // define DUT
   //std::cout << dummyDUT2 << std::endl;	// print basic parameters of the sample
   dummyDUT2.ReadSampleCard();	// read SampleCard and set parameters accordingly
 
-  std::string sampleID = "S57";
-  dummyDUT2.SetSampleID(sampleID); 
+  std::string sampleID = "S57"; // !! should come from sensor card
+  dummyDUT2.SetSampleID(sampleID); // !! integrate into ReadSampleCard()
   //std::cout << dummyDUT2 << std::endl;
 
-  std::vector<TCT::acquisition_single> AllAcqs;
 
+  for(int i = 0; i < countersubdir; i++) {
+    // create vec with acq_singles in it
+    std::vector<TCT::acquisition_single> AllAcqs;
 
-  //TCT::param param;
+    // create measurement object from one subdir for each cycle
+    TCT::measurement meas(pathndirs[i]);
 
-  TCT::measurement meas(DataFolder);
-  //std::cout << meas << std::endl;
+    if(!meas.AcqsLoader(&AllAcqs, MaxAcqs)) return 1;
 
-  if(!meas.AcqsLoader(&AllAcqs, MaxAcqs)) return 1;//, 4); // change to take parameter from param
-  // !! analyser functions belong to measurement class a.t.m., disentangle ?
+    // now create instance of avg acquisition using Nsamples from loaded files
+    TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
+    AcqAvg.SetPolarity(AllAcqs[0].Polarity());
 
-  // now create instance of avg acquisition using Nsamples from loaded files
-  TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
+    //now analyse all acquisitions
+    int Nselected = 0;
 
-  //now analyse all acquisitions
-  int Nselected = 0;
+#ifdef DEBUG 
+    std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
+#endif
 
-  #ifdef DEBUG 
-  std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
-  #endif
+    for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
 
-  for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
+#ifdef DEBUG 
+      std::cout << " - Start with Acq #" << i_acq << std::endl;
+#endif
 
-    #ifdef DEBUG 
-    std::cout << " - Start with Acq #" << i_acq << std::endl;
-    #endif
+      TCT::acquisition_single* acq = &AllAcqs[i_acq];
+      ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
 
-    TCT::acquisition_single* acq = &AllAcqs[i_acq];
-    ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
+#ifdef DEBUG 
+      std::cout << *acq << std::endl;
+#endif
 
-    #ifdef DEBUG 
-    std::cout << *acq << std::endl;
-    #endif
+      if( ana.AcqsSelecter(acq) ) {
+        Nselected++;
+	acq->SetSelect(true);
+      }
+      ana.AcqsProfileFiller(acq, &AcqAvg);
 
-    if( ana.AcqsSelecter(acq) ) Nselected++;
-    ana.AcqsProfileFiller(acq, &AcqAvg);
+    }
+
+    ana.SetOutSample_ID(dummyDUT2.SampleID());
+    ana.SetOutTemp(dirs2[i]);
+    ana.SetOutVolt(subdirs2[i]);
+
+    ana.AcqsWriter(&AllAcqs, &AcqAvg);
+
+    std::cout << "   Nselected = " << Nselected << std::endl;
+    std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
+
+    // now take care of memory management
+    // delete remaning TH1Fs in acquisition_single and then clear AllAcqs
+    for(int j = 0; j < AllAcqs.size(); j++) {
+    	AllAcqs[j].Clear();
+    }
+    AllAcqs.clear();
+
+#ifdef DEBUG 
+    std::cout << "   AllAcqs has " << AllAcqs.size() << " objects left" << std::endl;
+#endif
 
   }
-
-  /*std::cout << AllAcqs.size() << std::endl;
-    for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
-    std::cout << " - Start with Acq #" << i_acq << std::endl;
-
-    acq = AllAcqs[i_acq];
-    std::cout << acq << std::endl;
-
-    }*/
-  ana.AcqsWriter(&dummyDUT2, &AllAcqs, &AcqAvg);
-
-  std::cout << "Nselected = " << Nselected << std::endl;
-  std::cout << "ratio of selected acqs = " << (float)Nselected/AllAcqs.size()*100. << "%" << std::endl;
-
-
 
   //theApp.Run(kTRUE); 
   //char key = getchar();
