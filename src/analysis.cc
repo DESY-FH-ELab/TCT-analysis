@@ -27,16 +27,19 @@ namespace TCT {
 
     for( auto i : id_val){
       //if(i.first == "") _ = atof((i.second).c_str());
-      if(i.first == "AmplNegLate_Cut") _AmplNegLate_Cut = atof((i.second).c_str());
-      if(i.first == "AmplPosLate_Cut") _AmplPosLate_Cut = atof((i.second).c_str());
-      if(i.first == "AmplNegEarly_Cut") _AmplNegEarly_Cut = atof((i.second).c_str());
-      if(i.first == "AmplPosEarly_Cut") _AmplPosEarly_Cut = atof((i.second).c_str());
-      if(i.first == "Outfolder") _OutFolder = i.second;
-      if(i.first == "Noise_Cut") _Noise_Cut = atof((i.second).c_str());
-      if(i.first == "NoiseEnd_Cut") _NoiseEnd_Cut = atof((i.second).c_str());
-      if(i.first == "S2n_Cut") _S2n_Cut = atof((i.second).c_str());
-      if(i.first == "S2n_Ref") _S2n_Ref = atof((i.second).c_str());
-      if(i.first == "PrintEvent") _PrintEvent = atoi((i.second).c_str());
+      if(i.first == "AmplNegLate_Cut")	_AmplNegLate_Cut = atof((i.second).c_str());
+      if(i.first == "AmplPosLate_Cut")	_AmplPosLate_Cut = atof((i.second).c_str());
+      if(i.first == "AmplNegEarly_Cut")	_AmplNegEarly_Cut = atof((i.second).c_str());
+      if(i.first == "AmplPosEarly_Cut")	_AmplPosEarly_Cut = atof((i.second).c_str());
+      if(i.first == "Outfolder")	_OutFolder = i.second;
+      if(i.first == "Noise_Cut")	_Noise_Cut = atof((i.second).c_str());
+      if(i.first == "NoiseEnd_Cut")	_NoiseEnd_Cut = atof((i.second).c_str());
+      if(i.first == "S2n_Cut")		_S2n_Cut = atof((i.second).c_str());
+      if(i.first == "S2n_Ref")		_S2n_Ref = atof((i.second).c_str());
+      if(i.first == "PrintEvent")	_PrintEvent = atoi((i.second).c_str());
+      if(i.first == "DoSmearing")	_DoSmearing = static_cast<bool>(atoi((i.second).c_str()));
+      if(i.first == "AddNoise")		_AddNoise = atof((i.second).c_str());
+      if(i.first == "AddJitter")	_AddJitter = atof((i.second).c_str());
     }
 
     #ifdef DEBUG 
