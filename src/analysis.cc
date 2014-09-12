@@ -111,6 +111,23 @@ namespace TCT {
     return ok;
   }
 
+  void analysis::AcqsSmearer(TCT::acquisition_single *acq, float noise, bool val){
+
+    acq->NoiseAdder(noise);
+    //acq->JitterAdder(jitter);
+
+    return;
+  }
+
+  void analysis::AcqsSmearer(TCT::acquisition_single *acq, bool val, float jitter){
+
+    //acq->NoiseAdder(noise);
+    acq->JitterAdder(jitter);
+
+    return;
+  }
+
+
   void analysis::AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg){
 
     #ifdef DEBUG

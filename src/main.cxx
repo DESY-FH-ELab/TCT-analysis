@@ -199,7 +199,9 @@ int main(int argc, char* argv[])
 #endif
 
       TCT::acquisition_single* acq = &AllAcqs[i_acq];
+      if(ana.DoSmearing()) ana.AcqsSmearer(acq, ana.AddNoise(), false);
       ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
+      if(ana.DoSmearing()) ana.AcqsSmearer(acq, false, ana.AddJitter()); // AcqsAnalyser removes jitter by determining each acqs delay. Hence, to add jitter, delay has to be manipulated after AcqsAnalyser (and before filling of profile
 
 #ifdef DEBUG 
       std::cout << *acq << std::endl;
