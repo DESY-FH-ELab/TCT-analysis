@@ -305,7 +305,8 @@ namespace TCT {
       bool SelectionRan() { return _SelectionRan;}
       void SetSelectionRan(bool select) { _SelectionRan = select;}
 
-      void DrawPulse();
+      void DrawAcq();
+      void PrintAcq();
       bool Read(FILE *infile, uint32_t iFile);
       bool Read(FILE *infile, uint32_t iFile, TCT::acquisition_avg *avg); 
       void FillNtuple(TCT::acquisition_avg *avg);

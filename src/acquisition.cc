@@ -122,9 +122,15 @@ namespace TCT {
 
   }
 
+  void acquisition_single::PrintAcq(){
+
+    for( int i = 0; i < Nsamples(); i++) std::cout << " " << i << ": " << time[i] << " " << volt[i] << std::endl;
+
+  }
+
   void acquisition_single::FillNtuple(TCT::acquisition_avg *acqAvg) {
 
-    #ifdef DEBUG 
+#ifdef DEBUG 
     std::cout << "start ACQ_single::FillNtuple " << std::endl;
     #endif
 
