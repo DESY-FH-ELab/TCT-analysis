@@ -43,6 +43,9 @@ namespace TCT {
       std::string _OutVolt;
       std::string _OutPos; // for X and Y position
 
+      bool _DoSmearing;
+      float _AddNoise;
+      float _AddJitter;
 
 
     public:
@@ -59,7 +62,10 @@ namespace TCT {
 	_AmplPosLate_Cut(0.01),
 	_AmplNegLate_Cut(-0.02),
 	_OutFolder("../results/"),
-        _PrintEvent(-1)
+        _PrintEvent(-1),
+	_DoSmearing(false),
+	_AddNoise(.0),
+	_AddJitter(.0)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -114,12 +120,31 @@ namespace TCT {
       void SetPrintEvent(int num ) { _PrintEvent = num;}
       const uint32_t & PrintEvent() const { return _PrintEvent;}
 
+      bool DoSmearing() { return _DoSmearing;}
+      void SetDoSmearing(bool val) { _DoSmearing = val;}
+      const bool & DoSmearing() const { return _DoSmearing;}
+
+      float AddNoise() { return _AddNoise;}
+      void SetAddNoise(float noise) { _AddNoise = noise;}
+      const float & AddNoise() const { return _AddNoise;}
+
+      float AddJitter() { return _AddJitter;}
+      void SetAddJitter(float val) { _AddJitter = val;}
+      const float & AddJitter() const { return _AddJitter;}
+
+      //float () { return _;}
+      //void Set(float ) { _ = ;}
+      //const float & () const { return _;}
+
+
       //float () { return _;}
       //void Set(float ) { _ = ;}
       //const float & () const { return _;}
 
       void SetParameters(std::map<std::string, std::string> id_val);
       bool AcqsSelecter(TCT::acquisition_single *acq);
+      void AcqsSmearer(TCT::acquisition_single *acq, float noise, bool);
+      void AcqsSmearer(TCT::acquisition_single *acq, bool, float jitter);
       void AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg);
       void AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg);
 
