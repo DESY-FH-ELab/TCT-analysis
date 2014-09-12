@@ -311,8 +311,8 @@ namespace TCT {
       bool Read(FILE *infile, uint32_t iFile, TCT::acquisition_avg *avg); 
       void FillNtuple(TCT::acquisition_avg *avg);
       void SignalFinder(TCT::acquisition_avg *avg, float, float, float );
-      void SignalManipulator();
-      void ClearStruct();
+      void NoiseAdder(float noise_factor);
+      void JitterAdder(float jitter);
       void SetName(std::string name);
       std::string & Name() { return _Name;}
       const std::string & Name() const { return _Name;}

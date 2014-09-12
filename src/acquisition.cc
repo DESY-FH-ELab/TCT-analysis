@@ -13,6 +13,7 @@
 
 // ROOT includes
 #include "TMath.h" 
+#include "TRandom3.h" 
 
 //#define DEBUG
 
@@ -481,20 +482,52 @@ namespace TCT {
       std::cout << *this << std::endl;
     }
 
-    #ifdef DEBUG 
+#ifdef DEBUG 
     std::cout << "end ACQ_single::SignalFinder " << std::endl;
-    #endif
+#endif
 
 
     return;
   } // end signal finder
 
-  void acquisition_single::SignalManipulator(){
+  void acquisition_single::NoiseAdder(float additional_noise_rms){
 
+    TRandom *r3 = new TRandom3();
+    r3->SetSeed(0);
+    double x;
+    for(int i = 0; i < Nsamples(); i++){
+      x = r3->Gaus(0,additional_noise_rms);
+      volt[i] += x;
+    }
 
+    //repeat Noise calculation for smeared stuff
+    float mean, rms;
+
+    mean = .0;
+    for (uint32_t i = 0; i < Nsamples_start(); i++) 
+      mean += volt[i];
+    mean /= (float)Nsamples_start();
+
+    rms = .0;
+    for (uint32_t i = 0; i < Nsamples_start(); i++) 
+      rms += (volt[i]-mean)*(volt[i]-mean);
+    rms /= (float)Nsamples_start();
+    rms = TMath::Power(rms,0.5);
+
+    SetOffset(mean);
+    SetNoise(rms);
 
     return;
   }
 
+  void acquisition_single::JitterAdder(float additional_jitter_rms){
 
+    TRandom *r3 = new TRandom3();
+    r3->SetSeed(0);
+    double t;
+    t = r3->Gaus(0,additional_jitter_rms);
+
+    SetDelay(Delay() + t);
+    return;
+  }
 }
