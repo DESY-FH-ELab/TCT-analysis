@@ -33,7 +33,7 @@ namespace TCT {
     /*
      */
     //  gROOT->ProcessLine("#include <vector>");
-    printf("read files from %s\n",filedir);
+    printf(" read files from %s\n",filedir);
     //if (!AllTests) Init();
     //GetCuts(filedir);
 
@@ -50,11 +50,11 @@ namespace TCT {
 	Char_t pathandfile[250];
 	strcpy(pathandfile,filedir);
 	strcat(pathandfile,infile);
-	if(nfiles < 10) std::cout << "read file from: " << pathandfile << std::endl;
-	if(nfiles == 10) std::cout << "suppressing further 'read from' info" << std::endl;
+	if(nfiles < 3) std::cout << "  read file from: " << pathandfile << std::endl;
+	if(nfiles == 3) std::cout << " suppressing further 'read from' info" << std::endl;
 	file = fopen(pathandfile,"r");
 	if (!file) {
-	  std::cout <<"Can't open file"<<std::endl;
+	  std::cout << " *** Can't open file! " <<std::endl;
 	  exit(1);
 	}
 
@@ -63,7 +63,6 @@ namespace TCT {
 	//std::cout << "start Read() " << nfiles << std::endl;
 	bool read = acq.Read(file, nfiles);
 	fclose(file);
-	//delete[] file; // doesnt work
 	//if (read) std::cout << "File read!" << std::endl;
 	nfiles++;
 	//std::cout << "nfiles: " << nfiles;
@@ -80,7 +79,7 @@ namespace TCT {
     if(nfiles == 0) { 
       std::cout << " no files read, exiting..." << std::endl; return false;
     } else {
-      std::cout << "   -> Found " << allAcqs->size() << " acquisitions, proceed with analysis\n" <<std::endl;
+      std::cout << "   -> Found " << allAcqs->size() << " acquisitions, proceed with analysis" <<std::endl;
     }
 
     return true;

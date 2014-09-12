@@ -1,12 +1,22 @@
 #comments have to start with a #
 #put group key words in []
-[Sensor]
-ProjectFolder	=	/home/hjansen/TCT/TCT-analysis/
-Outfolder	=	/home/hjansen/TCT/TCT-analysis/results/
+
+[General]
+ProjectFolder	=	/home/hjansen/TCT/TCT-analysis
+Outfolder	=	/home/hjansen/TCT/TCT-analysis/results
 
 [Analysis]
-MaxAcqs	=	3
+MaxAcqs		=	100
 Noise_Cut	=	0.005
-S2n_Cut	=	3.0
-S2n_Ref	=	2.0
+Noise_Cut	=	0.005
+S2n_Cut		=	3.
+S2n_Ref		=	2.
+AmplPosLate_Cut	=	0.015
+#PrintEvent	=	100
 
+[Sensor]
+#sampleCard	=	/home/hjansen/TCT/TCT-analysis/testsensor/S57
+# add data to sampleCard
+# write/dontwrite flag
+# how to not run on all folders found?
+#

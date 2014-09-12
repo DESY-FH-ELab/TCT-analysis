@@ -98,7 +98,7 @@ namespace TCT {
     Char_t buffername [50];
     Char_t buffername2 [50];
     sprintf (buffername, "Pulse_%d", (int)iFile);
-    sprintf (buffername2, "Pulse_%d-10", (int)iFile);
+    sprintf (buffername2, "Pulse_%d-FILTERED", (int)iFile);
 
 
     _H_acquisition = new TH1F(buffername, buffername, Nsamples(), time[0]-SampleInterval()*0.5, time[Nsamples()-1]+SampleInterval()*0.5);
