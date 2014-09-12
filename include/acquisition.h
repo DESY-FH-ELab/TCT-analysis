@@ -174,7 +174,19 @@ namespace TCT {
       acquisition_avg & operator = (const acquisition_avg &) = default;
 
       // Dectructor
-      ~acquisition_avg() = default;
+      ~acquisition_avg(){
+       delete _H_noise;
+       delete _G_noise_evo;
+       delete _G_s2n_evo;
+       delete _N_tuple;
+       delete _H2_acqs2D;
+       delete _Profile;
+       delete _ProfileFILTERED;
+       delete _H2_delay_width;
+       delete _H2_ampl_width;
+       delete _H2_delay_ampl;
+       delete _H2_rise1090_ampl;
+      };
 
       virtual double GetSNR() const {
 	return 1.0;
@@ -260,7 +272,8 @@ namespace TCT {
 	_Rise1090(-1.),
 	_Fall(-1.),
 	_SelectionRan(false),
-	_NFound(0){};
+	_NFound(0),
+	_Selected(false){};
 
 
       // Default copy constructer should be fine
@@ -269,18 +282,28 @@ namespace TCT {
 
       // Dectructor
       ~acquisition_single() = default;
+      //{
+        //delete _H_acquisition;		// dont delete here, need them for writting still
+        //delete _H_acquisitionFILTERED;	// 
+      //};
 
 
       virtual double GetSNR() const {
 	return 1.0;
       }
 
+      void Clear(){
+        delete _H_acquisition;
+        delete _H_acquisitionFILTERED;
+      }
+
       void Print();
-      void GetOffsetNoise(uint32_t iEv, TCT::acquisition_avg *avg);
+      void GetOffsetNoise(uint32_t iAcq, TCT::acquisition_avg *avg);
+
       bool Select() { return _Selected;}
+      void SetSelect(bool select) { _Selected = select;}
       bool SelectionRan() { return _SelectionRan;}
       void SetSelectionRan(bool select) { _SelectionRan = select;}
-      void SetSelect(bool select) { _Selected = select;}
 
       void DrawPulse();
       bool Read(FILE *infile, uint32_t iFile);
@@ -427,7 +450,7 @@ namespace TCT {
 }
 
 inline std::ostream & operator << (std::ostream & os, const TCT::acquisition_single & acq) {
-  return os	<< "   This acq is " << acq.Name() << " #" << acq.iAcq()
+  return os	<< "\n   This acq is " << acq.Name() << " #" << acq.iAcq()
     << "\n MaxAmpl " << acq.Maxamplitude()
     << "   Delay " << acq.Delay()
     << "   Width " << acq.Width()
@@ -440,6 +463,6 @@ inline std::ostream & operator << (std::ostream & os, const TCT::acquisition_sin
     << "   Offset_End " << acq.Offset_end()
     << "   NFound " << acq.NFound()
     //<< "    " << acq.()
-    << std::endl;
+    ;
 }
 #endif
