@@ -15,6 +15,8 @@
 #include "TSystem.h"
 #include "TFile.h"
 
+//#define DEBUG
+
 namespace TCT {
 
   void analysis::SetParameters(std::map<std::string, std::string> id_val){
@@ -204,29 +206,42 @@ namespace TCT {
 
   }
 
-    void analysis::AcqsWriter(TCT::sample *sample, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
+    /*void analysis::AcqsWriter(std::string SampleID, std::string temp, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
+   
+    std::string folder	= OutFolder() + temp; 
+    gSystem->MakeDirectory(folder.c_str());
+    SetOutFolder(folder);
+
+
+    // then call Writer
+    }
+
+    void analysis::AcqsWriter(std::string SampleID, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
+    
+    // first create the folder
+    // then add string
+    // then call Writer
+    }*/
+
+    void analysis::AcqsWriter(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
 
     #ifdef DEBUG
     std::cout << "start ANA::AcqsWriter" << std::endl;
     #endif
 
     std::string outfolder	= OutFolder(); 
-    std::string outsample	= sample->SampleID();
-    std::string outtemp		= std::to_string((int)acqAvg->Temp());
-    std::string outpolarity = "+";
-    if(acqAvg->Polarity() > .0) outpolarity = "-";
-    std::string outvolt 	= std::to_string((int)acqAvg->BiasVolt());
-
-
-    std::string outpath  = outfolder + "/" + outsample + "/" + outtemp + "K";
-    std::string outpath1 = outfolder + "/" + outsample + "/";
-    std::string pathandfilename = outpath  + "/" + outsample + "_" + outtemp + "K_" + outpolarity + outvolt + "V.root";
-
-    gSystem->MakeDirectory(outpath1.c_str());
-    //if(gSystem->MakeDirectory(outpath.c_str()) == -1) std::cout << "couldnt create directory" << std::endl;
+    std::string outpath  = outfolder + "/" + OutSample_ID();
     gSystem->MakeDirectory(outpath.c_str());
+    outpath  = outpath + "/" + OutTemp();
+    gSystem->MakeDirectory(outpath.c_str());
+    //outpath  = outpath + "/" + OutVolt(); // dont create subdir for voltages, as there is only one rootfile per voltage
+    //gSystem->MakeDirectory(outpath.c_str());
 
-    std::cout << "\n *** outfile written to: " << pathandfilename << " *** " << std::endl;
+    std::string pathandfilename = outpath  + "/" + OutSample_ID() + "_" + OutTemp() + "_" + OutVolt() + ".root";
+    //std::string pathandfilename = outfolder  + "/" + "outfile.root";
+
+
+    std::cout << "\n   *** outfile written to: " << pathandfilename << " *** " << std::endl;
 
     TFile* f_rootfile = new TFile(pathandfilename.c_str(),"RECREATE","TCTanalyser");
 

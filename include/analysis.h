@@ -38,6 +38,10 @@ namespace TCT {
       uint32_t _PrintEvent;
 
       std::string _OutFolder; // Folder, where the root file is writen to 
+      std::string _OutSample_ID;
+      std::string _OutTemp;
+      std::string _OutVolt;
+      std::string _OutPos; // for X and Y position
 
 
 
@@ -118,11 +122,26 @@ namespace TCT {
       bool AcqsSelecter(TCT::acquisition_single *acq);
       void AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg);
       void AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg);
-      void AcqsWriter(TCT::sample* sample, std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
+
+      void AcqsWriter(std::string SampleID, std::string temp, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg);
+      void AcqsWriter(std::string SampleID, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg);
+      void AcqsWriter(std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
 
       std::string OutFolder() {return _OutFolder;} 
       void SetOutFolder(std::string string) { _OutFolder = string;}
       const std::string & OutFolder() const {return _OutFolder;}
+      
+      std::string OutSample_ID() {return _OutSample_ID;} 
+      void SetOutSample_ID(std::string string) { _OutSample_ID = string;}
+      const std::string & OutSample_ID() const {return _OutSample_ID;}
+      
+      std::string OutTemp() {return _OutTemp;} 
+      void SetOutTemp(std::string string) { _OutTemp = string;}
+      const std::string & OutTemp() const {return _OutTemp;}
+      
+      std::string OutVolt() {return _OutVolt;} 
+      void SetOutVolt(std::string string) { _OutVolt = string;}
+      const std::string & OutVolt() const {return _OutVolt;}
       
     };
 
