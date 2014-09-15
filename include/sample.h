@@ -32,7 +32,7 @@ namespace TCT {
 
       // the empty constructor sets a dummy strong and a dummy thickness
       sample() : 
-	_SampleID("DummyString"),
+	_SampleID("def"),
 	_Thickness(-1){}
 
 
