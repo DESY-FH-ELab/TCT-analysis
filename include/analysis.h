@@ -50,6 +50,8 @@ namespace TCT {
 
       std::string _SampleCard; // 
       std::string _DataFolder; // 
+      bool _SaveToFile;
+      bool _SaveSingles;
 
 
     public:
@@ -72,7 +74,9 @@ namespace TCT {
 	_AddNoise(.0),
 	_AddJitter(.0),
 	_SampleCard("def"),
-	_DataFolder("def")
+	_DataFolder("def"),
+	_SaveToFile(false),
+	_SaveSingles(false)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -133,6 +137,14 @@ namespace TCT {
       bool DoSmearing() { return _DoSmearing;}
       void SetDoSmearing(bool val) { _DoSmearing = val;}
       const bool & DoSmearing() const { return _DoSmearing;}
+
+      bool SaveSingles() { return _SaveSingles;}
+      void SetSaveSingles(bool val) { _SaveSingles = val;}
+      const bool & SaveSingles() const { return _SaveSingles;}
+
+      bool SaveToFile() { return _SaveToFile;}
+      void SetSaveToFile(bool val) { _SaveToFile = val;}
+      const bool & SaveToFile() const { return _SaveToFile;}
 
       float AddNoise() { return _AddNoise;}
       void SetAddNoise(float noise) { _AddNoise = noise;}

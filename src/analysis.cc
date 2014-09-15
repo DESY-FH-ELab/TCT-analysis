@@ -43,6 +43,8 @@ namespace TCT {
       if(i.first == "AddJitter")	_AddJitter = atof((i.second).c_str());
       if(i.first == "SampleCard")	_SampleCard = i.second;
       if(i.first == "DataFolder")	_DataFolder = i.second;
+      if(i.first == "SaveToFile")	_SaveToFile = static_cast<bool>(atoi((i.second).c_str()));
+      if(i.first == "SaveSingles")	_SaveSingles = static_cast<bool>(atoi((i.second).c_str()));
     }
 
 #ifdef DEBUG 
@@ -269,7 +271,7 @@ namespace TCT {
     f_rootfile->cd("single_acqs");
 
     //std::cout << allAcqs->at(0) << std::endl;
-    for(uint32_t i_acq = 0; i_acq < allAcqs->size(); i_acq++){
+    if( SaveSingles()) for(uint32_t i_acq = 0; i_acq < allAcqs->size(); i_acq++){
 
       TCT::acquisition_single* acq = &allAcqs->at(i_acq);
       acq->Hacq()->Write();

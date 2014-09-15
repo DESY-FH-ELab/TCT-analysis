@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
       ana.SetOutTemp(dirs2[i]);
       ana.SetOutVolt(subdirs2[i]);
 
-      ana.AcqsWriter(&AllAcqs, &AcqAvg);
+      if(ana.SaveToFile()) ana.AcqsWriter(&AllAcqs, &AcqAvg);
 
       std::cout << "   Nselected = " << Nselected << std::endl;
       std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
@@ -311,7 +311,7 @@ int main(int argc, char* argv[])
     ana.SetOutTemp("def");
     ana.SetOutVolt("def");
 
-    ana.AcqsWriterNoSubs(&AllAcqs, &AcqAvg);
+    if(ana.SaveToFile()) ana.AcqsWriterNoSubs(&AllAcqs, &AcqAvg);
 
     std::cout << "   Nselected = " << Nselected << std::endl;
     std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
