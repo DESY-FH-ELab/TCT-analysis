@@ -2,8 +2,9 @@
 #put group key words in []
 
 [General]
-ProjectFolder	=	/home/hjansen/TCT/TCT-analysis
-Outfolder	=	/home/hjansen/TCT/TCT-analysis/results
+ProjectFolder	=	../
+DataFolder	=	../testdata/S57
+Outfolder	=	../results
 
 [Analysis]
 MaxAcqs		=	100
@@ -20,8 +21,9 @@ SaveToFile	=	1
 SaveSingles	=	0
 
 [Sensor]
-#sampleCard	=	/home/hjansen/TCT/TCT-analysis/testsensor/S57
-# add data to sampleCard
-# write/dontwrite flag
-# how to not run on all folders found?
-#
+SampleCard	=	../testsensor/SC_S57.txt
+
+# get and store Nselected 
+# get and store mean s2nval
+# create 2D histo with n
+# create 2D histo with s2nval 
