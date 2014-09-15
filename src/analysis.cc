@@ -240,12 +240,12 @@ namespace TCT {
     std::string outfolder	= OutFolder(); 
     std::string outpath  = outfolder + "/" + OutSample_ID();
     gSystem->MakeDirectory(outpath.c_str());
-    outpath  = outpath + "/" + OutTemp();
+    outpath  = outpath + "/" + OutSubFolder();
     gSystem->MakeDirectory(outpath.c_str());
     //outpath  = outpath + "/" + OutVolt(); // dont create subdir for voltages, as there is only one rootfile per voltage
     //gSystem->MakeDirectory(outpath.c_str());
 
-    std::string pathandfilename = outpath  + "/" + OutSample_ID() + "_" + OutTemp() + "_" + OutVolt() + ".root";
+    std::string pathandfilename = outpath  + "/" + OutSample_ID() + "_" + OutSubFolder() + "_" + OutSubsubFolder() + ".root";
     //std::string pathandfilename = outfolder  + "/" + "outfile.root";
 
 

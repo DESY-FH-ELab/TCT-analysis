@@ -40,8 +40,8 @@ namespace TCT {
 
       std::string _OutFolder; // Folder, where the root file is writen to 
       std::string _OutSample_ID;
-      std::string _OutTemp;
-      std::string _OutVolt;
+      std::string _OutSubFolder;
+      std::string _OutSubsubFolder;
       std::string _OutPos; // for X and Y position
 
       bool _DoSmearing;
@@ -184,13 +184,13 @@ namespace TCT {
       void SetOutSample_ID(std::string string) { _OutSample_ID = string;}
       const std::string & OutSample_ID() const {return _OutSample_ID;}
       
-      std::string OutTemp() {return _OutTemp;} 
-      void SetOutTemp(std::string string) { _OutTemp = string;}
-      const std::string & OutTemp() const {return _OutTemp;}
+      std::string OutSubFolder() {return _OutSubFolder;} 
+      void SetOutSubFolder(std::string string) { _OutSubFolder = string;}
+      const std::string & OutSubFolder() const {return _OutSubFolder;}
       
-      std::string OutVolt() {return _OutVolt;} 
-      void SetOutVolt(std::string string) { _OutVolt = string;}
-      const std::string & OutVolt() const {return _OutVolt;}
+      std::string OutSubsubFolder() {return _OutSubsubFolder;} 
+      void SetOutSubsubFolder(std::string string) { _OutSubsubFolder = string;}
+      const std::string & OutSubsubFolder() const {return _OutSubsubFolder;}
       
     };
 
