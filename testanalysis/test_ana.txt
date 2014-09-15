@@ -1,5 +1,6 @@
 #comments have to start with a #
 #put group key words in []
+#always specify ID, TAB, "=", TAB, value
 
 [General]
 ProjectFolder	=	../
@@ -9,7 +10,10 @@ Outfolder	=	../results
 [Analysis]
 MaxAcqs		=	100
 Noise_Cut	=	0.005
-Noise_Cut	=	0.005
+NoiseEnd_Cut	=	0.005
+Nsamples_start	=	50	# in Samples
+Nsamples_end	=	50	# in Samples
+PrePulseInterval	= 	50	# in ns. 
 S2n_Cut		=	3.
 S2n_Ref		=	2.
 AmplPosLate_Cut	=	0.015
@@ -19,6 +23,7 @@ AddNoise	=	0.000	# in volts
 AddJitter	=	0.0	# in ns
 SaveToFile	=	1
 SaveSingles	=	0
+#Temp and Volt is not set at the moment, need to writ this into header file during measurement
 
 [Sensor]
 SampleCard	=	../testsensor/SC_S57.txt
