@@ -77,7 +77,7 @@ namespace TCT {
 
 
     if(nfiles == 0) { 
-      std::cout << " no files read, exiting..." << std::endl; return false;
+      std::cout << " -> no files read " << std::endl; return false;
     } else {
       std::cout << "   -> Found " << allAcqs->size() << " acquisitions, proceed with analysis" <<std::endl;
     }
