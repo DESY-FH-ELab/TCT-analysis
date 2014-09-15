@@ -26,20 +26,28 @@ namespace TCT {
     private :
       std::string _Name;
       std::string _DataInFolder; // Folder, where the associated data files are
-      uint32_t _Nacqs;
+
+      bool _IsManyPulseStructure; //
+      bool _IsMIP; //
+
+      float _Temp;	// 
+      float _BiasVolt;	// 
+
+      double _X, _Y; // in um. ?? do we need local and global coordinates?
 
     public :
 
       measurement(std::string infolder) : 
-        measurement ()
-      {
-        SetDataInFolder(infolder);
-      }
+	measurement (){
+	  SetDataInFolder(infolder);
+	}
 
       measurement() :
-        _Name("Meas1"),
-	_Nacqs(5)
-      {}
+	_Name("Meas1"),
+	_IsMIP(false),
+	_Temp(295.),
+	_BiasVolt(500.){
+	}
 
       // Default copy constructer should be fine
       measurement(const measurement &)               = default;
@@ -52,17 +60,25 @@ namespace TCT {
       std::string Name() {return _Name;}
       const std::string & Name() const {return _Name;}
 
+      void SetBiasVolt(float volt) { _BiasVolt = volt;} 
+      float BiasVolt() {return _BiasVolt;} 
+      const float & BiasVolt() const { return _BiasVolt;} 
+
+      void SetTemp(float temp) { _Temp = temp;} 
+      float Temp() {return _Temp;}  
+      const float & Temp() const { return _Temp;} 
+
+      bool IsMIP() { return _IsMIP;} 
+      void SetIsMIP(bool Is) { _IsMIP = Is;} 
+
       bool AcqsLoader(std::vector<TCT::acquisition_single> *acqs, uint32_t maxAcqs = -1);
-      //void AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg);
-      //bool AcqsSelecter(TCT::acquisition_single *acq);
-      //void AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg);
-      //void AcqsWriter(TCT::sample* sample, std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
 
   };
 }
 
 inline std::ostream & operator << (std::ostream & os, const TCT::measurement & meas) {
-	return os 	<< "\n This measurement is called \n" << meas.Name()
-			<< "   - data folder = " << meas.DataInFolder() << std::endl;
+  return os 	<< "\n This measurement is called \n" << meas.Name()
+    << "   - data folder = " << meas.DataInFolder() 
+    << std::endl;
 }
 #endif

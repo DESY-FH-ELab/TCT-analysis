@@ -29,33 +29,24 @@ namespace TCT {
     private :
 
       bool _IsEdgeTCT;
-      double _x, _y; // do we need local and global coordinates ?? in um
       double _SNR;
       double _AmpRefLaser;
-      bool _IsManyPulseStructure;
-      bool _IsMIP;
       uint32_t _Nsamples;
       uint32_t _Nsamples_start;
       uint32_t _Nsamples_end;
 
     protected:
 
-      float _Temp;	// in K
-      float _BiasVolt;	// in Volt
       float _SampleInterval;	// in ns
-      float _PrePulseInterval;	// in ns. !! By how much should be translated can be inferred from Delay(), or from the trigger position written in the scope header
       float _Polarity;
 
     public :
     
       acquisition_base() :
-        _Temp(295.),
-	_BiasVolt(500.),
 	_Nsamples(-1),
 	_Nsamples_start(50),
 	_Nsamples_end(50),
-	_SampleInterval(0.1),
-	_PrePulseInterval(20.),
+	_SampleInterval(0.1), // !! this should be read from data header!
 	_Polarity(.0)
       {};
 
@@ -70,7 +61,6 @@ namespace TCT {
       acquisition_base(uint32_t nsamples) :
         acquisition_base() 
       {   
-	_IsMIP = false; // !! Get this from measurement class
 	_Nsamples = nsamples;
       };
 
@@ -100,23 +90,8 @@ namespace TCT {
       void SetSampleInterval(float interval){ _SampleInterval = interval;}
       const float & SampleInterval() const{ return _SampleInterval;}
 
-      float PrePulseInterval(){ return _PrePulseInterval;}
-      void SetPrePulseInterval(float interval){ _PrePulseInterval = interval;}
-      const float & PrePulseInterval() const{ return _PrePulseInterval;}
-
       std::vector<double> volt; // ?? encapsulate?
       std::vector<double> time;
-
-      void SetBiasVolt(float volt) { _BiasVolt = volt;}
-      float BiasVolt() {return _BiasVolt;}
-      const float & BiasVolt() const { return _BiasVolt;}
-
-      void SetTemp(float temp) { _Temp = temp;} 
-      float Temp() {return _Temp;} 
-      const float & Temp() const { return _Temp;}
-
-      bool IsMIP() { return _IsMIP;}
-      void SetIsMIP(bool Is) { _IsMIP = Is;}
 
       void SetPolarity(float pol) { _Polarity = pol;}
       float Polarity() {return _Polarity;}
@@ -141,6 +116,7 @@ namespace TCT {
       TH1F*	_H_noise;
       TGraph*	_G_noise_evo;
       TGraph*	_G_s2n_evo;
+      float _PrePulseInterval;	// in ns. !! Specifies how many ns of "pure baseline" are shown before the pulse starts at 0 ns in the avg class. Maximum value can be inferred from Delay(), or from the trigger position written in the scope header
 
 
     public :
@@ -149,6 +125,7 @@ namespace TCT {
 
       acquisition_avg(uint32_t nsamples) :
 	acquisition_base(nsamples){
+	  _PrePulseInterval = 20.;
 	  _H_noise 	= new TH1F("noise","noise",100,0,0.01);
 	  _G_noise_evo 	= new TGraph(1000);
 	  _G_noise_evo->SetNameTitle("Noise Evolution","Noise Evolution");
@@ -205,6 +182,10 @@ namespace TCT {
       TGraph*	G_noise_evo()	{ return _G_noise_evo;}
       TGraph*	G_s2n_evo()	{ return _G_s2n_evo;}
 
+      float PrePulseInterval(){ return _PrePulseInterval;}
+      void SetPrePulseInterval(float interval){ _PrePulseInterval = interval;}
+      const float & PrePulseInterval() const{ return _PrePulseInterval;}
+
   }; // end of acquisition_avg implementation
 
 
@@ -219,18 +200,18 @@ namespace TCT {
       std::string _Name;
       uint32_t _iAcq;
       float _Maxamplitude;	// this is the amplitude of a single pulse, at MaxSigLocation
-      float _AmplNegEarly;		// most neg value before rising edge
-      float _AmplPosEarly;		// most pos value before rising edge
+      float _AmplNegEarly;	// most neg value before rising edge
+      float _AmplPosEarly;	// most pos value before rising edge
       float _AmplNegLate;	// most neg value after falling edge
       float _AmplPosLate;	// most neg value after falling edge
       float _Avg;		// between edges for alpha 
       float _Avgshort;		// avg shortly after risind edge (beta,p,...)
-      float _Delay;		// from acq start to start of RE, start of RE is defined by S2nRef in param.h
+      float _Delay;		// from acq start to start of RE, start of RE is defined by S2n_Ref
       float _Delayfilt;		// from acq start to start of RE for filtered pulses
       float _Width;		// from 50% of RE to 50% of FE
       float _Rise;		// from start to position of maxamplitude 
       float _Rise1090;		// rise time from 10% to 90%
-      float _Fall;		// from position of maxamp to end of pulse, end of FE is defined by S2nRef in param.h
+      float _Fall;		// from position of maxamp to end of pulse, end of FE is defined by S2n_Ref
       float _S2nval;		// avg / Noise
       float _Offset;		// baseline offset before RE
       float _Offset_end;	// baseline offset after FE
@@ -444,6 +425,7 @@ namespace TCT {
       virtual double GetSNR() const {
 	return 1.0;
       }
+
       TProfile* Profile() {return _Profile;}
 
   }; // end of acquisition_multi_avg implementation	

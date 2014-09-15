@@ -435,8 +435,6 @@ namespace TCT {
 
       bool found10 = false;
       bool found90 = false;
-      float frac = 0.25;
-      if(IsMIP()) frac = 0.49;
       for(int i = start[MaxSigLoc]; i < AmpMaxPos[MaxSigLoc]; i++){ // MIPs
 	//std::cout << "prof->GetBinContent(i): " <<  i << "  " << prof->GetBinContent(i) << std::endl;
 

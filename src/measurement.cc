@@ -33,7 +33,7 @@ namespace TCT {
     /*
      */
     //  gROOT->ProcessLine("#include <vector>");
-    printf(" read files from %s\n",filedir);
+    std::cout << " read files from: " << filedir << std::endl;
     //if (!AllTests) Init();
     //GetCuts(filedir);
 
@@ -46,24 +46,20 @@ namespace TCT {
     FILE *file;
     while((infile = gSystem->GetDirEntry(dir))) {
       if (strstr(infile,".txt") && !strstr(infile,".swp") ) {
-	//printf("file: %s\n",infile);
-	Char_t pathandfile[250];
+	char pathandfile[250];
 	strcpy(pathandfile,filedir);
 	strcat(pathandfile,infile);
 	if(nfiles < 3) std::cout << "  read file from: " << pathandfile << std::endl;
 	if(nfiles == 3) std::cout << " suppressing further 'read from' info" << std::endl;
 	file = fopen(pathandfile,"r");
 	if (!file) {
-	  std::cout << " *** Can't open file! " <<std::endl;
+	  std::cout << "   *** Can't open file! Exiting!" <<std::endl;
 	  exit(1);
 	}
 
 	TCT::acquisition_single acq(nfiles); 
-	//std::cout << acq->BiasVolt() << std::endl;
-	//std::cout << "start Read() " << nfiles << std::endl;
 	bool read = acq.Read(file, nfiles);
 	fclose(file);
-	//if (read) std::cout << "File read!" << std::endl;
 	nfiles++;
 	//std::cout << "nfiles: " << nfiles;
 	allAcqs->push_back(acq);
@@ -71,8 +67,6 @@ namespace TCT {
       }
     }
     gSystem->FreeDirectory(dir);
-    //std::cout << "end read in" << std::endl;
-    //char key = getchar();
 
 
 
