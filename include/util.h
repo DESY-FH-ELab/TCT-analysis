@@ -24,11 +24,14 @@ namespace TCT {
     private :
 
       std::map<std::string, std::string> _id_val;
+      bool _IsRead = false;
 
     public:
 
       void parse(std::ifstream & cfgfile); 
       std::map<std::string, std::string> ID_val() {return _id_val;}
+
+      bool IsRead() { return _IsRead;}
 
   };
 }

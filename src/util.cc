@@ -39,10 +39,12 @@ namespace TCT {
 
     }
 
-    std::cout << "\n identifiers and values from analysis file" << std::endl; 
+    std::cout << "\n identifiers and values from file" << std::endl; 
     for(auto i : _id_val) {
       std::cout << i.first << " " << i.second << " " << "\n";
     }
+
+    _IsRead = true;
 
     return;
   }
