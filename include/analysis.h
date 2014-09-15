@@ -25,6 +25,7 @@ namespace TCT {
 
     private :
 
+      uint32_t _MaxAcqs;
       float _Noise_Cut;		// in V
       float _NoiseEnd_Cut;
       float _S2n_Cut;
@@ -47,10 +48,14 @@ namespace TCT {
       float _AddNoise;
       float _AddJitter;
 
+      std::string _SampleCard; // 
+      std::string _DataFolder; // 
+
 
     public:
 
       analysis() :
+        _MaxAcqs(-1),
 	_Noise_Cut(0.01),
 	_NoiseEnd_Cut(0.01),
         _S2n_Cut(9.),
@@ -65,7 +70,9 @@ namespace TCT {
         _PrintEvent(-1),
 	_DoSmearing(false),
 	_AddNoise(.0),
-	_AddJitter(.0)
+	_AddJitter(.0),
+	_SampleCard("def"),
+	_DataFolder("def")
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -77,6 +84,9 @@ namespace TCT {
         SetParameters(id_val);
       }
 
+      uint32_t MaxAcqs() { return _MaxAcqs;}
+      void SetMaxAcqs(uint32_t val) { _MaxAcqs = val;}
+      const uint32_t & MaxAcqs() const { return _MaxAcqs;}
 
       float S2n_Cut() { return _S2n_Cut;}
       void SetS2n_Cut (float val) { _S2n_Cut = val;}
@@ -132,10 +142,13 @@ namespace TCT {
       void SetAddJitter(float val) { _AddJitter = val;}
       const float & AddJitter() const { return _AddJitter;}
 
-      //float () { return _;}
-      //void Set(float ) { _ = ;}
-      //const float & () const { return _;}
+      std::string SampleCard () { return _SampleCard;}
+      void SetSampleCard(std::string val) { _SampleCard = val;}
+      const std::string & SampleCard() const { return _SampleCard;}
 
+      std::string DataFolder () { return _DataFolder;}
+      void SetDataFolder(std::string val) { _DataFolder = val;}
+      const std::string & DataFolder() const { return _DataFolder;}
 
       //float () { return _;}
       //void Set(float ) { _ = ;}
@@ -148,9 +161,8 @@ namespace TCT {
       void AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg);
       void AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg);
 
-      void AcqsWriter(std::string SampleID, std::string temp, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg);
-      void AcqsWriter(std::string SampleID, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg);
       void AcqsWriter(std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
+      void AcqsWriterNoSubs(std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
 
       std::string OutFolder() {return _OutFolder;} 
       void SetOutFolder(std::string string) { _OutFolder = string;}

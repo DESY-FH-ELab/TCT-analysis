@@ -21,12 +21,13 @@ namespace TCT {
 
   void analysis::SetParameters(std::map<std::string, std::string> id_val){
 
-    #ifdef DEBUG 
+#ifdef DEBUG 
     std::cout << " start ANA::SetParameterd: Read and set parameters from input map" << std::endl; 
-    #endif
+#endif
 
     for( auto i : id_val){
       //if(i.first == "") _ = atof((i.second).c_str());
+      if(i.first == "MaxAcqs")		_MaxAcqs = atoi((i.second).c_str());
       if(i.first == "AmplNegLate_Cut")	_AmplNegLate_Cut = atof((i.second).c_str());
       if(i.first == "AmplPosLate_Cut")	_AmplPosLate_Cut = atof((i.second).c_str());
       if(i.first == "AmplNegEarly_Cut")	_AmplNegEarly_Cut = atof((i.second).c_str());
@@ -40,20 +41,22 @@ namespace TCT {
       if(i.first == "DoSmearing")	_DoSmearing = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "AddNoise")		_AddNoise = atof((i.second).c_str());
       if(i.first == "AddJitter")	_AddJitter = atof((i.second).c_str());
+      if(i.first == "SampleCard")	_SampleCard = i.second;
+      if(i.first == "DataFolder")	_DataFolder = i.second;
     }
 
-    #ifdef DEBUG 
+#ifdef DEBUG 
     std::cout << " end ANA::SetParameters" << std::endl; 
-    #endif
+#endif
 
     return;
   }
 
   bool analysis::AcqsSelecter(TCT::acquisition_single *acq){
 
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << " start ANA::AcqsSelecter" << std::endl;
-    #endif
+#endif
 
     bool ok = true;
 
@@ -130,9 +133,9 @@ namespace TCT {
 
   void analysis::AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg){
 
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << "start ANA::AcqsAnalyser" << std::endl;
-    #endif
+#endif
 
     //std::cout << "GOF" << std::endl;
     acq->GetOffsetNoise(iAcq, acqAvg);
@@ -186,20 +189,20 @@ namespace TCT {
 
 
 
-    */   
+     */   
 
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << "end ANA::AcqsAnalyser" << std::endl;
-    #endif
+#endif
 
     return;	
   }
- 
+
   void analysis::AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg) {
 
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << "start ANA::AcqsProfileFiller" << std::endl;
-    #endif
+#endif
 
     if (acq->Select()){
       Float_t tmp_t = -1.0;
@@ -218,36 +221,19 @@ namespace TCT {
 
     } 
 
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << "end ANA::AcqsProfileFiller" << std::endl;
-    #endif
+#endif
 
     return;
 
   }
 
-    /*void analysis::AcqsWriter(std::string SampleID, std::string temp, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
-   
-    std::string folder	= OutFolder() + temp; 
-    gSystem->MakeDirectory(folder.c_str());
-    SetOutFolder(folder);
+  void analysis::AcqsWriter(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
 
-
-    // then call Writer
-    }
-
-    void analysis::AcqsWriter(std::string SampleID, std::string volt, std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
-    
-    // first create the folder
-    // then add string
-    // then call Writer
-    }*/
-
-    void analysis::AcqsWriter(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
-
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << "start ANA::AcqsWriter" << std::endl;
-    #endif
+#endif
 
     std::string outfolder	= OutFolder(); 
     std::string outpath  = outfolder + "/" + OutSample_ID();
@@ -298,9 +284,68 @@ namespace TCT {
 
     f_rootfile->Close();
 
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << "end ANA::AcqsWriter" << std::endl;
-    #endif
+#endif
+
+    return;
+
+  }
+
+  void analysis::AcqsWriterNoSubs(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
+
+#ifdef DEBUG
+    std::cout << "start ANA::AcqsWriter-no-subfolder" << std::endl;
+#endif
+
+    std::string outfolder	= OutFolder(); 
+    std::string outpath  = outfolder + "/" + OutSample_ID();
+    gSystem->MakeDirectory(outpath.c_str());
+
+    std::string pathandfilename = outpath  + "/" + OutSample_ID() + ".root";
+    //std::string pathandfilename = outfolder  + "/" + "outfile.root";
+
+
+    std::cout << "\n   *** outfile written to: " << pathandfilename << " *** " << std::endl;
+
+    TFile* f_rootfile = new TFile(pathandfilename.c_str(),"RECREATE","TCTanalyser");
+
+    f_rootfile->cd();
+    acqAvg->N_tuple()->Write();
+    acqAvg->H2_acqs2D()->Write();
+    acqAvg->Profile()->Write();
+    //acqAvg->ProfileFILTERED()->Write();
+    acqAvg->H2_delay_width()->Write();
+    acqAvg->H2_ampl_width()->Write();
+    acqAvg->H2_delay_ampl()->Write();
+    acqAvg->H2_rise1090_ampl()->Write();
+    acqAvg->H_noise()->Write();
+    acqAvg->G_noise_evo()->Write();
+    acqAvg->G_s2n_evo()->Write();
+
+    // now write the single pulses into the file !! add option -save_all for switch
+    f_rootfile->mkdir("single_acqs");
+    f_rootfile->cd("single_acqs");
+
+    //std::cout << allAcqs->at(0) << std::endl;
+    for(uint32_t i_acq = 0; i_acq < allAcqs->size(); i_acq++){
+
+      TCT::acquisition_single* acq = &allAcqs->at(i_acq);
+      acq->Hacq()->Write();
+
+      //std::cout << *acq << std::endl;
+
+
+    }
+    //for ( TCT::acquisition_single acq : &allAcqs) {
+    //  std::cout << acq << std::endl;
+    //}
+
+    f_rootfile->Close();
+
+#ifdef DEBUG
+    std::cout << "end ANA::AcqsWriter" << std::endl;
+#endif
 
     return;
 
