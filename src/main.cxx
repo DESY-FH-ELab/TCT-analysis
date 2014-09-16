@@ -275,8 +275,8 @@ int main(int argc, char* argv[])
 
 
     if(ana.SaveToFile()) 
-      if(countersubdir > 0) ana.AcqsWriter(&AllAcqs, &AcqAvg);
-      else ana.AcqsWriterNoSubs(&AllAcqs, &AcqAvg);
+      if(countersubdir > 0) ana.AcqsWriter(&AllAcqs, &AcqAvg, true);
+      else ana.AcqsWriter(&AllAcqs, &AcqAvg, false);
 
     std::cout << "   Nselected = " << Nselected << std::endl;
     std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;

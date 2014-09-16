@@ -173,8 +173,8 @@ namespace TCT {
       void AcqsAnalyser(TCT::acquisition_single *acq, uint32_t iAcq, TCT::acquisition_avg *acqAvg);
       void AcqsProfileFiller(TCT::acquisition_single *acq, TCT::acquisition_avg *acqAvg);
 
-      void AcqsWriter(std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
-      void AcqsWriterNoSubs(std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
+      void AcqsWriter(std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg, bool HasSubs = true);
+      //void AcqsWriterNoSubs(std::vector<TCT::acquisition_single> *acqs, TCT::acquisition_avg *acqAvg);
 
       std::string OutFolder() {return _OutFolder;} 
       void SetOutFolder(std::string string) { _OutFolder = string;}

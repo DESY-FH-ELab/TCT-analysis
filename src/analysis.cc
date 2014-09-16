@@ -231,7 +231,7 @@ namespace TCT {
 
   }
 
-  void analysis::AcqsWriter(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
+  void analysis::AcqsWriter(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg, bool HasSubs){
 
 #ifdef DEBUG
     std::cout << "start ANA::AcqsWriter" << std::endl;
@@ -240,12 +240,14 @@ namespace TCT {
     std::string outfolder	= OutFolder(); 
     std::string outpath  = outfolder + "/" + OutSample_ID();
     gSystem->MakeDirectory(outpath.c_str());
-    outpath  = outpath + "/" + OutSubFolder();
-    gSystem->MakeDirectory(outpath.c_str());
+    if(HasSubs) outpath  = outpath + "/" + OutSubFolder();
+    if(HasSubs) gSystem->MakeDirectory(outpath.c_str());
     //outpath  = outpath + "/" + OutVolt(); // dont create subdir for voltages, as there is only one rootfile per voltage
     //gSystem->MakeDirectory(outpath.c_str());
 
-    std::string pathandfilename = outpath  + "/" + OutSample_ID() + "_" + OutSubFolder() + "_" + OutSubsubFolder() + ".root";
+    std::string pathandfilename;
+    if(HasSubs) pathandfilename = outpath  + "/" + OutSample_ID() + "_" + OutSubFolder() + "_" + OutSubsubFolder() + ".root";
+    else pathandfilename = outpath  + "/" + OutSample_ID() + ".root";
     //std::string pathandfilename = outfolder  + "/" + "outfile.root";
 
 
@@ -294,7 +296,7 @@ namespace TCT {
 
   }
 
-  void analysis::AcqsWriterNoSubs(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
+  /*void analysis::AcqsWriterNoSubs(std::vector<TCT::acquisition_single> *allAcqs, TCT::acquisition_avg *acqAvg){
 
 #ifdef DEBUG
     std::cout << "start ANA::AcqsWriter-no-subfolder" << std::endl;
@@ -351,6 +353,6 @@ namespace TCT {
 
     return;
 
-  }
+  }*/
 
 }
