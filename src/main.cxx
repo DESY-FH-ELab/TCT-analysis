@@ -237,6 +237,7 @@ int main(int argc, char* argv[])
     std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
 #endif
 
+    AcqAvg.SetNanalysed(AllAcqs.size());
     for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
 
 #ifdef DEBUG 
@@ -256,6 +257,7 @@ int main(int argc, char* argv[])
 	Nselected++;
 	acq->SetSelect(true);
       }
+      AcqAvg.SetNselected(Nselected);
       ana.AcqsProfileFiller(acq, &AcqAvg);
 
     }

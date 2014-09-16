@@ -16,6 +16,7 @@
 #include "TProfile.h"
 #include "TNtuple.h"
 #include "TGraph.h"
+#include "TMath.h"
 
 // TCT includes
 //#include "analysis.h"
@@ -117,7 +118,10 @@ namespace TCT {
       TGraph*	_G_noise_evo;
       TGraph*	_G_s2n_evo;
       float _PrePulseInterval;	// in ns. !! Specifies how many ns of "pure baseline" are shown before the pulse starts at 0 ns in the avg class. Maximum value can be inferred from Delay(), or from the trigger position written in the scope header
-
+      uint32_t _Nselected;
+      uint32_t _Nanalysed;
+      std::vector<float> _V_S2nval;
+      float _S2nval;
 
     public :
 
@@ -185,6 +189,21 @@ namespace TCT {
       float PrePulseInterval(){ return _PrePulseInterval;}
       void SetPrePulseInterval(float interval){ _PrePulseInterval = interval;}
       const float & PrePulseInterval() const{ return _PrePulseInterval;}
+
+      uint32_t Nselected(){ return _Nselected;}
+      void SetNselected(uint32_t val){ _Nselected = val;}
+      const uint32_t & Nselected() const{ return _Nselected;}
+
+      uint32_t Nanalysed(){ return _Nanalysed;}
+      void SetNanalysed(uint32_t val){ _Nanalysed = val;}
+      const uint32_t & Nanalysed() const{ return _Nanalysed;}
+
+      float S2nval() { return _S2nval;}
+      void SetS2nval(float time) { _S2nval = time;}
+      const float & S2nval() const { return _S2nval;}
+
+      std::vector<float> *V_S2nval() { return &_V_S2nval;}
+      float M_V_S2nval() { return TMath::Mean(V_S2nval()->begin(), V_S2nval()->end());}
 
   }; // end of acquisition_avg implementation
 

@@ -420,6 +420,7 @@ namespace TCT {
       SetAvgshort(avgshort/((float)count));
 
       SetS2nval(Avg()/Noise());
+      (acqAvg->V_S2nval())->push_back(Avg()/Noise());
 
 
       (acqAvg->G_s2n_evo())->SetPoint(iAcq(),iAcq(),S2nval());
