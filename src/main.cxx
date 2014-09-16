@@ -260,7 +260,9 @@ int main(int argc, char* argv[])
       AcqAvg.SetNselected(Nselected);
       ana.AcqsProfileFiller(acq, &AcqAvg);
 
-    }
+    } // end fot AllAcqs.size()
+
+    //std::cout << "Mean s2nval = " << AcqAvg.M_V_S2nval() << std::endl;
 
     ana.SetOutSample_ID(sample.SampleID());
     if(countersubdir > 0) {

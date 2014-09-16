@@ -15,6 +15,9 @@ lib/*
 .*.swp
 *.cc.swo
 
+# ignore kate autosave
+*kate-swp
+
 # ignore git mergetool backup files
 *.orig
 
