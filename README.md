@@ -39,11 +39,10 @@ here, a subfolder structure is created: `<sample-name>/<temperature>/<root-file.
 Look at the header of the sample files included in the repository.
 If your headers differ from that, change the Read() method in acquisition.cc accordingly
 
-  * Execute the binary: `> ./tct-analysis -r <path-to-project-directory>`
+  * Execute the binary from the TCT-analysis/build folder: `> ./tct-analysis -af <path-to-analysis-file>`
 e.g.
-`> ./tct-analysis -r /home/<user>/<my-path>/TCT-analysis/`
-or if executed from /TCT-analysis/build
-`> ./tct-analysis -r ..`
+ ./tct-analysis -af ../testanalysis/test_ana.txt
+
 
 
 

@@ -28,7 +28,3 @@ SaveSingles	=	0
 [Sensor]
 SampleCard	=	../testsensor/SC_S57.txt
 
-# get and store Nselected 
-# get and store mean s2nval
-# create 2D histo with n
-# create 2D histo with s2nval 
