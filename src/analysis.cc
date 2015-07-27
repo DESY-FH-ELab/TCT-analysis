@@ -45,6 +45,10 @@ namespace TCT {
       if(i.first == "DataFolder")	_DataFolder = i.second;
       if(i.first == "SaveToFile")	_SaveToFile = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "SaveSingles")	_SaveSingles = static_cast<bool>(atoi((i.second).c_str()));
+      if(i.first == "LeCroyRAW")	_LeCroyRAW = static_cast<bool>(atoi((i.second).c_str()));
+      //tct scanning
+      if(i.first == "Mode")		_Mode = atoi((i.second).c_str());
+      
     }
 
 #ifdef DEBUG 

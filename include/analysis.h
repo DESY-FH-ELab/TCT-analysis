@@ -26,6 +26,7 @@ namespace TCT {
     private :
 
       uint32_t _MaxAcqs;
+      uint32_t _Mode;
       float _Noise_Cut;		// in V
       float _NoiseEnd_Cut;
       float _S2n_Cut;
@@ -52,15 +53,17 @@ namespace TCT {
       std::string _DataFolder; // 
       bool _SaveToFile;
       bool _SaveSingles;
+      bool _LeCroyRAW;
 
 
     public:
 
       analysis() :
-        _MaxAcqs(-1),
+	_Mode(0),
+    _MaxAcqs(-1),
 	_Noise_Cut(0.01),
 	_NoiseEnd_Cut(0.01),
-        _S2n_Cut(9.),
+     _S2n_Cut(9.),
 	_S2n_Ref(2.),
 	_Amplitude_Cut(0.01),
 	_Width_Cut(3.0),
@@ -76,7 +79,8 @@ namespace TCT {
 	_SampleCard("def"),
 	_DataFolder("def"),
 	_SaveToFile(false),
-	_SaveSingles(false)
+	_SaveSingles(false),
+	_LeCroyRAW(false)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -87,6 +91,10 @@ namespace TCT {
       {
         SetParameters(id_val);
       }
+
+      uint32_t Mode() { return _Mode;}
+      void SetMode(uint32_t val) { _Mode = val;}
+      const uint32_t & Mode() const { return _Mode;}
 
       uint32_t MaxAcqs() { return _MaxAcqs;}
       void SetMaxAcqs(uint32_t val) { _MaxAcqs = val;}
@@ -141,6 +149,10 @@ namespace TCT {
       bool SaveSingles() { return _SaveSingles;}
       void SetSaveSingles(bool val) { _SaveSingles = val;}
       const bool & SaveSingles() const { return _SaveSingles;}
+
+      bool LeCroyRAW() { return _LeCroyRAW;}
+      void SetLeCroyRAW(bool val) { _LeCroyRAW = val;}
+      const bool & LeCroyRAW() const { return _LeCroyRAW;}
 
       bool SaveToFile() { return _SaveToFile;}
       void SetSaveToFile(bool val) { _SaveToFile = val;}
