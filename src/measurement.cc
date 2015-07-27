@@ -15,7 +15,7 @@
 
 namespace TCT {
 
-  bool measurement::AcqsLoader(std::vector<TCT::acquisition_single> *allAcqs, uint32_t MaxAcqs){
+  bool measurement::AcqsLoader(std::vector<TCT::acquisition_single> *allAcqs, uint32_t MaxAcqs, bool LeCroyRAW){
 
     //if(debug) std::cout << "start PulseCheck" << std::endl;
 
@@ -43,29 +43,54 @@ namespace TCT {
     uint32_t nfiles = 0;
     //std::cout << "do read in" << std::endl;
     //char key = getchar();
-    FILE *file;
-    while((infile = gSystem->GetDirEntry(dir))) {
-      if (strstr(infile,".txt") && !strstr(infile,".swp") ) {
-	char pathandfile[250];
-	strcpy(pathandfile,filedir);
-	strcat(pathandfile,infile);
-	if(nfiles < 3) std::cout << "  read file from: " << pathandfile << std::endl;
-	if(nfiles == 3) std::cout << " suppressing further 'read from' info" << std::endl;
-	file = fopen(pathandfile,"r");
-	if (!file) {
-	  std::cout << "   *** Can't open file! Exiting!" <<std::endl;
-	  exit(1);
-	}
+    std::cout<<"Parsing oscilloscope data"<<std::endl;
+    if(LeCroyRAW) {
+        std::cout << " Parsing data using LeCroy RAW reader " << std::endl;
+        while((infile = gSystem->GetDirEntry(dir))) {
+            if (strstr(infile,".trc")) {
+                char pathandfile[250];
+                strcpy(pathandfile,filedir);
+                strcat(pathandfile,infile);
+                if(nfiles < 3) std::cout << "  read file from: " << pathandfile << std::endl;
+                if(nfiles == 3) std::cout << " suppressing further 'read from' info" << std::endl;
 
-	TCT::acquisition_single acq(nfiles); 
-	bool read = acq.Read(file, nfiles);
-	fclose(file);
-	nfiles++;
-	//std::cout << "nfiles: " << nfiles;
-	allAcqs->push_back(acq);
-	if (nfiles > MaxAcqs-1) break;
-      }
+                TCT::acquisition_single acq(nfiles);
+                std::string fullfname = pathandfile;
+                bool read = acq.ReadRAW(fullfname, nfiles);
+                nfiles++;
+                //std::cout << "nfiles: " << nfiles;
+                allAcqs->push_back(acq);
+                if (nfiles > MaxAcqs-1) break;
+            }
+        }
     }
+    else {
+        std::cout << " Parsing data using *.txt reader " << std::endl;
+        FILE *file;
+        while((infile = gSystem->GetDirEntry(dir))) {
+            if (strstr(infile,".txt") && !strstr(infile,".swp") ) {
+                char pathandfile[250];
+                strcpy(pathandfile,filedir);
+                strcat(pathandfile,infile);
+                if(nfiles < 3) std::cout << "  read file from: " << pathandfile << std::endl;
+                if(nfiles == 3) std::cout << " suppressing further 'read from' info" << std::endl;
+                file = fopen(pathandfile,"r");
+                if (!file) {
+                    std::cout << "   *** Can't open file! Exiting!" <<std::endl;
+                    exit(1);
+                }
+
+                TCT::acquisition_single acq(nfiles);
+                bool read = acq.Read(file, nfiles);
+                fclose(file);
+                nfiles++;
+                //std::cout << "nfiles: " << nfiles;
+                allAcqs->push_back(acq);
+                if (nfiles > MaxAcqs-1) break;
+            }
+        }
+    }
+
     gSystem->FreeDirectory(dir);
 
 
