@@ -108,18 +108,28 @@ SET(LIB_SOURCE_FILES
   "src/measurement.cc"
   "src/util.cc"
   "src/analysis.cc"
+  "src/scanning.cc"
   )
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
+MESSAGE(STATUS ${ROOT_LIBRARIES})
 
+# Check for LCR Library
+FIND_PACKAGE ( LCR REQUIRED )
+INCLUDE_DIRECTORIES( ${LCR_INCLUDE_DIR} )
+
+# Check for TCTAnalyze library by particulars.si
+FIND_PACKAGE ( TCTAnalyze REQUIRED )
+INCLUDE_DIRECTORIES( ${TCTAnalyze_INCLUDE} )
 
 # build main TCT-ANALYSIS executable
 add_executable(tct-analysis  src/main.cxx )
-target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES})
+target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
 # now set up the installation directory
 INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  ARCHIVE DESTINATION lib
+)
 
 
 
