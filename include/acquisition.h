@@ -308,6 +308,7 @@ namespace TCT {
       void DrawAcq();
       void PrintAcq();
       bool Read(FILE *infile, uint32_t iFile);
+      bool ReadRAW(std::string fullfname, uint32_t iFile);
       bool Read(FILE *infile, uint32_t iFile, TCT::acquisition_avg *avg); 
       void FillNtuple(TCT::acquisition_avg *avg);
       void SignalFinder(TCT::acquisition_avg *avg, float, float, float );

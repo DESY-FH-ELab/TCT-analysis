@@ -15,6 +15,9 @@
 #include "TMath.h" 
 #include "TRandom3.h" 
 
+// External includes
+#include "LeCroy.h"
+
 //#define DEBUG
 
 namespace TCT {
@@ -55,7 +58,6 @@ namespace TCT {
       counter++;
 
     }
-
 
     if(maxvolt > fabs(minvolt)) SetPolarity(1.);
     else SetPolarity(-1.);
@@ -115,6 +117,63 @@ namespace TCT {
 
 
     return kTRUE;
+  }
+
+  bool acquisition_single::ReadRAW(std::string fullfname, uint32_t iFile){
+
+	#ifdef DEBUG 
+	    std::cout << "start ACQ_single::ReadRAW"  << std::endl;
+	#endif
+	LeCroy::waveFile thisFile(fullfname);
+
+	int ret=0;
+	//float t_off=thisFile.HORIZ_OFFSET;
+	float t_off = 0;
+        //SetSampleInterval(thisFile.pTimingArray1[1]-thisFile.pTimingArray1[0]);
+	SetSampleInterval(thisFile.HORIZ_INTERVAL);
+
+	// pre-parse to find polarity
+
+	double in_v, in_t;
+	float minvolt = 1.;
+	float maxvolt = -1.;
+	for(int i = 0; i < thisFile.WAVE_ARRAY_COUNT; i++) {
+		in_v = thisFile.pDataArray1[i];
+	        if(in_v > maxvolt) maxvolt = in_v;
+		if(in_v < minvolt) minvolt = in_v;
+	}
+
+	if(maxvolt > fabs(minvolt)) SetPolarity(1.);
+    	else SetPolarity(-1.);
+    	//if(BiasVolt() < 0) Polarity = 1.;
+
+	for(int i = 0; i < thisFile.WAVE_ARRAY_COUNT; i++) {
+		in_v = thisFile.pDataArray1[i];
+	        time.push_back(t_off+i*SampleInterval());
+        	volt.push_back(Polarity()*thisFile.pDataArray1[i]);
+	}
+
+    	SetNsamples(thisFile.WAVE_ARRAY_COUNT);
+
+	// fill histogram and add to Object array // !! next 6 lines to be moved to the constructor
+	Char_t buffername [50];
+	Char_t buffername2 [50];
+	sprintf (buffername, "Pulse_%d", (int)iFile);
+	sprintf (buffername2, "Pulse_%d-FILTERED", (int)iFile);
+
+	_H_acquisition = new TH1F(buffername, buffername, Nsamples(), time[0]-SampleInterval()*0.5, time[Nsamples()-1]+SampleInterval()*0.5);
+	_H_acquisitionFILTERED = new TH1F(buffername2, buffername2, Nsamples(), time[0]-SampleInterval()*0.5, time[Nsamples()-1]+SampleInterval()*0.5);
+
+	this->SetName("SingleAcq");
+	//this->PrintAcq();
+
+	#ifdef DEBUG 
+	    std::cout << "end ACQ_single::ReadRAW"  << std::endl;
+	#endif
+
+	return kTRUE;
+
+	
   }
 
   void acquisition_single::SetName(std::string name){
