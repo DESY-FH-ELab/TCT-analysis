@@ -18,6 +18,7 @@
 #include "acquisition.h"
 #include "measurement.h"
 #include "analysis.h"
+#include "scanning.h"
 
 //  includes from ROOT libraries
 #include "TCanvas.h"
@@ -191,112 +192,168 @@ int main(int argc, char* argv[])
 
 
 
+  uint32_t counter;
+  switch(ana.Mode()) {
+      case 0:
+          //if(countersubdir > 0) {
+          counter=0;
+          while(1){
 
 
-  //if(countersubdir > 0) {
-  uint32_t counter = 0;
-  while(1){
+    #ifdef DEBUG
+              std::cout << " Start with subfolder # " << counter << std::endl;
+    #endif
+              //int i = 0; i < countersubdir; i++) {
+              // create vec with acq_singles in it
+              std::vector<TCT::acquisition_single> AllAcqs;
+
+              if(countersubdir == 0) {
+                  // check if DataFolder() ends on "/", if not, add it
+                  std::string path = ana.DataFolder();
+                  if (path.length() > 0) {
+                      std::string::iterator it = path.end() - 1;
+                      if (*it != '/') {
+                          path.append("/");
+                      }
+                  }
+                  ana.SetDataFolder(path);
+                  // push DataFolder to pathndirs (this is a hack to cope with Nsubdir == 0...)
+                  pathndirs.push_back(ana.DataFolder());
+              }
+              // create measurement object from one subdir for each cycle
+              TCT::measurement meas(pathndirs[counter]);
+
+              if(!meas.AcqsLoader(&AllAcqs, ana.MaxAcqs(),ana.LeCroyRAW())) {
+                  std::cout << " Folder empty! Skipping folder" << std::endl;
+                  continue;
+              };
+
+              // now create instance of avg acquisition using Nsamples from loaded files
+              TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
+              AcqAvg.SetPolarity(AllAcqs[0].Polarity());
+
+              //now analyse all acquisitions
+              int Nselected = 0;
+
+    #ifdef DEBUG
+              std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
+    #endif
+
+              AcqAvg.SetNanalysed(AllAcqs.size());
+              for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
+
+    #ifdef DEBUG
+                  std::cout << " - Start with Acq #" << i_acq << std::endl;
+    #endif
+
+                  TCT::acquisition_single* acq = &AllAcqs[i_acq];
+                  if(ana.DoSmearing()) ana.AcqsSmearer(acq, ana.AddNoise(), false);
+                  ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
+                  if(ana.DoSmearing()) ana.AcqsSmearer(acq, false, ana.AddJitter()); // AcqsAnalyser removes jitter by determining each acqs delay. Hence, to add jitter, delay has to be manipulated after AcqsAnalyser (and before filling of profile
+
+    #ifdef DEBUG
+                  std::cout << *acq << std::endl;
+    #endif
+
+                  if( ana.AcqsSelecter(acq) ) {
+                      Nselected++;
+                      acq->SetSelect(true);
+                  }
+                  AcqAvg.SetNselected(Nselected);
+                  ana.AcqsProfileFiller(acq, &AcqAvg);
+
+              } // end fot AllAcqs.size()
+
+              //std::cout << "Mean s2nval = " << AcqAvg.M_V_S2nval() << std::endl;
+
+              ana.SetOutSample_ID(sample.SampleID());
+              if(countersubdir > 0) {
+                  ana.SetOutSubFolder(dirs2[counter]);
+                  ana.SetOutSubsubFolder(subdirs2[counter]);
+              } else {
+                  ana.SetOutSubFolder("def");
+                  ana.SetOutSubsubFolder("def");
+              }
 
 
-#ifdef DEBUG 
-    std::cout << " Start with subfolder # " << counter << std::endl;
-#endif
-    //int i = 0; i < countersubdir; i++) {
-    // create vec with acq_singles in it
-    std::vector<TCT::acquisition_single> AllAcqs;
+              if(ana.SaveToFile())
+                  if(countersubdir > 0) ana.AcqsWriter(&AllAcqs, &AcqAvg, true);
+                  else ana.AcqsWriter(&AllAcqs, &AcqAvg, false);
 
-    if(countersubdir == 0) {
-      // check if DataFolder() ends on "/", if not, add it
-      std::string path = ana.DataFolder();
-      if (path.length() > 0) {
-	std::string::iterator it = path.end() - 1;
-	if (*it != '/') {
-	  path.append("/");
-	}
-      }
-      ana.SetDataFolder(path);
-      // push DataFolder to pathndirs (this is a hack to cope with Nsubdir == 0...)
-      pathndirs.push_back(ana.DataFolder());
-    }
-    // create measurement object from one subdir for each cycle
-    TCT::measurement meas(pathndirs[counter]);
+              std::cout << "   Nselected = " << Nselected << std::endl;
+              std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
 
-    if(!meas.AcqsLoader(&AllAcqs, ana.MaxAcqs())) {
-      std::cout << " Folder empty! Skipping folder" << std::endl; 
-      continue;
-    };
+              // now take care of memory management
+              // delete remaning TH1Fs in acquisition_single and then clear AllAcqs
+              for(int j = 0; j < AllAcqs.size(); j++) {
+                  AllAcqs[j].Clear();
+              }
+              AllAcqs.clear();
 
-    // now create instance of avg acquisition using Nsamples from loaded files
-    TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
-    AcqAvg.SetPolarity(AllAcqs[0].Polarity());
+              counter++;
+              if( countersubdir == 0) break;
+              if(counter == countersubdir) break;
+    #ifdef DEBUG
+              std::cout << "   AllAcqs has " << AllAcqs.size() << " objects left" << std::endl;
+    #endif
 
-    //now analyse all acquisitions
-    int Nselected = 0;
+          }
+      case 1:
+          counter = 0;
+          while(1) {
+              if(countersubdir == 0) {
+                  // check if DataFolder() ends on "/", if not, add it
+                  std::string path = ana.DataFolder();
+                  if (path.length() > 0) {
+                      std::string::iterator it = path.end() - 1;
+                      if (*it != '/') {
+                          path.append("/");
+                      }
+                  }
+                  ana.SetDataFolder(path);
+                  // push DataFolder to pathndirs (this is a hack to cope with Nsubdir == 0...)
+                  pathndirs.push_back(ana.DataFolder());
+              }
+              const char* filedir = pathndirs[counter].c_str(); // !! change to encapsulation
 
-#ifdef DEBUG 
-    std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
-#endif
+              std::cout << " read files from: " << filedir << std::endl;
 
-    AcqAvg.SetNanalysed(AllAcqs.size());
-    for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
+              // get list of files in filedir
+              void *dir = gSystem->OpenDirectory(filedir);
+              const char *infile;
+              uint32_t nfiles = 0;
+              std::cout<<"Parsing DAQ data"<<std::endl;
+              bool HasSubs = (bool)countersubdir;
+              ana.SetOutSample_ID(sample.SampleID());
+              if(countersubdir > 0) {
+                  ana.SetOutSubFolder(dirs2[counter]);
+                  ana.SetOutSubsubFolder(subdirs2[counter]);
+              } else {
+                  ana.SetOutSubFolder("def");
+                  ana.SetOutSubsubFolder("def");
+              }
+              while((infile = gSystem->GetDirEntry(dir))) {
 
-#ifdef DEBUG 
-      std::cout << " - Start with Acq #" << i_acq << std::endl;
-#endif
+                  if (strstr(infile,".tct")) {
+                      char pathandfile[250];
+                      strcpy(pathandfile,filedir);
+                      strcat(pathandfile,infile);
+                      if(nfiles < 3) std::cout << "  read file from: " << pathandfile << std::endl;
+                      if(nfiles == 3) std::cout << " suppressing further 'read from' info" << std::endl;
 
-      TCT::acquisition_single* acq = &AllAcqs[i_acq];
-      if(ana.DoSmearing()) ana.AcqsSmearer(acq, ana.AddNoise(), false);
-      ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
-      if(ana.DoSmearing()) ana.AcqsSmearer(acq, false, ana.AddJitter()); // AcqsAnalyser removes jitter by determining each acqs delay. Hence, to add jitter, delay has to be manipulated after AcqsAnalyser (and before filling of profile
-
-#ifdef DEBUG 
-      std::cout << *acq << std::endl;
-#endif
-
-      if( ana.AcqsSelecter(acq) ) {
-	Nselected++;
-	acq->SetSelect(true);
-      }
-      AcqAvg.SetNselected(Nselected);
-      ana.AcqsProfileFiller(acq, &AcqAvg);
-
-    } // end fot AllAcqs.size()
-
-    //std::cout << "Mean s2nval = " << AcqAvg.M_V_S2nval() << std::endl;
-
-    ana.SetOutSample_ID(sample.SampleID());
-    if(countersubdir > 0) {
-      ana.SetOutSubFolder(dirs2[counter]);
-      ana.SetOutSubsubFolder(subdirs2[counter]);
-    } else {
-      ana.SetOutSubFolder("def");
-      ana.SetOutSubsubFolder("def");
-    }
-
-
-    if(ana.SaveToFile()) 
-      if(countersubdir > 0) ana.AcqsWriter(&AllAcqs, &AcqAvg, true);
-      else ana.AcqsWriter(&AllAcqs, &AcqAvg, false);
-
-    std::cout << "   Nselected = " << Nselected << std::endl;
-    std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
-
-    // now take care of memory management
-    // delete remaning TH1Fs in acquisition_single and then clear AllAcqs
-    for(int j = 0; j < AllAcqs.size(); j++) {
-      AllAcqs[j].Clear();
-    }
-    AllAcqs.clear();
-
-    counter++;
-    if( countersubdir == 0) break;
-    if(counter == countersubdir) break;
-#ifdef DEBUG 
-    std::cout << "   AllAcqs has " << AllAcqs.size() << " objects left" << std::endl;
-#endif
-
-  } 
-
+                      TCT::Scanning daq_data;
+                      bool read = daq_data.ReadTCT(pathandfile,&ana, HasSubs);
+                      if(!read) {std::cout<<"Processing of file "<<pathandfile<<" failed. Skipping."<<std::endl;  continue;}
+                      nfiles++;
+                      //std::cout << "nfiles: " << nfiles;
+                      if (nfiles > ana.MaxAcqs()-1) break;
+                  }
+              }
+              counter++;
+              if( countersubdir == 0) break;
+              if(counter == countersubdir) break;
+          }
+  }
   //theApp.Run(kTRUE); 
   //char key = getchar();
 

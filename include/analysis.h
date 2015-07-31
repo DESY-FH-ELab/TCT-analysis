@@ -55,6 +55,22 @@ namespace TCT {
       bool _SaveSingles;
       bool _LeCroyRAW;
 
+      //scanning parameters
+      uint32_t _CH_Det;
+      uint32_t _CH_PhDiode;
+      uint32_t _CH_Trig;
+      uint32_t _OptAxis;
+      bool _DO_focus;
+      uint32_t _FPerp;
+      float _FFWHM;
+      float _FLevel;
+      float _FTlow;
+      float _FThigh;
+      float _FDLow;
+      float _FDHigh;
+      float _FFitLow;
+      float _FFitHigh;
+      bool _FSeparateCharges;
 
     public:
 
@@ -80,7 +96,12 @@ namespace TCT {
 	_DataFolder("def"),
 	_SaveToFile(false),
 	_SaveSingles(false),
-	_LeCroyRAW(false)
+    _LeCroyRAW(false),
+    _CH_Det(0),
+    _CH_PhDiode(0),
+    _CH_Trig(0),
+    _OptAxis(3),
+    _DO_focus(false)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -165,6 +186,69 @@ namespace TCT {
       float AddJitter() { return _AddJitter;}
       void SetAddJitter(float val) { _AddJitter = val;}
       const float & AddJitter() const { return _AddJitter;}
+
+      //begin scanning section
+      uint32_t CH_Det() { return _CH_Det;}
+      void SetCH_Det(uint32_t val) { _CH_Det = val;}
+      const uint32_t & CH_Det() const { return _CH_Det;}
+
+      uint32_t CH_PhDiode() { return _CH_PhDiode;}
+      void SetCH_PhDiode(uint32_t val) { _CH_PhDiode = val;}
+      const uint32_t & CH_PhDiode() const { return _CH_PhDiode;}
+
+      uint32_t CH_Trig() { return _CH_Trig;}
+      void SetCH_Trig(uint32_t val) { _CH_Trig = val;}
+      const uint32_t & CH_Trig() const { return _CH_Trig;}
+
+      uint32_t OptAxis() { return _OptAxis;}
+      void SetOptAxis(uint32_t val) { _OptAxis = val;}
+      const uint32_t & OptAxis() const { return _OptAxis;}
+
+      bool DO_focus() { return _DO_focus;}
+      void SetDO_focus(bool val) { _DO_focus = val;}
+      const bool & DO_focus() const { return _DO_focus;}
+
+      uint32_t FPerp() { return _FPerp;}
+      void SetFPerp(uint32_t val) { _FPerp = val;}
+      const uint32_t & FPerp() const { return _FPerp;}
+
+      float FFWHM() { return _FFWHM;}
+      void SetFFWHM(float val) { _FFWHM = val;}
+      const float & FFWHM() const { return _FFWHM;}
+
+      float FLevel() { return _FLevel;}
+      void SetFLevel(float val) { _FLevel = val;}
+      const float & FLevel() const { return _FLevel;}
+
+      float FTlow() { return _FTlow;}
+      void SetFTlow(float val) { _FTlow = val;}
+      const float & FTlow() const { return _FTlow;}
+
+      float FThigh() { return _FThigh;}
+      void SetFThigh(float val) { _FThigh = val;}
+      const float & FThigh() const { return _FThigh;}
+
+      float FDLow() { return _FDLow;}
+      void SetFDLow(float val) { _FDLow = val;}
+      const float & FDLow() const { return _FDLow;}
+
+      float FDHigh() { return _FDHigh;}
+      void SetFDHigh(float val) { _FDHigh = val;}
+      const float & FDHigh() const { return _FDHigh;}
+
+      float FFitLow() { return _FFitLow;}
+      void SetFFitLow(float val) { _FFitLow = val;}
+      const float & FFitLow() const { return _FFitLow;}
+
+      float FFitHigh() { return _FFitHigh;}
+      void SetFFitHigh(float val) { _FFitHigh = val;}
+      const float & FFitHigh() const { return _FFitHigh;}
+
+      bool FSeparateCharges() { return _FSeparateCharges;}
+      void SetFSeparateCharges(bool val) { _FSeparateCharges = val;}
+      const bool & FSeparateCharges() const { return _FSeparateCharges;}
+
+      //end scanning section
 
       std::string SampleCard () { return _SampleCard;}
       void SetSampleCard(std::string val) { _SampleCard = val;}

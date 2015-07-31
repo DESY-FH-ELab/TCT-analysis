@@ -4,8 +4,12 @@
 
 [General]
 ProjectFolder	=	../
-DataFolder	=	../testdata/S57
+DataFolder	=	../testdata/test_2
 Outfolder	=	../results
+#Set acq mode.
+# 0 - taking the sets of single measurements (*.txt or *.raw files by oscilloscope). Settings are in [Analysis]
+# 1 - taking the data from *.tct file produced by DAQ software. Settings are in [Scanning]
+Mode		=	1
 
 [Analysis]
 MaxAcqs		=	100
@@ -22,8 +26,39 @@ DoSmearing	=	0
 AddNoise	=	0.000	# in volts
 AddJitter	=	0.0	# in ns
 SaveToFile	=	1
-SaveSingles	=	0
-#Temp and Volt is not set at the moment, need to writ this into header file during measurement
+SaveSingles	=	1
+LeCroyRAW       =       1
+#Temp and Volt is not set at the moment, need to write this into header file during measurement
+
+[Scanning]
+#Channels of oscilloscope connected to detector, photodiode, trigger. Put numbers 1,2,3,4 - corresponding to channels, no such device connected put 0.
+CH_Detector	=	1
+#Turning on of the Photodiode channel also adds normalisation to all scans;
+CH_Photodiode	=	2
+CH_Trigger	=	3
+#Set optical Axis. 1-x,2-y,3-z
+Optical_Axis	=	3
+#Perform next operations. Analysis will start only if all needed data is present:
+#Scanning over optical and perpendiculr to strip axes, fitting the best position.
+Focus_Search	=	1
+#Scanning Axis.
+F_Perp_Ax	=	1
+#Expected FWHM for fitting
+F_FWHM		=	10
+#Expected strip position
+F_Level		=	40
+#Integrate signal from TLow to THigh - ns
+F_TLow		=	50
+F_THigh		=	200
+#Integrate photodiode signale from DLow to DHigh - ns
+F_DLow          =       51
+F_DHigh         =       53
+#Fit Data from FitLow to FitHigh - micrometers. It's a distance along scanning axis. If FitHigh=-1 - means to fit in all range.
+F_FitLow        =       0
+F_FitHigh       =       -1
+#Plot charge, normed charge and photodiode charge for each Z
+F_PlSCharges	=	1
+
 
 [Sensor]
 SampleCard	=	../testsensor/SC_S57.txt
