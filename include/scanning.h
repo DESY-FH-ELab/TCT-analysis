@@ -36,6 +36,8 @@ namespace TCT {
         bool ReadTCT(char* filename,analysis* ana, bool HasSubs);
         bool CheckData(PSTCT *stct1, analysis* ana);
         bool DoFocus(TFile* f_rootfile, PSTCT *stct, analysis* ana);
+        bool LaserChargeDrift(TFile* f_rootfile, PSTCT *stct, analysis* ana);
+        bool BeamSigma(TFile* f_rootfile, PSTCT *stct, analysis* ana);
         bool SimulateDoFocus(TFile* f_rootfile, analysis* ana);
         bool CheckFocus(PSTCT *stct1, analysis* ana);
 
