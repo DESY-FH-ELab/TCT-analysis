@@ -300,6 +300,15 @@ int main(int argc, char* argv[])
           }
       case 1:
           counter = 0;
+// Simulation of the tctscan
+/*
+          std::string sim_out = ana.OutFolder() + "/" + "simulated.root";
+          TFile* f_rootfile_1 = new TFile(sim_out.c_str(),"RECREATE","TCTanalyser");
+          f_rootfile_1->cd();
+          TCT::Scanning daq_data;
+          daq_data.SimulateDoFocus(f_rootfile_1,&ana);
+          f_rootfile_1->Close();
+*/
           while(1) {
               if(countersubdir == 0) {
                   // check if DataFolder() ends on "/", if not, add it
@@ -348,11 +357,13 @@ int main(int argc, char* argv[])
                       //std::cout << "nfiles: " << nfiles;
                       if (nfiles > ana.MaxAcqs()-1) break;
                   }
+
               }
               counter++;
               if( countersubdir == 0) break;
               if(counter == countersubdir) break;
           }
+
   }
   //theApp.Run(kTRUE); 
   //char key = getchar();
