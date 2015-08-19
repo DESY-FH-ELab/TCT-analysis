@@ -71,6 +71,7 @@ namespace TCT {
       float _FFitLow;
       float _FFitHigh;
       bool _FSeparateCharges;
+      float _Movements_dt;
 
     public:
 
@@ -101,7 +102,8 @@ namespace TCT {
     _CH_PhDiode(0),
     _CH_Trig(0),
     _OptAxis(3),
-    _DO_focus(false)
+    _DO_focus(false),
+    _Movements_dt(0)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -247,6 +249,10 @@ namespace TCT {
       bool FSeparateCharges() { return _FSeparateCharges;}
       void SetFSeparateCharges(bool val) { _FSeparateCharges = val;}
       const bool & FSeparateCharges() const { return _FSeparateCharges;}
+
+      float Movements_dt() { return _Movements_dt;}
+      void SetMovements_dt(float val) { _Movements_dt = val;}
+      const float & Movements_dt() const { return _Movements_dt;}
 
       //end scanning section
 

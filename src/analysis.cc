@@ -64,6 +64,7 @@ namespace TCT {
       if(i.first == "F_FitLow")           _FFitLow = atof((i.second).c_str());
       if(i.first == "F_FitHigh")          _FFitHigh = atof((i.second).c_str());
       if(i.first == "F_PlSCharges")		_FSeparateCharges = static_cast<bool>(atoi((i.second).c_str()));
+      if(i.first == "Movements_dt")          _Movements_dt = atof((i.second).c_str());
       
     }
 
