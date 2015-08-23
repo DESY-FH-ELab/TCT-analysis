@@ -27,6 +27,7 @@ namespace TCT {
 
       uint32_t _MaxAcqs;
       uint32_t _Mode;
+      uint32_t _TCT_Mode;
       float _Noise_Cut;		// in V
       float _NoiseEnd_Cut;
       float _S2n_Cut;
@@ -38,6 +39,8 @@ namespace TCT {
       float _AmplPosLate_Cut;	// in V
       float _AmplNegLate_Cut;	// in V
       uint32_t _PrintEvent;
+
+      float _SampleThickness;
 
       std::string _OutFolder; // Folder, where the root file is writen to 
       std::string _OutSample_ID;
@@ -103,7 +106,8 @@ namespace TCT {
     _CH_Trig(0),
     _OptAxis(3),
     _DO_focus(false),
-    _Movements_dt(0)
+    _Movements_dt(0),
+    _TCT_Mode(0)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
       }
@@ -118,6 +122,10 @@ namespace TCT {
       uint32_t Mode() { return _Mode;}
       void SetMode(uint32_t val) { _Mode = val;}
       const uint32_t & Mode() const { return _Mode;}
+
+      uint32_t TCT_Mode() { return _TCT_Mode;}
+      void SetTCT_Mode(uint32_t val) { _TCT_Mode = val;}
+      const uint32_t & TCT_Mode() const { return _TCT_Mode;}
 
       uint32_t MaxAcqs() { return _MaxAcqs;}
       void SetMaxAcqs(uint32_t val) { _MaxAcqs = val;}
@@ -285,6 +293,10 @@ namespace TCT {
       std::string OutSample_ID() {return _OutSample_ID;} 
       void SetOutSample_ID(std::string string) { _OutSample_ID = string;}
       const std::string & OutSample_ID() const {return _OutSample_ID;}
+
+      float SampleThickness() { return _SampleThickness;}
+      void SetSampleThickness(float val) { _SampleThickness = val;}
+      const float & SampleThickness() const { return _SampleThickness;}
       
       std::string OutSubFolder() {return _OutSubFolder;} 
       void SetOutSubFolder(std::string string) { _OutSubFolder = string;}

@@ -267,6 +267,7 @@ int main(int argc, char* argv[])
               //std::cout << "Mean s2nval = " << AcqAvg.M_V_S2nval() << std::endl;
 
               ana.SetOutSample_ID(sample.SampleID());
+              ana.SetSampleThickness(sample.Thickness());
               if(countersubdir > 0) {
                   ana.SetOutSubFolder(dirs2[counter]);
                   ana.SetOutSubsubFolder(subdirs2[counter]);

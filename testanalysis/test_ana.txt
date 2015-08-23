@@ -4,7 +4,8 @@
 
 [General]
 ProjectFolder	=	../
-DataFolder	=	../testdata/test_2
+DataFolder	=	../testdata/edge_focus_1
+
 Outfolder	=	../results
 #Set acq mode.
 # 0 - taking the sets of single measurements (*.txt or *.raw files by oscilloscope). Settings are in [Analysis]
@@ -34,32 +35,35 @@ LeCroyRAW       =       1
 #Channels of oscilloscope connected to detector, photodiode, trigger. Put numbers 1,2,3,4 - corresponding to channels, no such device connected put 0.
 CH_Detector	=	1
 #Turning on of the Photodiode channel also adds normalisation to all scans;
-CH_Photodiode	=	2
-CH_Trigger	=	3
+CH_Photodiode	=	3
+CH_Trigger	=	4
 #Set optical Axis. 1-x,2-y,3-z
 Optical_Axis	=	3
+#Time between stage movements in seconds.
+Movements_dt        =       1
 #Perform next operations. Analysis will start only if all needed data is present:
-#Scanning over optical and perpendiculr to strip axes, fitting the best position.
-Focus_Search	=	1
+# 0-top,1-edge,2-bottom
+TCT_Mode             =       1
+#Scanning over optical and perpendiculr to strip axes (or along the detector depth in case of edge-tct), fitting the best position.
+Focus_Search	=	0
 #Scanning Axis.
 F_Perp_Ax	=	1
 #Expected FWHM for fitting
 F_FWHM		=	10
 #Expected strip position
-F_Level		=	40
+F_Level		=	100
 #Integrate signal from TLow to THigh - ns
-F_TLow		=	50
-F_THigh		=	200
+F_TLow		=	40
+F_THigh		=	100
 #Integrate photodiode signale from DLow to DHigh - ns
-F_DLow          =       51
-F_DHigh         =       53
+F_DLow          =       0
+F_DHigh         =       51
 #Fit Data from FitLow to FitHigh - micrometers. It's a distance along scanning axis. If FitHigh=-1 - means to fit in all range.
 F_FitLow        =       0
 F_FitHigh       =       -1
 #Plot charge, normed charge and photodiode charge for each Z
 F_PlSCharges	=	1
 
-
 [Sensor]
-SampleCard	=	../testsensor/SC_S57.txt
+SampleCard	=	../testsensor/SC_CE2339.txt
 
