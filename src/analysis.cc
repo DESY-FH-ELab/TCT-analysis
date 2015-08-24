@@ -56,13 +56,10 @@ namespace TCT {
       if(i.first == "Focus_Search")		_DO_focus = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "F_Perp_Ax")		_FPerp = atoi((i.second).c_str());
       if(i.first == "F_FWHM")           _FFWHM = atof((i.second).c_str());
-      if(i.first == "F_Level")          _FLevel = atof((i.second).c_str());
       if(i.first == "F_TLow")           _FTlow = atof((i.second).c_str());
       if(i.first == "F_THigh")          _FThigh = atof((i.second).c_str());
       if(i.first == "F_DLow")           _FDLow = atof((i.second).c_str());
       if(i.first == "F_DHigh")          _FDHigh = atof((i.second).c_str());
-      if(i.first == "F_FitLow")           _FFitLow = atof((i.second).c_str());
-      if(i.first == "F_FitHigh")          _FFitHigh = atof((i.second).c_str());
       if(i.first == "F_PlSCharges")		_FSeparateCharges = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "Movements_dt")          _Movements_dt = atof((i.second).c_str());
       if(i.first == "TCT_Mode")         _TCT_Mode = atoi((i.second).c_str());

@@ -196,25 +196,38 @@ namespace TCT {
 
         // fit definition
 
-        Float_t LowLim=ana->FFitLow();             //   low limit for fit
-        Float_t HiLim;
-        if((ana->FFitHigh())==-1) HiLim=Sc0+Ss*numS;
-        else HiLim=ana->FFitHigh();             //   high limit for fit
         Float_t FWHM=ana->FFWHM();               //   expected FWHM
-        Float_t Level=ana->FLevel();               //  start of flat level
 
+        TF1 *ff2=new TF1("ff2","[2]/2.*(TMath::Erfc((x-[0])/[1]) + (TMath::Erf((x-[0]-[3])/[1]) + 1))",0,Ss*numS);
 
-
-        TF1 *ff2=new TF1("ff2","[2]/2.*(TMath::Erfc((x-[0])/[1]) + (TMath::Erf((x-[0]-[3])/[1]) + 1))",LowLim,HiLim);
-        ff2->SetParameter(0,Level);
-        ff2->SetParameter(1,FWHM);
-        ff2->SetParameter(2,cc[0]->GetHistogram()->GetMaximum());
-        ff2->SetParameter(3,0.7*FWHM);
+        double *yy_temp;
+        Int_t i_max, i_min;
+        Float_t max, min;
 
         for(int j=0;j<=numO;j++){
+
+            yy_temp = cc[j]->GetY();
+            max = yy_temp[0];
+            min = yy_temp[0];
+
+            for(int i=1;i<=numS;i++) {
+                if(yy_temp[i]>max) {
+                    max=yy_temp[i];
+                    i_max=i;
+                }
+                if(yy_temp[i]<min) {
+                    min=yy_temp[i];
+                    i_min=i;
+                }
+            }
+            ff2->SetParameter(0,i_min*Ss);
+            ff2->SetParameter(1,FWHM);
+            ff2->SetParameter(2,max);
+            ff2->SetParameter(3,FWHM);
+
             cc[j]->Fit("ff2","Rq");
             gStyle->SetOptFit(1);
-
+            //cc[j] = new TGraph(numS,xx,yy);
             width[j]=ff2->GetParameter(1)*2.35/TMath::Sqrt(2);
             pos[j]=ff2->GetParameter(0)+ ff2->GetParameter(3)/2;
             minQ[j] = ff2->Eval(ff2->GetParameter(0) + ff2->GetParameter(3)/2)/ff2->GetParameter(2);
@@ -225,11 +238,6 @@ namespace TCT {
 
         //calculating the normed charge distribution
         if(ana->CH_PhDiode()) {
-
-            ff2->SetParameter(0,Level);
-            ff2->SetParameter(1,FWHM);
-            ff2->SetParameter(2,3);
-            ff2->SetParameter(3,0.7*FWHM);
 
             Double_t *temp_Y1;
             Double_t *temp_Y2;
@@ -255,7 +263,26 @@ namespace TCT {
                     temp_Y3[i] = temp_sr_general*temp_Y1[i]/temp_Y2[i];
                 }
                 cc_norm[j] = new TGraph(numS+1,cc[0]->GetX(),temp_Y3);
-                if(j==0) ff2->SetParameter(2,cc_norm[j]->GetHistogram()->GetMaximum());
+
+                yy_temp = cc_norm[j]->GetY();
+                max = yy_temp[0];
+                min = yy_temp[0];
+
+                for(int i=1;i<=numS;i++) {
+                    if(yy_temp[i]>max) {
+                        max=yy_temp[i];
+                        i_max=i;
+                    }
+                    if(yy_temp[i]<min) {
+                        min=yy_temp[i];
+                        i_min=i;
+                    }
+                }
+                ff2->SetParameter(0,i_min*Ss);
+                ff2->SetParameter(1,FWHM);
+                ff2->SetParameter(2,max);
+                ff2->SetParameter(3,FWHM);
+
                 cc_norm[j]->Fit("ff2","Rq");
                 gStyle->SetOptFit(1);
 
@@ -619,45 +646,60 @@ namespace TCT {
         }
 
         // fit definition
-
-        Float_t LowLim=ana->FFitLow();             //   low limit for fit
-        Float_t HiLim;
-        if((ana->FFitHigh())==-1) HiLim=Sc0+Ss*numS;
-        else HiLim=ana->FFitHigh();             //   high limit for fit
         Float_t FWHM=ana->FFWHM();               //   expected FWHM
-        Float_t Level=ana->FLevel();               //  start of flat level
 
-
-/*
-        TF1 *ff2=new TF1("ff2","[2]*TMath::Erf((x-[0])/[1])+[3]",LowLim,HiLim);
-        ff2->SetParameter(0,Level);
-        ff2->SetParameter(1,FWHM);
-        ff2->SetParameter(2,cc[0]->GetHistogram()->GetMaximum()-cc[0]->GetHistogram()->GetMinimum()/2);
-        */
-/*        TF1 *ff2=new TF1("ff2","[2]/2.*(TMath::Erfc((x-[0])/[1]) + (TMath::Erf((x-[0]-[3])/[1]) + 1))",LowLim,HiLim);
-        ff2->SetParameter(0,Level);
-        ff2->SetParameter(1,FWHM);
-        ff2->SetParameter(2,cc[0]->GetHistogram()->GetMaximum()-cc[0]->GetHistogram()->GetMinimum()/2);
-        ff2->SetParameter(3,300);
-        */
-
-        TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])+[3]",LowLim,HiLim);
-        ff_left->SetParameter(0,Level);
-        ff_left->SetParameter(1,FWHM);
-        ff_left->SetParameter(2,cc[0]->GetHistogram()->GetMaximum()-cc[0]->GetHistogram()->GetMinimum()/2);
+        TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])-[3]",0,Ss*numS);
         ff_left->SetParName(0,"Left edge");
         ff_left->SetParName(1,"#sigma_left");
 
-        TF1 *ff_right=new TF1("ff_right","[2]*TMath::Erf((x-[0])/[1])+[3]",LowLim,HiLim);
-        ff_right->SetParameter(0,Level+ana->SampleThickness());
-        ff_right->SetParameter(1,FWHM);
-        ff_right->SetParameter(2,cc[0]->GetHistogram()->GetMaximum()-cc[0]->GetHistogram()->GetMinimum()/2);
+        TF1 *ff_right=new TF1("ff_right","[2]*TMath::Erf((x-[0])/[1])-[3]",0,Ss*numS);
         ff_right->SetParName(0,"Right edge");
         ff_right->SetParName(1,"#sigma_right");
 
+        double *yy_temp;
+        Float_t *yy = new Float_t[numS];
+        Int_t i_max, i_min;
+        Float_t max, min, der_max, der_min;
+        Float_t FitHeight;
+
         for(int j=0;j<=numO;j++){
+
+            yy_temp = cc[j]->GetY();
+            max = yy_temp[0];
+            min = yy_temp[0];
+            der_max = yy_temp[1]-yy_temp[0];
+            der_min = yy_temp[1]-yy_temp[0];
+            for(int i=1;i<=numS;i++) {
+                yy[i-1] = yy_temp[i]-yy_temp[i-1];
+                if(yy_temp[i]>max) max=yy_temp[i];
+                if(yy_temp[i]<min) min=yy_temp[i];
+                if(yy[i-1]>der_max) {
+                    der_max = yy[i-1];
+                    i_max = i;
+                }
+                if(yy[i-1]<der_min) {
+                    der_min = yy[i-1];
+                    i_min = i;
+                }
+
+            }
+
+            FitHeight = (max-min)/2;
+            ff_left->SetParameter(0,i_min*Ss);
+            ff_left->SetParameter(1,FWHM);
+            ff_left->SetParameter(2,FitHeight);
+            ff_left->SetParameter(3,FitHeight);
+            ff_left->SetRange(0,(i_max+i_min)/2*Ss);
+
+            ff_right->SetParameter(0,i_max*Ss);
+            ff_right->SetParameter(1,FWHM);
+            ff_right->SetParameter(2,FitHeight);
+            ff_right->SetParameter(3,FitHeight);
+            ff_right->SetRange((i_max+i_min)/2*Ss,Ss*numS);
+
             cc[j]->SetLineColor(kBlack);
-            cc[j]->SetMarkerColor(kBlack);
+            cc[j]->SetMarkerSize(0);
+            cc[j]->SetLineWidth(1);
             cc[j]->Fit("ff_left","Rq");
             cc[j]->Fit("ff_right","Rq+");
             cc[j]->GetFunction("ff_right")->SetLineColor(kBlue);
@@ -669,16 +711,11 @@ namespace TCT {
             sensor_thick[j]=pos_right[j]-pos_left[j];
             optical_axis_co[j]=Opt0+j*Os;
         }
+        delete yy;
 
 
         //calculating the normed charge distribution
         if(ana->CH_PhDiode()) {
-
-            ff_left->SetParameter(0,Level);
-            ff_left->SetParameter(1,FWHM);
-
-            ff_right->SetParameter(0,Level);
-            ff_right->SetParameter(1,FWHM);
 
             Double_t *temp_Y1;
             Double_t *temp_Y2;
@@ -697,6 +734,7 @@ namespace TCT {
             }
             temp_sr_general=temp_sr_general/(numO+1);
             //std::cout<<"temp sr general: "<<temp_sr_general<<std::endl;
+            Float_t *yy = new Float_t[numS];
             for(int j=0;j<=numO;j++) {
                 temp_Y1 = cc[j]->GetY();
                 temp_Y2 = ph_charge[j]->GetY();
@@ -704,10 +742,40 @@ namespace TCT {
                     temp_Y3[i] = temp_sr_general*temp_Y1[i]/temp_Y2[i];
                 }
                 cc_norm[j] = new TGraph(numS+1,cc[0]->GetX(),temp_Y3);
-                if(j==0) {
-                    ff_left->SetParameter(2,cc_norm[0]->GetHistogram()->GetMaximum()-cc[0]->GetHistogram()->GetMinimum()/2);
-                    ff_right->SetParameter(2,cc_norm[0]->GetHistogram()->GetMaximum()-cc[0]->GetHistogram()->GetMinimum()/2);
+
+                yy_temp = cc_norm[j]->GetY();
+                max = yy_temp[0];
+                min = yy_temp[0];
+                der_max = yy_temp[1]-yy_temp[0];
+                der_min = yy_temp[1]-yy_temp[0];
+                for(int i=1;i<=numS;i++) {
+                    yy[i-1] = yy_temp[i]-yy_temp[i-1];
+                    if(yy_temp[i]>max) max=yy_temp[i];
+                    if(yy_temp[i]<min) min=yy_temp[i];
+                    if(yy[i-1]>der_max) {
+                        der_max = yy[i-1];
+                        i_max = i;
+                    }
+                    if(yy[i-1]<der_min) {
+                        der_min = yy[i-1];
+                        i_min = i;
+                    }
+
                 }
+
+                FitHeight = (max-min)/2;
+                ff_left->SetParameter(0,i_min*Ss);
+                ff_left->SetParameter(1,FWHM);
+                ff_left->SetParameter(2,FitHeight);
+                ff_left->SetParameter(3,FitHeight);
+                ff_left->SetRange(0,(i_max+i_min)/2*Ss);
+
+                ff_right->SetParameter(0,i_max*Ss);
+                ff_right->SetParameter(1,FWHM);
+                ff_right->SetParameter(2,FitHeight);
+                ff_right->SetParameter(3,FitHeight);
+                ff_right->SetRange((i_max+i_min)/2*Ss,Ss*numS);
+
                 cc_norm[j]->Fit("ff_left","Rq");
                 cc_norm[j]->Fit("ff_right","Rq+");
                 cc_norm[j]->GetFunction("ff_right")->SetLineColor(kBlue);
@@ -719,6 +787,7 @@ namespace TCT {
                 pos_right_normed[j]=ff_right->GetParameter(0);
                 sensor_thick_normed[j]=pos_right_normed[j]-pos_left_normed[j];
             }
+            delete yy;
         }
 
 
@@ -934,6 +1003,53 @@ namespace TCT {
             SensTg1->Write("SensorThickness_Normed");
 
         }
+
+        return true;
+    }
+
+    bool Scanning::EdgeDoField(TFile* f_rootfile, PSTCT *stct, analysis* ana) {
+
+        if(!CheckFocus(stct,ana)) {std::cout<<"No data for focusing. Skipping..."<<std::endl; return false;}
+        TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
+        dir_fsearch->cd();
+        Int_t numO,numS;
+        Int_t numWF=1000;
+
+        MeasureWF *wf[numWF];               // waveforms
+        MeasureWF *wf1[numWF];
+
+        TGraph *cc[numWF];                  // charge collection graph
+
+        Float_t Ss,Os;                       // Optical axis step
+        Float_t Sc0,Opt0;
+
+        TGraph* ph_charge[numWF];
+
+        Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
+        Int_t optic_axis=(ana->OptAxis())-1;            // select optic axis (0=x,1=y,2=z)
+        Int_t scanning_axis=ana->FPerp()-1;         // select scanning axis (0=x,1=y,2=z)
+
+        switch(scanning_axis)
+          {
+          case 0: numS=stct->Nx-1; Ss=stct->dx; Sc0=stct->x0;  break; //x-axis
+          case 1: numS=stct->Ny-1; Ss=stct->dx; Sc0=stct->y0; break; //y-axis
+          case 2: numS=stct->Nz-1; Ss=stct->dx; Sc0=stct->z0; break; //z-axis
+          }
+        for(int j=0;j<=numO;j++)
+           {
+             switch(optic_axis)
+           {
+           case 0: wf[j]=stct->Projection(ChNumber,scanning_axis,j,0,0,0,0,numS+1); break;
+           case 1: wf[j]=stct->Projection(ChNumber,scanning_axis,0,j,0,0,0,numS+1); break;
+           case 2: wf[j]=stct->Projection(ChNumber,scanning_axis,0,0,j,0,0,numS+1); break;
+           }
+
+             wf[j]->SetTemperatures(stct->T);
+             //wf[j]->ScaleHisto(0.0001); //use any value to set the scale
+             //wf[j]->CorrectBaseLine(1); //correct base line - not needed
+             cc[j]=wf[j]->CCE(ana->FTlow(),ana->FThigh());   //integrate the charge in time window 0-80 ns
+
+           }
 
         return true;
     }

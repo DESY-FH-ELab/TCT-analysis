@@ -66,13 +66,10 @@ namespace TCT {
       bool _DO_focus;
       uint32_t _FPerp;
       float _FFWHM;
-      float _FLevel;
       float _FTlow;
       float _FThigh;
       float _FDLow;
       float _FDHigh;
-      float _FFitLow;
-      float _FFitHigh;
       bool _FSeparateCharges;
       float _Movements_dt;
 
@@ -226,10 +223,6 @@ namespace TCT {
       void SetFFWHM(float val) { _FFWHM = val;}
       const float & FFWHM() const { return _FFWHM;}
 
-      float FLevel() { return _FLevel;}
-      void SetFLevel(float val) { _FLevel = val;}
-      const float & FLevel() const { return _FLevel;}
-
       float FTlow() { return _FTlow;}
       void SetFTlow(float val) { _FTlow = val;}
       const float & FTlow() const { return _FTlow;}
@@ -245,14 +238,6 @@ namespace TCT {
       float FDHigh() { return _FDHigh;}
       void SetFDHigh(float val) { _FDHigh = val;}
       const float & FDHigh() const { return _FDHigh;}
-
-      float FFitLow() { return _FFitLow;}
-      void SetFFitLow(float val) { _FFitLow = val;}
-      const float & FFitLow() const { return _FFitLow;}
-
-      float FFitHigh() { return _FFitHigh;}
-      void SetFFitHigh(float val) { _FFitHigh = val;}
-      const float & FFitHigh() const { return _FFitHigh;}
 
       bool FSeparateCharges() { return _FSeparateCharges;}
       void SetFSeparateCharges(bool val) { _FSeparateCharges = val;}
