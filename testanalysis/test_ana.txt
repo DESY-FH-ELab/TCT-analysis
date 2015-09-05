@@ -4,7 +4,8 @@
 
 [General]
 ProjectFolder	=	../
-DataFolder	=	../testdata/edge_field_0
+DataFolder	=	../testdata/channels_check
+#DataFolder	=	../testdata/test_2_red
 
 Outfolder	=	../results
 #Set acq mode.
@@ -39,26 +40,39 @@ CH_Photodiode	=	3
 CH_Trigger	=	4
 #Set optical Axis. 1-x,2-y,3-z
 Optical_Axis	=	3
+#Set voltage source number (1 or 2)
+VoltageSource   =       1
 #Time between stage movements in seconds.
 Movements_dt        =       1
 #Perform next operations. Analysis will start only if all needed data is present:
 # 0-top,1-edge,2-bottom
 TCT_Mode             =       1
 #Scanning over optical and perpendiculr to strip axes (or along the detector depth in case of edge-tct), fitting the best position.
-Focus_Search	=	1
+#!!!
+Focus_Search	=	0
+#!!!
 #Scanning Axis.
 F_Perp_Ax	=	1
 #Expected FWHM for fitting
 F_FWHM		=	10
 #Integrate signal from TLow to THigh - ns
-F_TLow		=	40
-F_THigh		=	120
+F_TLow		=	50.7
+F_THigh		=	140
+#F_TLow		=	40
+#F_THigh		=	140
 #Integrate photodiode signale from DLow to DHigh - ns
-F_DLow          =       0
+F_DLow          =       46
 F_DHigh         =       51
+#F_DLow          =       0
+#F_DHigh         =       53.2
 #Plot charge, normed charge and photodiode charge for each Z
 F_PlSCharges	=	1
-
+#!!!
+EdgeDepletionVoltage    =   1
+EdgeVelocityProfile     =   1
+#!!!
+#Averaging the signal for Velocity profile from F_TLow to F_TLow+EV_Time
+EV_Time                 = 0.3
 [Sensor]
 SampleCard	=	../testsensor/SC_CE2339.txt
 

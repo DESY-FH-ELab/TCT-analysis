@@ -12,6 +12,8 @@
 
 // ROOT includes
 #include "TFile.h"
+#include "TGraph.h"
+#include "TMultiGraph.h"
 // TCT includes
 #include "TCTScan.h"
 #include "analysis.h"
@@ -22,6 +24,14 @@ namespace TCT {
 
     private :
         int _Nsamples;
+        TFile* f_rootfile;
+        PSTCT* stct;
+        analysis* ana;
+
+        Double_t mu_els = 1400;
+        Double_t mu_holes = 450;
+        Double_t v_sat_h = 0.5e7;
+        Double_t v_sat_el = 1.4e7;
     protected:
 
     public :
@@ -33,15 +43,38 @@ namespace TCT {
 
         // Destructor
         ~Scanning() = default;
-        bool ReadTCT(char* filename,analysis* ana, bool HasSubs);
-        bool CheckData(PSTCT *stct1, analysis* ana);
-        bool DoFocus(TFile* f_rootfile, PSTCT *stct, analysis* ana);
-        bool EdgeDoFocus(TFile* f_rootfile, PSTCT *stct, analysis* ana);
-        bool EdgeDoField(TFile* f_rootfile, PSTCT *stct, analysis* ana);
-        bool LaserChargeDrift(TFile* f_rootfile, PSTCT *stct, analysis* ana);
-        bool BeamSigma(TFile* f_rootfile, PSTCT *stct, analysis* ana);
-        bool SimulateDoFocus(TFile* f_rootfile, analysis* ana);
-        bool CheckFocus(PSTCT *stct1, analysis* ana);
+        bool ReadTCT(char* filename, analysis* ana1, bool HasSubs);
+        bool TopDoFocus();
+        bool EdgeDoFocus();
+        bool EdgeDoDepletion();
+        bool EdgeDoVelocity();
+        bool LaserChargeDrift();
+        bool BeamSigma();
+        bool SimulateDoFocus();
+        bool CheckData();
+        bool CheckFocus();
+        bool CheckEdgeDepletion();
+        bool CheckEdgeVelocity();
+        void SwitchAxis(Int_t sw, Int_t& nPoints, Float_t& step, Float_t& p0);
+        void CalculateCharges(Int_t Channel, Int_t Ax, Int_t numAx,  Int_t scanning, Int_t numS, TGraph **charges, Float_t tstart, Float_t tfinish);
+        TGraph** NormedCharge(TGraph** sensor, TGraph** photodiode, Int_t numP);
+        void ChargeCorrelationHist(TGraph** sensor, TGraph** photodetector, Int_t numO);
+        void FindEdges(TGraph* gr, Int_t numS, Float_t dx, Double_t &left_edge, Double_t &right_edge);
+        void FindEdges(TGraph** gr, Int_t numP, Int_t numS, Float_t dx, Float_t* left_pos, Float_t* left_width, Float_t* right_pos, Float_t* right_width);
+        TGraph* GraphBuilder(Int_t N, Float_t *x, Float_t *y, const char *namex, const char *namey, const char *title);
+        TGraph* GraphBuilder(Int_t N, Float_t *x, Float_t *y, const char *namex, const char *namey, const char *title, const char *write_name);
+        TGraph* GraphBuilder(Int_t N, Double_t *x, Double_t *y, const char *namex, const char *namey, const char *title);
+        TGraph* GraphBuilder(Int_t N, Double_t *x, Double_t *y, const char *namex, const char *namey, const char *title, const char *write_name);
+        void GraphSeparate(Int_t N, TGraph **gr, const char *dir_name, const char *namex, const char *namey, const char *title, const char *name_0, Double_t *name_1);
+        void GraphSeparate(Int_t N, TGraph **gr, const char *dir_name, const char *namex, const char *namey, const char *title, const char *name_0, Float_t *name_1);
+        void MultiGraphWriter(Int_t N, TGraph **gr, const char *namex, const char *namey, const char *title, const char *write_name);
+        void SetFitParameters(TF1* ff, Double_t p0, Double_t p1, Double_t p2, Double_t p3);
+        Double_t GraphIntegral(TGraph *gr, Double_t x1, Double_t x2);
+        Double_t ff(Double_t E, Double_t Uuu, Double_t a);
+        Double_t BiSectionMethod(Double_t eps, Double_t x1, Double_t x2, Double_t Uuu, Double_t a);
+        Double_t Mu(Double_t E, Int_t Type);
+        template <typename T> int sgn(T val);
+        Double_t abs(Double_t x);
 
 
     }; // end of class scanning

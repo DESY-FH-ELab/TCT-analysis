@@ -63,7 +63,10 @@ namespace TCT {
       uint32_t _CH_PhDiode;
       uint32_t _CH_Trig;
       uint32_t _OptAxis;
+      uint32_t _VoltSource;
       bool _DO_focus;
+      bool _DO_EdgeDepletion;
+      bool _DO_EdgeVelocity;
       uint32_t _FPerp;
       float _FFWHM;
       float _FTlow;
@@ -72,6 +75,7 @@ namespace TCT {
       float _FDHigh;
       bool _FSeparateCharges;
       float _Movements_dt;
+      float _EV_Time;
 
     public:
 
@@ -103,7 +107,10 @@ namespace TCT {
     _CH_Trig(0),
     _OptAxis(3),
     _DO_focus(false),
+    _DO_EdgeDepletion(false),
+    _DO_EdgeVelocity(false),
     _Movements_dt(0),
+    _EV_Time(0.3),
     _TCT_Mode(0)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
@@ -211,9 +218,21 @@ namespace TCT {
       void SetOptAxis(uint32_t val) { _OptAxis = val;}
       const uint32_t & OptAxis() const { return _OptAxis;}
 
+      uint32_t VoltSource() { return _VoltSource;}
+      void SetVoltSource(uint32_t val) { _VoltSource = val;}
+      const uint32_t & VoltSource() const { return _VoltSource;}
+
       bool DO_focus() { return _DO_focus;}
       void SetDO_focus(bool val) { _DO_focus = val;}
       const bool & DO_focus() const { return _DO_focus;}
+
+      bool DO_EdgeDepletion() { return _DO_EdgeDepletion;}
+      void SetDO_EdgeDepletion(bool val) { _DO_EdgeDepletion = val;}
+      const bool & DO_EdgeDepletion() const { return _DO_EdgeDepletion;}
+
+      bool DO_EdgeVelocity() { return _DO_EdgeVelocity;}
+      void SetDO_EdgeVelocity(bool val) { _DO_EdgeVelocity = val;}
+      const bool & DO_EdgeVelocity() const { return _DO_EdgeVelocity;}
 
       uint32_t FPerp() { return _FPerp;}
       void SetFPerp(uint32_t val) { _FPerp = val;}
@@ -246,6 +265,10 @@ namespace TCT {
       float Movements_dt() { return _Movements_dt;}
       void SetMovements_dt(float val) { _Movements_dt = val;}
       const float & Movements_dt() const { return _Movements_dt;}
+
+      float EV_Time() { return _EV_Time;}
+      void SetEV_Time(float val) { _EV_Time = val;}
+      const float & EV_Time() const { return _EV_Time;}
 
       //end scanning section
 

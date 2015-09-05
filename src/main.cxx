@@ -335,6 +335,7 @@ int main(int argc, char* argv[])
               std::cout<<"Parsing DAQ data"<<std::endl;
               bool HasSubs = (bool)countersubdir;
               ana.SetOutSample_ID(sample.SampleID());
+              ana.SetSampleThickness(sample.Thickness());
               if(countersubdir > 0) {
                   ana.SetOutSubFolder(dirs2[counter]);
                   ana.SetOutSubsubFolder(subdirs2[counter]);
