@@ -54,7 +54,7 @@ namespace TCT {
       if(i.first == "CH_Trigger")		_CH_Trig = atoi((i.second).c_str());
       if(i.first == "Optical_Axis")		_OptAxis = atoi((i.second).c_str());
       if(i.first == "Focus_Search")		_DO_focus = static_cast<bool>(atoi((i.second).c_str()));
-      if(i.first == "F_Perp_Ax")		_FPerp = atoi((i.second).c_str());
+      if(i.first == "Scanning_Axis")		_ScAxis = atoi((i.second).c_str());
       if(i.first == "F_FWHM")           _FFWHM = atof((i.second).c_str());
       if(i.first == "F_TLow")           _FTlow = atof((i.second).c_str());
       if(i.first == "F_THigh")          _FThigh = atof((i.second).c_str());
@@ -63,7 +63,7 @@ namespace TCT {
       if(i.first == "F_PlSCharges")		_FSeparateCharges = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "Movements_dt")          _Movements_dt = atof((i.second).c_str());
       if(i.first == "TCT_Mode")         _TCT_Mode = atoi((i.second).c_str());
-      if(i.first == "VoltageSource")         _VoltSource = atoi((i.second).c_str());
+      if(i.first == "Voltage_Source")         _VoltSource = atoi((i.second).c_str());
       if(i.first == "EdgeDepletionVoltage")		_DO_EdgeDepletion = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "EdgeVelocityProfile")		_DO_EdgeVelocity = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "EV_Time")          _EV_Time = atof((i.second).c_str());

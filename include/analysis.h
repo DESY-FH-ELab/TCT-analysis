@@ -67,7 +67,7 @@ namespace TCT {
       bool _DO_focus;
       bool _DO_EdgeDepletion;
       bool _DO_EdgeVelocity;
-      uint32_t _FPerp;
+      uint32_t _ScAxis;
       float _FFWHM;
       float _FTlow;
       float _FThigh;
@@ -111,6 +111,7 @@ namespace TCT {
     _DO_EdgeVelocity(false),
     _Movements_dt(0),
     _EV_Time(0.3),
+    _FFWHM(10.),
     _TCT_Mode(0)
       {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
@@ -234,9 +235,9 @@ namespace TCT {
       void SetDO_EdgeVelocity(bool val) { _DO_EdgeVelocity = val;}
       const bool & DO_EdgeVelocity() const { return _DO_EdgeVelocity;}
 
-      uint32_t FPerp() { return _FPerp;}
-      void SetFPerp(uint32_t val) { _FPerp = val;}
-      const uint32_t & FPerp() const { return _FPerp;}
+      uint32_t ScAxis() { return _ScAxis;}
+      void SetScAxis(uint32_t val) { _ScAxis = val;}
+      const uint32_t & ScAxis() const { return _ScAxis;}
 
       float FFWHM() { return _FFWHM;}
       void SetFFWHM(float val) { _FFWHM = val;}

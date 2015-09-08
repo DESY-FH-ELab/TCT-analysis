@@ -109,7 +109,7 @@ namespace TCT {
 
         Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
         Int_t optic_axis=(ana->OptAxis())-1;            // select optic axis (0=x,1=y,2=z)
-        Int_t scanning_axis=ana->FPerp()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
 
         SwitchAxis(optic_axis,numO,Os,Opt0);
 
@@ -346,7 +346,7 @@ namespace TCT {
 
         Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
         Int_t optic_axis=(ana->OptAxis())-1;            // select optic axis (0=x,1=y,2=z)
-        Int_t scanning_axis=ana->FPerp()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
 
         SwitchAxis(optic_axis,numO,Os,Opt0);
 
@@ -539,7 +539,7 @@ namespace TCT {
 
         Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
         Int_t volt_source=(ana->VoltSource());            // select
-        Int_t scanning_axis=ana->FPerp()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
         Float_t *voltages;
 
         switch(volt_source)
@@ -733,7 +733,7 @@ namespace TCT {
 
         Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
         Int_t volt_source=(ana->VoltSource());            // select
-        Int_t scanning_axis=ana->FPerp()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
         Float_t *voltages;
 
         switch(volt_source)
@@ -1413,13 +1413,13 @@ namespace TCT {
             std::cout<<"\t\t\tOptical axis contains only "<<NOpt<<" points. Not enough for focusing."<<std::endl;
             return false;
         }
-        std::cout<<"\t\t-- Scanning Axis: "<< ana->FPerp() <<std::endl;
-        switch(ana->FPerp()) {
+        std::cout<<"\t\t-- Scanning Axis: "<< ana->ScAxis() <<std::endl;
+        switch(ana->ScAxis()) {
         case 1: NSc = stct->Nx; break;
         case 2: NSc = stct->Ny; break;
         case 3: NSc = stct->Nz; break;
         }
-        if(NSc>1) std::cout<<"\t\t\tScanning axis contains "<<NSc<<" points. OK"<<std::endl;
+        if(NSc>10) std::cout<<"\t\t\tScanning axis contains "<<NSc<<" points. OK"<<std::endl;
         else {
             std::cout<<"\t\t\tScanning axis contains only "<<NSc<<" point. Not enough for focusing."<<std::endl;
             return false;
@@ -1439,18 +1439,18 @@ namespace TCT {
         case 1: NSource = stct->NU1; break;
         case 2: NSource = stct->NU2; break;
         }
-        if(NSource>=3) std::cout<<"\t\t\tVoltage scan contains "<<NSource<<" points. OK"<<std::endl;
+        if(NSource>=7) std::cout<<"\t\t\tVoltage scan contains "<<NSource<<" points. OK"<<std::endl;
         else {
             std::cout<<"\t\t\tVoltage scan contains only "<<NSource<<" points. Not enough for depletion voltage search."<<std::endl;
             return false;
         }
-        std::cout<<"\t\t-- Scanning Axis: "<< ana->FPerp() <<std::endl;
-        switch(ana->FPerp()) {
+        std::cout<<"\t\t-- Scanning Axis: "<< ana->ScAxis() <<std::endl;
+        switch(ana->ScAxis()) {
         case 1: NSc = stct->Nx; break;
         case 2: NSc = stct->Ny; break;
         case 3: NSc = stct->Nz; break;
         }
-        if(NSc>1) std::cout<<"\t\t\tScanning axis contains "<<NSc<<" points. OK"<<std::endl;
+        if(NSc>10) std::cout<<"\t\t\tScanning axis contains "<<NSc<<" points. OK"<<std::endl;
         else {
             std::cout<<"\t\t\tScanning axis contains only "<<NSc<<" point. Not enough for depletion voltage search."<<std::endl;
             return false;
@@ -1472,13 +1472,13 @@ namespace TCT {
         case 2: NSource = stct->NU2; break;
         }
         if(NSource>=1) std::cout<<"\t\t\tVoltage scan contains "<<NSource<<" points. OK"<<std::endl;
-        std::cout<<"\t\t-- Scanning Axis: "<< ana->FPerp() <<std::endl;
-        switch(ana->FPerp()) {
+        std::cout<<"\t\t-- Scanning Axis: "<< ana->ScAxis() <<std::endl;
+        switch(ana->ScAxis()) {
         case 1: NSc = stct->Nx; break;
         case 2: NSc = stct->Ny; break;
         case 3: NSc = stct->Nz; break;
         }
-        if(NSc>1) std::cout<<"\t\t\tScanning axis contains "<<NSc<<" points. OK"<<std::endl;
+        if(NSc>10) std::cout<<"\t\t\tScanning axis contains "<<NSc<<" points. OK"<<std::endl;
         else {
             std::cout<<"\t\t\tScanning axis contains only "<<NSc<<" point. Not enough for velocity profile."<<std::endl;
             return false;
