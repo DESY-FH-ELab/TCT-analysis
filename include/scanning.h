@@ -28,10 +28,6 @@ namespace TCT {
         PSTCT* stct;
         analysis* ana;
 
-        Double_t mu_els = 1400;
-        Double_t mu_holes = 450;
-        Double_t v_sat_h = 0.5e7;
-        Double_t v_sat_el = 1.4e7;
     protected:
 
     public :
@@ -44,11 +40,11 @@ namespace TCT {
         // Destructor
         ~Scanning() = default;
         bool ReadTCT(char* filename, analysis* ana1, bool HasSubs);
-        bool TopDoFocus();
-        bool EdgeDoFocus();
-        bool EdgeDoDepletion();
-        bool EdgeDoVelocity();
-        bool LaserChargeDrift();
+        bool DoTopFocus();
+        bool DoEdgeFocus();
+        bool DoEdgeDepletion();
+        bool DoEdgeVelocity();
+        bool LaserPowerDrop();
         bool BeamSigma();
         bool SimulateDoFocus();
         bool CheckData();

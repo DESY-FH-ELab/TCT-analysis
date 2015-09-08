@@ -53,24 +53,35 @@ TCT_Mode             =       1
 #!!!
 Focus_Search	=	0
 #!!!
-#Integrate signal from TestSenorLow to TestSensorHigh - ns // FIXME
-F_TLow		=	50.7
-F_THigh		=	140
-#F_TLow		=	40
-#F_THigh		=	140
-#Integrate photodiode signal from DLow to DHigh - ns //FIXME
-F_DLow          =       46
-F_DHigh         =       51
-#F_DLow          =       0
-#F_DHigh         =       53.2
-#Plot charge, normed charge and photodiode charge for each Z, voltage
-F_PlotSeperrateCharges	=	1 // FIXME
+#Integrate sensor signal from TimeSensorLow to TimeSensorHigh - ns
+TimeSensorLow		=	50.7
+TimeSensorHigh		=	140
+#Integrate photodiode signal from TimeDiodeLow to TimeDiodeHigh - ns
+TimeDiodeLow          =       46
+TimeDiodeDHigh         =       51
+#Save charge, normed charge and photodiode charge for each Z, voltage
+SaveSeparateCharges	=	1
+#Save waveforms for each position and voltage
+SaveSeparateWaveforms   =       1
 #!!!
+#search for depletion voltage
 EdgeDepletionVoltage    =   1
+#extracting the velocity and electric field profiles
 EdgeVelocityProfile     =   1
 #!!!
-#Averaging the current for Velocity profile from F_TLow to F_TLow+EV_Time
+#Averaging the current for electric field profile from F_TLow to F_TLow+EV_Time
 EV_Time                 = 0.3
+
+[Parameters]
+Mu0_Electrons           =   1400
+Mu0_Holes               =   450
+SaturationVelocity      =   1e7
+Amplification           =   300
+LightSplitter           =   9.65
+ResistanceSensor        =   50
+ResistancePhotoDetector =   50
+ResponcePhotoDetector   =   0.7
+EnergyPair              =   3.61
 
 [Sensor]
 SampleCard	=	../testsensor/SC_CE2339.txt

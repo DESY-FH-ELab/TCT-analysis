@@ -31,7 +31,7 @@ namespace TCT {
     bool Scanning::ReadTCT(char* filename, analysis *ana1, bool HasSubs) {
         ana = ana1;
         stct = new PSTCT(filename,-3,2);
-        stct->CorrectBaseLine(10.); // FIXME what is 10
+        stct->CorrectBaseLine(10.); // FIXME1 what is 10
 
         // CheckData: check if channels are set in config file 
         if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; return false;}
@@ -57,13 +57,15 @@ namespace TCT {
         f_rootfile->mkdir("sample_signals");
         f_rootfile->cd("sample_signals");
 
+
+        if(ana->FSeparateWaveforms()) f_rootfile->mkdir("detector_signals");
+
         for(int i=0;i<4;i++) { // scan over channels
             if(stct->WFOnOff[i]) {
                 sample_hist = stct->GetHA(i,0,0,0,0,0); // get one sample from each channel
                 sample_hist->Write();
             }
-            if(ana->SaveSingles() && (i+1)==ana->CH_Det() && stct->WFOnOff[i]) { //FIXME use new "SaveSingles()" checking on new option // loop over all WFs
-                f_rootfile->mkdir("detector_signals"); // FIXME do only once!
+            if(ana->FSeparateWaveforms() && (i+1)==ana->CH_Det() && stct->WFOnOff[i]) { //loop over all waveforms
                 f_rootfile->cd("detector_signals");
                 for(int l=0;l<stct->NU2;l++) {
                     for(int n=0;n<stct->NU1;n++) {
@@ -82,12 +84,12 @@ namespace TCT {
             }
         }
 
-        if(ana->DO_focus() && ana->TCT_Mode()==0) TopDoFocus();
-        if(ana->DO_focus() && ana->TCT_Mode()==1) EdgeDoFocus();
+        if(ana->DO_focus() && ana->TCT_Mode()==0) DoTopFocus();
+        if(ana->DO_focus() && ana->TCT_Mode()==1) DoEdgeFocus();
         //if(ana->DO_focus() && ana->TCT_Mode()==2) BottomDoFocus(); // FIXME needs implementation
-        if(ana->DO_EdgeDepletion() && ana->TCT_Mode()==1) EdgeDoDepletion();
-        if(ana->DO_EdgeVelocity() && ana->TCT_Mode()==1) EdgeDoVelocity();
-        if(ana->CH_PhDiode()) LaserChargeDrift(); // FIXME dont use "DRIFT" for this
+        if(ana->DO_EdgeDepletion() && ana->TCT_Mode()==1) DoEdgeDepletion();
+        if(ana->DO_EdgeVelocity() && ana->TCT_Mode()==1) DoEdgeVelocity();
+        if(ana->CH_PhDiode()) LaserPowerDrop();
         if(ana->CH_PhDiode()) BeamSigma();
 
         f_rootfile->Close();
@@ -97,7 +99,7 @@ namespace TCT {
         return true;
     }
 
-    bool Scanning::TopDoFocus() {
+    bool Scanning::DoTopFocus() {
 
         if(!CheckFocus()) {std::cout<<"No data for focusing. Skipping..."<<std::endl; return false;}
         TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
@@ -229,7 +231,7 @@ namespace TCT {
         }
 
         //plot graphs at different positions along optical axis
-        MultiGraphWriter(numO,cc,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance"); // FIXME axis  
+        MultiGraphWriter(numO,cc,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance");
 
         //plot graphs at different positions along optical axis with normed data
         if(ana->CH_PhDiode()) {
@@ -333,7 +335,7 @@ namespace TCT {
         return true;
     }
 
-    bool Scanning::EdgeDoFocus() {
+    bool Scanning::DoEdgeFocus() {
 
         if(!CheckFocus()) {std::cout<<"No data for focusing. Skipping..."<<std::endl; return false;}
         TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
@@ -529,7 +531,7 @@ namespace TCT {
         return true;
     }
 
-    bool Scanning::EdgeDoDepletion() {
+    bool Scanning::DoEdgeDepletion() {
 
         if(!CheckEdgeDepletion()) {std::cout<<"No data for depletion voltage search. Skipping..."<<std::endl; return false;}
         TDirectory *dir_depl = f_rootfile->mkdir("DepletionVoltage");
@@ -635,7 +637,7 @@ namespace TCT {
         }
 
         TF1 *depl_fit1 = new TF1("depl_fit1","pol1");
-        TF1 *depl_fit2 = new TF1("depl_fit2","pol1"); // FIXME, try pol0 !!
+        TF1 *depl_fit2 = new TF1("depl_fit2","pol0");
 
         Float_t *sq_volt = new Float_t[numVolt];
         Float_t *derivative = new Float_t[numVolt];
@@ -720,7 +722,7 @@ namespace TCT {
         return true;
     }
 
-    bool Scanning::EdgeDoVelocity() {
+    bool Scanning::DoEdgeVelocity() {
 
         if(!CheckEdgeVelocity()) {std::cout<<"No data for velocity profile. Skipping..."<<std::endl; return false;}
         TDirectory *dir_vel = f_rootfile->mkdir("Velocity");
@@ -780,12 +782,12 @@ namespace TCT {
         std::cout<<"\tIntegrating in the range "<<left_edge<<" - "<<right_edge<<std::endl;
         std::cout<<std::endl;
 
-        Double_t *xxx = charge_max_bias->GetX(); // FIXME  no xxx
+        Double_t *temp_max_bias_charge = charge_max_bias->GetX();
         Int_t ix1=-1;
         Int_t ix2=-1;
         for(Int_t i=0;i<numS;i++) {
-            if(xxx[i]<=left_edge) ix1=i;
-            if(xxx[i]<=right_edge) ix2=i;
+            if(temp_max_bias_charge[i]<=left_edge) ix1=i;
+            if(temp_max_bias_charge[i]<=right_edge) ix2=i;
         }
         if(ix1==-1) ix1=0;
         if(ix2==-1) ix2=numS-1;
@@ -795,12 +797,12 @@ namespace TCT {
 
         //calculating the velocity profile asuuming integral(E)dx = Vbias
         Double_t eps = 1e-3;
-        Double_t *temp_Y1; // FIXME what is this
+        Double_t *temp_sensor;
         Double_t *temp_vel_h=new Double_t[numS];
         Double_t *temp_vel_el=new Double_t[numS];
         Double_t *temp_field=new Double_t[numS];
         for(int j=0;j<numVolt;j++) { // FIXME constants seems to prefer smaller values towards low electric fields , why?
-            temp_Y1 = cc[j]->GetY();
+            temp_sensor = cc[j]->GetY();
 
             Double_t a=1;
             if(GraphIntegral(cc[j],left_edge,right_edge)<0) a = -a;
@@ -809,7 +811,7 @@ namespace TCT {
             while(abs(voltages[j]-sum)>eps) {
 
                 for(int i=0; i<numS; i++) {
-                    temp_field[i] = BiSectionMethod(eps,-5e3,1e6,temp_Y1[i],a);
+                    temp_field[i] = BiSectionMethod(eps,-5e3,1e6,temp_sensor[i],a);
                 }
                 sum=0;
                 for(int i=ix1;i<=ix2;i++) sum+=temp_field[i];
@@ -821,8 +823,8 @@ namespace TCT {
             std::cout<<"U = "<<voltages[j]<<" norm const: "<<a<<std::endl;
             for(int i=0;i<numS;i++) {
                 temp_field[i] = 1e-4*temp_field[i];
-                temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/v_sat_h);
-                temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/v_sat_el);
+                temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/ana->v_sat());
+                temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/ana->v_sat());
             }
             field[j] = GraphBuilder(numS,cc[0]->GetX(),temp_field,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field");
             velocity_holes[j] = GraphBuilder(numS,cc[0]->GetX(),temp_vel_h,"scanning distance [#mum]", "Velocity [cm/s]","Holes Velocity Profile");
@@ -836,7 +838,7 @@ namespace TCT {
             //calculating the mean charge from the photodetector
             cc_norm=NormedCharge(cc,ph_charge,numVolt);
 
-            Double_t *temp_sensor; // FIXME should be called somethign with "charge"
+            Double_t *temp_sensor;
 
             for(int j=0;j<numVolt;j++) {
                 temp_sensor = cc_norm[j]->GetY();
@@ -861,8 +863,8 @@ namespace TCT {
                 //std::cout<<"U = "<<voltages[j]<<" norm const: "<<a<<std::endl;
                 for(int i=0;i<numS;i++) {
                     temp_field[i] = 1e-4*temp_field[i];
-                    temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/v_sat_h);
-                    temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/v_sat_el);
+                    temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/ana->v_sat());
+                    temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/ana->v_sat());
                 }
                 field_normed[j] = GraphBuilder(numS,cc[0]->GetX(),temp_field,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field");
                 velocity_holes_normed[j] = GraphBuilder(numS,cc[0]->GetX(),temp_vel_h,"scanning distance [#mum]", "Velocity [cm/s]","Holes Velocity Profile");
@@ -893,38 +895,37 @@ namespace TCT {
             }
             temp_sr_general=temp_sr_general/(numVolt);
 
-            Double_t Ampl = 300; // FIXME needs accurate update!
-            Double_t Res_sensor = 50.;
-            Double_t Res_photo = 50.;
-            Double_t Response_photo = 0.7;
+            Double_t ampl = ana->ampl(); // FIXME needs accurate update!
+            Double_t Res_sensor = ana->R_sensor();
+            Double_t Res_photo = ana->R_diode();
+            Double_t Response_photo = ana->RespPhoto();
             Double_t Eweight = 1./(ana->SampleThickness()*1e-4);
-            Double_t E_pair = 3.61;
-            Double_t diode_multi = 9.65;
+            Double_t E_pair = ana->E_pair();
+            Double_t diode_multi = ana->light_split();
 
-            Double_t *temp_Y1; //FIXME what am I?
-            Double_t *temp_Y2;
-            Double_t *temp_Y3 = new Double_t[numS];
-            Double_t *temp_Y4 = new Double_t[numS];
+            Double_t *temp_sensor_charge;
+            Double_t *temp_diode_charge;
+            Double_t *temp_velocity_avg = new Double_t[numS];
+            Double_t *temp_field = new Double_t[numS];
 
             Double_t Neh = 0.624*diode_multi*temp_sr_general/Res_photo/Response_photo/E_pair;
-            //Neh = 1.32*Neh/10000;
-            Neh = Neh*0.02146; // Integral over one strip from energye depostion a.f.o. depth for 80 um strip, and lambda = 11 1/cm
+            Neh = Neh*0.02146; // Integral over one strip from energy depostion a.f.o. depth for 80 um strip, and lambda = 11 1/cm
             std::cout<<"Photodiode charge: "<<temp_sr_general<<std::endl;
             std::cout<<"Npairs: "<<1.e7*Neh<<std::endl;
 
             for(int j=0;j<numVolt;j++) {
-                temp_Y1 = cc[j]->GetY();
-                temp_Y2 = ph_charge[j]->GetY();
+                temp_sensor_charge = cc[j]->GetY();
+                temp_diode_charge = ph_charge[j]->GetY();
                 for(int i=0;i<numS;i++) {
-                    temp_Y3[i] = -1e9*0.624*temp_sr_general*temp_Y1[i]/(ana->EV_Time()*temp_Y2[i]*Eweight*Ampl*Res_sensor*Neh);
-                    temp_Y4[i] = 1e-4*temp_Y3[i]/(1850);
+                    temp_velocity_avg[i] = -1e9*0.624*temp_sr_general*temp_sensor_charge[i]/(ana->EV_Time()*temp_diode_charge[i]*Eweight*ampl*Res_sensor*Neh);
+                    temp_field[i] = 1e-4*temp_velocity_avg[i]/(ana->mu0_els()+ana->mu0_holes());
                 }
-                velocity_diode[j] = GraphBuilder(numS,cc[0]->GetX(),temp_Y3,"scanning distance [#mum]", "Velocity [cm/s]","Velocity Profile");
-                field_diode[j] = GraphBuilder(numS,cc[0]->GetX(),temp_Y4,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field Profile");
+                velocity_diode[j] = GraphBuilder(numS,cc[0]->GetX(),temp_velocity_avg,"scanning distance [#mum]", "Velocity [cm/s]","Velocity Profile");
+                field_diode[j] = GraphBuilder(numS,cc[0]->GetX(),temp_field,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field Profile");
             }
 
-            delete temp_Y3;
-            delete temp_Y4;
+            delete temp_velocity_avg;
+            delete temp_field;
 
         }
 
@@ -958,85 +959,25 @@ namespace TCT {
             MultiGraphWriter(numVolt,field_normed,"scanning distance [#mum]","Electric Field, [V/#mum]","Electric Field","Electric_Field");
             MultiGraphWriter(numVolt,velocity_holes_normed,"scanning distance [#mum]","Velocity, [cm/s]","Holes Velocity Profile","Vel_Holes");
             MultiGraphWriter(numVolt,velocity_electrons_normed,"scanning distance [#mum]","Velocity, [cm/s]","Electrons Velocity Profile","Vel_Electrons");
+
+            //plots normalization coefficient
             TGraph *coeff = GraphBuilder(numVolt,voltages,normcoeff,"Voltage, [V]","A","Norm Coefficient for Different voltages");
             TF1 *fff = new TF1("log0","[0]*log(x)",10,120);
             coeff->Fit("log0","R");
             coeff->Write("CoeffNorm");
+
             dir_vel_diode->cd();
             MultiGraphWriter(numVolt,velocity_diode,"scanning distance [#mum]","Velocity [cm/s]","Velocity Profiles","VelocityVsDist_diode");
             MultiGraphWriter(numVolt,field_diode,"scanning distance [#mum]","Electric Field, [V/#mum]","Electric Field","FieldVsDist_diode");
             dir_vel->cd();
         }
- /*           TCanvas* c2 = new TCanvas("c2","c2",3000,3000); // FIXME
-            c2->cd();
-            TLegend* leg = new TLegend(.7, .1, .9, .3,"Interval","NDC");
-            char legname[100];
-
-            TF1 *fit_vel = new TF1("fit_vel","pol1",180,420);
-            mgg = new TMultiGraph();
-            mgg->SetTitle("Different Integration times");
-            for(int i=0;i<numTsteps;i++) {
-                cc_diffint[i]->SetLineColor(i%8+1);
-                cc_diffint[i]->SetMarkerSize(0);
-                cc_diffint[i]->SetLineWidth(1);
-                cc_diffint[i]->Fit("fit_vel","Rq");
-                sprintf(legname,"%.2f-%.2f",ana->FTlow(),ana->FTlow()+(i+1)*(ana->FThigh()-ana->FTlow())/numTsteps);
-                //sprintf(legname,"%.2f-%.2f",ana->FTlow(),ana->FTlow()+(i+1)*(51.5-ana->FTlow())/numTsteps);
-                leg->AddEntry(cc_diffint[i],legname,"l");
-                mgg->Add(cc_diffint[i]);
-            }
-            mgg->Draw("AL");
-            leg->Draw();
-            char name[100];
-            sprintf(name,"U = %.1f",voltages[numVolt]);
-            mgg->SetName(name);
-            mgg->GetYaxis()->SetTitle("Charge [arb]");
-            mgg->GetXaxis()->SetTitle("scanning distance [#mum]");
-            mgg->Write();
-
-            TImage *img = TImage::Create();
-            img->FromPad(c2);
-            img->WriteImage("canvas.png");
-            */
-/*
-            TH1F* sample_hist;
-            TGraph* peak_time;
-            TF1* fit_der = new TF1("fit_der","[1]*(x-[0])*(x-[0])+[2]",51.5,56);
-            Float_t* x_pos = new Float_t[300];
-            Float_t* timepeak = new Float_t[300];
-
-            TDirectory* dir_der = dir_vel->mkdir("derivative");
-            dir_der->cd();
-            for(int n=0;n<numVolt;n++) {
-                Int_t i=0;
-                for(int m=0;m<numS;m++) {
-                    if(1) {
-                        sample_hist = stct->GetHA(ana->CH_Det()-1,m,0,0,n,0);
-                        fit_der->SetParameter(0,54.2);
-                        fit_der->SetParameter(1, 2);
-                        fit_der->SetParameter(2,sample_hist->GetMinimum());
-                        sample_hist->Fit(fit_der,"Rq");
-                        x_pos[i]=Sc0+m*Ss;
-                        timepeak[i]=fit_der->GetParameter(0);
-                        sample_hist->Write();
-                        i++;
-                    }
-                }
-                peak_time = new TGraph(i,x_pos,timepeak);
-                char name[100];
-                sprintf(name,"U = %.1f",voltages[n]);
-                peak_time->Write(name);
-
-            }
-            dir_vel->cd();
-*/
 
         return true;
 
     }
 
     // this is independent of the sensor (and hence position), as it only uses the photo diode
-    bool Scanning::LaserChargeDrift() { // FIXME fix name 
+    bool Scanning::LaserPowerDrop() {
         f_rootfile->cd();
 
         Double_t dt;
@@ -1047,7 +988,9 @@ namespace TCT {
         Int_t N1=stct->Nx;
         Int_t N2=stct->Ny;
         Int_t N3=stct->Nz;
-        Int_t numS=N1*N2*N3;
+        Int_t N4=stct->NU1;
+        Int_t N5=stct->NU2;
+        Int_t numS=N1*N2*N3*N4*N5;
 
         TH1F **test_graph = new TH1F*[numS];
         Double_t *temp_integral = new Double_t[numS];
@@ -1057,19 +1000,23 @@ namespace TCT {
         Int_t thigh;
 
         Int_t i=0;
-        for(int j=0;j<N3;j++) {
-            for(int k=0;k<N2;k++) {
-                for(int m=0;m<N1;m++) {
-                    test_graph[i] = stct->GetHA(photo_channel-1,m,k,j);
-                    temp_width = test_graph[i]->GetBinWidth(1);
-                    bool found = false;
-                    for(int j=0;j<test_graph[i]->GetNbinsX();j++) {
-                        if(!found && test_graph[i]->GetBinContent(j)>5) {tlow = j;found=true;}
-                        if(found) { if(test_graph[i]->GetBinContent(j)<0) { thigh = j; break; } }
+        for(int p=0;p<N5;p++) {
+            for(int s=0;s<N4;s++) {
+                for(int j=0;j<N3;j++) {
+                    for(int k=0;k<N2;k++) {
+                        for(int m=0;m<N1;m++) {
+                            test_graph[i] = stct->GetHA(photo_channel-1,m,k,j,s,p);
+                            temp_width = test_graph[i]->GetBinWidth(1);
+                            bool found = false;
+                            for(int j=0;j<test_graph[i]->GetNbinsX();j++) {
+                                if(!found && test_graph[i]->GetBinContent(j)>5) {tlow = j;found=true;}
+                                if(found) { if(test_graph[i]->GetBinContent(j)<0) { thigh = j; break; } }
+                            }
+                            xxx[i] = i*dt;
+                            temp_integral[i] = test_graph[i]->Integral((Int_t)tlow,(Int_t)thigh)*temp_width;
+                            i++;
+                        }
                     }
-                    xxx[i] = i*dt;
-                    temp_integral[i] = test_graph[i]->Integral((Int_t)tlow,(Int_t)thigh)*temp_width;
-                    i++;
                 }
             }
         }
@@ -1089,7 +1036,9 @@ namespace TCT {
         Int_t N1=stct->Nx;
         Int_t N2=stct->Ny;
         Int_t N3=stct->Nz;
-        Int_t numS=N1*N2*N3;
+        Int_t N4=stct->NU1;
+        Int_t N5=stct->NU2;
+        Int_t numS=N1*N2*N3*N4*N5;
 
         TH1F **test_graph = new TH1F*[numS];
         Double_t *temp_integral = new Double_t[numS];
@@ -1101,27 +1050,31 @@ namespace TCT {
         Double_t sr = 0;
 
         Int_t i=0;
-        for(int j=0;j<N3;j++) {
-            for(int k=0;k<N2;k++) {
-                for(int m=0;m<N1;m++) {
-                    test_graph[i] = stct->GetHA(photo_channel-1,m,k,j);
-                    temp_width = test_graph[i]->GetBinWidth(1);
-                    bool found = false;
-                    for(int j=0;j<test_graph[i]->GetNbinsX();j++) {
-                        if(!found && test_graph[i]->GetBinContent(j)>5) {tlow = j;found=true;}
-                        if(found) { if(test_graph[i]->GetBinContent(j)<0) { thigh = j; break; } }
-                    }
-                    xxx[i] = i;
-                    temp_integral[i] = test_graph[i]->Integral((Int_t)tlow,(Int_t)thigh)*temp_width;
+        for(int p=0;p<N5;p++) {
+            for(int s=0;s<N4;s++) {
+                for(int j=0;j<N3;j++) {
+                    for(int k=0;k<N2;k++) {
+                        for(int m=0;m<N1;m++) {
+                            test_graph[i] = stct->GetHA(photo_channel-1,m,k,j,s,p);
+                            temp_width = test_graph[i]->GetBinWidth(1);
+                            bool found = false;
+                            for(int j=0;j<test_graph[i]->GetNbinsX();j++) {
+                                if(!found && test_graph[i]->GetBinContent(j)>5) {tlow = j;found=true;}
+                                if(found) { if(test_graph[i]->GetBinContent(j)<0) { thigh = j; break; } }
+                            }
+                            xxx[i] = i;
+                            temp_integral[i] = test_graph[i]->Integral((Int_t)tlow,(Int_t)thigh)*temp_width;
 
-                    if(i==0) {
-                        ch_min = temp_integral[i];
-                        ch_max = temp_integral[i];
+                            if(i==0) {
+                                ch_min = temp_integral[i];
+                                ch_max = temp_integral[i];
+                            }
+                            if(temp_integral[i]<ch_min) ch_min = temp_integral[i];
+                            if(temp_integral[i]>ch_max) ch_max = temp_integral[i];
+                            sr+=temp_integral[i];
+                            i++;
+                        }
                     }
-                    if(temp_integral[i]<ch_min) ch_min = temp_integral[i];
-                    if(temp_integral[i]>ch_max) ch_max = temp_integral[i];
-                    sr+=temp_integral[i];
-                    i++;
                 }
             }
         }
@@ -1157,7 +1110,7 @@ namespace TCT {
 
     }
 /*
-    bool Scanning::SimulateDoFocus() { //FIXME include it, add short explanation
+    bool Scanning::SimulateDoFocus() { //FIXME1 include it, add short explanation
 
         TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
         dir_fsearch->cd();
@@ -1493,7 +1446,7 @@ namespace TCT {
         return true;
     }
 
-    // FIXME add explenation here
+    // to set number of scanning points, step and x0 for each axis.
     void Scanning::SwitchAxis(Int_t sw, Int_t& nPoints, Float_t& step, Float_t& p0) {
         switch(sw)
           {
@@ -1796,7 +1749,7 @@ namespace TCT {
         main->cd();
 
     }
-
+//FIXME1 axis
     void Scanning::MultiGraphWriter(Int_t N, TGraph **gr, const char *namex, const char *namey, const char *title, const char *write_name) {
 
         TMultiGraph *mg = new TMultiGraph();
@@ -1806,10 +1759,10 @@ namespace TCT {
             gStyle->SetOptFit(0);
             gr[j]->SetLineColor(j%8+1);
             gr[j]->SetMarkerSize(0);
-            mg->Add(gr[j],"p");
+            mg->Add(gr[j]);
           }
 
-        mg->Draw("A");
+        mg->Draw("AP");
         mg->SetName(write_name);
         mg->SetTitle(title);
         mg->GetXaxis()->SetTitle(namex);
@@ -1847,8 +1800,8 @@ namespace TCT {
 
     Double_t Scanning::Mu(Double_t E, Int_t Type) {
 
-        if(Type==1) return mu_holes/(1.+mu_holes*E/v_sat_h); // FIXME get this values from config file
-        if(Type==0) return mu_els/sqrt(1.+mu_els*E/v_sat_el); // FIXME squared!
+        if(Type==1) return ana->mu0_holes()/(1.+ana->mu0_holes()*E/ana->v_sat());
+        if(Type==0) return ana->mu0_els()/sqrt(1.+ana->mu0_els()*E/ana->v_sat()*ana->mu0_els()*E/ana->v_sat());
 
     }
 

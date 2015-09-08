@@ -74,8 +74,20 @@ namespace TCT {
       float _FDLow;
       float _FDHigh;
       bool _FSeparateCharges;
+      bool _FSeparateWaveforms;
       float _Movements_dt;
       float _EV_Time;
+
+      //coefficients
+      float _mu0_els;
+      float _mu0_holes;
+      float _v_sat;
+      float _ampl;
+      float _light_split;
+      float _R_sensor;
+      float _R_diode;
+      float _RespPhoto;
+      float _E_pair;
 
     public:
 
@@ -263,6 +275,10 @@ namespace TCT {
       void SetFSeparateCharges(bool val) { _FSeparateCharges = val;}
       const bool & FSeparateCharges() const { return _FSeparateCharges;}
 
+      bool FSeparateWaveforms() { return _FSeparateWaveforms;}
+      void SetFSeparateWaveforms(bool val) { _FSeparateWaveforms = val;}
+      const bool & FSeparateWaveforms() const { return _FSeparateWaveforms;}
+
       float Movements_dt() { return _Movements_dt;}
       void SetMovements_dt(float val) { _Movements_dt = val;}
       const float & Movements_dt() const { return _Movements_dt;}
@@ -272,6 +288,20 @@ namespace TCT {
       const float & EV_Time() const { return _EV_Time;}
 
       //end scanning section
+
+      //begin coeffiecients
+
+      float mu0_els() { return _mu0_els; }
+      float mu0_holes() { return _mu0_holes; }
+      float v_sat() { return _v_sat; }
+      float ampl() { return _ampl; }
+      float light_split() { return _light_split; }
+      float R_sensor() { return  _R_sensor; }
+      float R_diode() { return  _R_diode; }
+      float RespPhoto() { return  _RespPhoto; }
+      float E_pair() { return  _E_pair; }
+
+      //end coefficients
 
       std::string SampleCard () { return _SampleCard;}
       void SetSampleCard(std::string val) { _SampleCard = val;}
