@@ -31,8 +31,9 @@ namespace TCT {
     bool Scanning::ReadTCT(char* filename, analysis *ana1, bool HasSubs) {
         ana = ana1;
         stct = new PSTCT(filename,-3,2);
-        stct->CorrectBaseLine(10.);
+        stct->CorrectBaseLine(10.); // FIXME what is 10
 
+        // CheckData: check if channels are set in config file 
         if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; return false;}
 
         std::string outfolder	= ana->OutFolder();
@@ -56,13 +57,13 @@ namespace TCT {
         f_rootfile->mkdir("sample_signals");
         f_rootfile->cd("sample_signals");
 
-        for(int i=0;i<4;i++) {
+        for(int i=0;i<4;i++) { // scan over channels
             if(stct->WFOnOff[i]) {
-                sample_hist = stct->GetHA(i,0,0,0,0,0);
+                sample_hist = stct->GetHA(i,0,0,0,0,0); // get one sample from each channel
                 sample_hist->Write();
             }
-            if(ana->SaveSingles() && (i+1)==ana->CH_Det() && stct->WFOnOff[i]) {
-                f_rootfile->mkdir("detector_signals");
+            if(ana->SaveSingles() && (i+1)==ana->CH_Det() && stct->WFOnOff[i]) { //FIXME use new "SaveSingles()" checking on new option // loop over all WFs
+                f_rootfile->mkdir("detector_signals"); // FIXME do only once!
                 f_rootfile->cd("detector_signals");
                 for(int l=0;l<stct->NU2;l++) {
                     for(int n=0;n<stct->NU1;n++) {
@@ -83,9 +84,10 @@ namespace TCT {
 
         if(ana->DO_focus() && ana->TCT_Mode()==0) TopDoFocus();
         if(ana->DO_focus() && ana->TCT_Mode()==1) EdgeDoFocus();
+        //if(ana->DO_focus() && ana->TCT_Mode()==2) BottomDoFocus(); // FIXME needs implementation
         if(ana->DO_EdgeDepletion() && ana->TCT_Mode()==1) EdgeDoDepletion();
         if(ana->DO_EdgeVelocity() && ana->TCT_Mode()==1) EdgeDoVelocity();
-        if(ana->CH_PhDiode()) LaserChargeDrift();
+        if(ana->CH_PhDiode()) LaserChargeDrift(); // FIXME dont use "DRIFT" for this
         if(ana->CH_PhDiode()) BeamSigma();
 
         f_rootfile->Close();
@@ -117,16 +119,16 @@ namespace TCT {
         TGraph **cc_norm;                  // charge collection graph
         TGraph **ph_charge = new TGraph*[numO];
 
-        Float_t *width = new Float_t[numO];
-        Float_t *pos = new Float_t[numO];
-        Float_t *abs_pos = new Float_t[numO];
-        Float_t *width_normed = new Float_t[numO];
-        Float_t *pos_normed = new Float_t[numO];
-        Float_t *strip_w = new Float_t[numO];
+        Float_t *width 		= new Float_t[numO];
+        Float_t *pos 		= new Float_t[numO];
+        Float_t *abs_pos 	= new Float_t[numO];
+        Float_t *width_normed 	= new Float_t[numO];
+        Float_t *pos_normed 	= new Float_t[numO];
+        Float_t *strip_w 	= new Float_t[numO];
         Float_t *strip_w_normed = new Float_t[numO];
-        Float_t *minQ = new Float_t[numO];
-        Float_t *minQ_normed = new Float_t[numO];
-        Float_t *optical_axis_co = new Float_t[numO];
+        Float_t *minQ 		= new Float_t[numO];
+        Float_t *minQ_normed 	= new Float_t[numO];
+        Float_t *optical_axis_co= new Float_t[numO];
 
         SwitchAxis(scanning_axis,numS,Ss,Sc0);
 
@@ -146,7 +148,7 @@ namespace TCT {
 
         // fit definition
 
-        Float_t FWHM=ana->FFWHM();               //   expected FWHM
+        Float_t FWHM=ana->FFWHM();               //   expected FWHM, can be specified in config file, dafaulted to 10. in header
 
         TF1 *ff2=new TF1("ff2","[2]/2.*(TMath::Erfc((x-[0])/[1]) + (TMath::Erf((x-[0]-[3])/[1]) + 1))",0,Ss*numS);
 
@@ -227,7 +229,7 @@ namespace TCT {
         }
 
         //plot graphs at different positions along optical axis
-        MultiGraphWriter(numO,cc,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance");
+        MultiGraphWriter(numO,cc,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance"); // FIXME axis  
 
         //plot graphs at different positions along optical axis with normed data
         if(ana->CH_PhDiode()) {
@@ -568,8 +570,8 @@ namespace TCT {
         Double_t right_edge,left_edge;
 
         FindEdges(cc[numVolt-1],numS,Ss,left_edge,right_edge);
-        if(abs((right_edge-left_edge)-ana->SampleThickness())>0.3*ana->SampleThickness()) {
-            std::cout<<"\tSorry, the detector thickness found for the highest bias voltage is more than 30% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
+        if(abs((right_edge-left_edge)-ana->SampleThickness())>0.1*ana->SampleThickness()) {
+            std::cout<<"\tSorry, the detector thickness found for the highest bias voltage is more than 10% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
             std::cout<<"\tLeft Edge = "<<left_edge<<" Right Edge = "<<right_edge<<std::endl;
             std::cout<<"\tOriginal Thickness is "<<ana->SampleThickness()<<" micrometers"<<std::endl;
             std::cout<<std::endl;
@@ -590,8 +592,8 @@ namespace TCT {
         }
 
         FindEdges(cc_norm[numVolt-1],numS,Ss,left_edge,right_edge);
-        if(abs((right_edge-left_edge)-ana->SampleThickness())>0.3*ana->SampleThickness()) {
-            std::cout<<"\tNORMED Sorry, the detector thickness found for the highest bias voltage is more than 30% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
+        if(abs((right_edge-left_edge)-ana->SampleThickness())>0.1*ana->SampleThickness()) {
+            std::cout<<"\tNORMED Sorry, the detector thickness found for the highest bias voltage is more than 10% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
             std::cout<<"\tNORMED Left Edge = "<<left_edge<<" Right Edge = "<<right_edge<<std::endl;
             std::cout<<"\tNORMED Original Thickness is "<<ana->SampleThickness()<<" micrometers"<<std::endl;
             std::cout<<"\tNORMED Aborting the depletion voltage search"<<std::endl;
@@ -633,7 +635,7 @@ namespace TCT {
         }
 
         TF1 *depl_fit1 = new TF1("depl_fit1","pol1");
-        TF1 *depl_fit2 = new TF1("depl_fit2","pol1");
+        TF1 *depl_fit2 = new TF1("depl_fit2","pol1"); // FIXME, try pol0 !!
 
         Float_t *sq_volt = new Float_t[numVolt];
         Float_t *derivative = new Float_t[numVolt];
@@ -680,7 +682,7 @@ namespace TCT {
 
             max_der=0;
             for(int i=2;i<numVolt;i++){
-                derivative[i] = total_charge_normed[i]-total_charge_normed[i-2];
+                derivative[i] = total_charge_normed[i]-total_charge_normed[i-2]; // ppor man's derivative; i-1 often doesnt work, try i-2
                 if(derivative[i]>max_der) max_der=derivative[i];
             }
 
@@ -778,7 +780,7 @@ namespace TCT {
         std::cout<<"\tIntegrating in the range "<<left_edge<<" - "<<right_edge<<std::endl;
         std::cout<<std::endl;
 
-        Double_t *xxx = charge_max_bias->GetX();
+        Double_t *xxx = charge_max_bias->GetX(); // FIXME  no xxx
         Int_t ix1=-1;
         Int_t ix2=-1;
         for(Int_t i=0;i<numS;i++) {
@@ -793,11 +795,11 @@ namespace TCT {
 
         //calculating the velocity profile asuuming integral(E)dx = Vbias
         Double_t eps = 1e-3;
-        Double_t *temp_Y1;
+        Double_t *temp_Y1; // FIXME what is this
         Double_t *temp_vel_h=new Double_t[numS];
         Double_t *temp_vel_el=new Double_t[numS];
         Double_t *temp_field=new Double_t[numS];
-        for(int j=0;j<numVolt;j++) {
+        for(int j=0;j<numVolt;j++) { // FIXME constants seems to prefer smaller values towards low electric fields , why?
             temp_Y1 = cc[j]->GetY();
 
             Double_t a=1;
@@ -811,7 +813,7 @@ namespace TCT {
                 }
                 sum=0;
                 for(int i=ix1;i<=ix2;i++) sum+=temp_field[i];
-                sum*=1e-4*Ss;
+                sum*=1e-4*Ss; // conversion from um to cm
                 if(voltages[j]-sum>0) a-=dx;
                 else a+=dx;
                 dx=dx/2;
@@ -834,7 +836,7 @@ namespace TCT {
             //calculating the mean charge from the photodetector
             cc_norm=NormedCharge(cc,ph_charge,numVolt);
 
-            Double_t *temp_sensor;
+            Double_t *temp_sensor; // FIXME should be called somethign with "charge"
 
             for(int j=0;j<numVolt;j++) {
                 temp_sensor = cc_norm[j]->GetY();
@@ -874,7 +876,7 @@ namespace TCT {
         delete temp_field;
 
 
-        //calculating the velocity profile using photodiode
+        //calculating the velocity profile using photodiode for estimate of N_e,h, Factor 100 to many :(
         if(ana->CH_PhDiode()) {
 
             Double_t temp_sr_general = 0;
@@ -891,7 +893,7 @@ namespace TCT {
             }
             temp_sr_general=temp_sr_general/(numVolt);
 
-            Double_t Ampl = 300;
+            Double_t Ampl = 300; // FIXME needs accurate update!
             Double_t Res_sensor = 50.;
             Double_t Res_photo = 50.;
             Double_t Response_photo = 0.7;
@@ -899,14 +901,14 @@ namespace TCT {
             Double_t E_pair = 3.61;
             Double_t diode_multi = 9.65;
 
-            Double_t *temp_Y1;
+            Double_t *temp_Y1; //FIXME what am I?
             Double_t *temp_Y2;
             Double_t *temp_Y3 = new Double_t[numS];
             Double_t *temp_Y4 = new Double_t[numS];
 
             Double_t Neh = 0.624*diode_multi*temp_sr_general/Res_photo/Response_photo/E_pair;
             //Neh = 1.32*Neh/10000;
-            Neh = Neh*0.02146;
+            Neh = Neh*0.02146; // Integral over one strip from energye depostion a.f.o. depth for 80 um strip, and lambda = 11 1/cm
             std::cout<<"Photodiode charge: "<<temp_sr_general<<std::endl;
             std::cout<<"Npairs: "<<1.e7*Neh<<std::endl;
 
@@ -965,7 +967,7 @@ namespace TCT {
             MultiGraphWriter(numVolt,field_diode,"scanning distance [#mum]","Electric Field, [V/#mum]","Electric Field","FieldVsDist_diode");
             dir_vel->cd();
         }
- /*           TCanvas* c2 = new TCanvas("c2","c2",3000,3000);
+ /*           TCanvas* c2 = new TCanvas("c2","c2",3000,3000); // FIXME
             c2->cd();
             TLegend* leg = new TLegend(.7, .1, .9, .3,"Interval","NDC");
             char legname[100];
@@ -1033,7 +1035,8 @@ namespace TCT {
 
     }
 
-    bool Scanning::LaserChargeDrift() {
+    // this is independent of the sensor (and hence position), as it only uses the photo diode
+    bool Scanning::LaserChargeDrift() { // FIXME fix name 
         f_rootfile->cd();
 
         Double_t dt;
@@ -1077,6 +1080,7 @@ namespace TCT {
         delete temp_integral;
     }
 
+    // this is independent of the sensor (and hence position), as it only uses the photo diode
     bool Scanning::BeamSigma() {
 
         Double_t dt = ana->Movements_dt();
@@ -1153,7 +1157,7 @@ namespace TCT {
 
     }
 /*
-    bool Scanning::SimulateDoFocus() {
+    bool Scanning::SimulateDoFocus() { //FIXME include it, add short explanation
 
         TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
         dir_fsearch->cd();
@@ -1428,6 +1432,7 @@ namespace TCT {
         std::cout<<"FocusSearch Data Test Passed. Processing..."<<std::endl;
         return true;
     }
+
     bool Scanning::CheckEdgeDepletion() {
 
         std::cout<<"\t- DO Edge Depletion: "<< ana->DO_EdgeDepletion() <<std::endl;
@@ -1488,6 +1493,7 @@ namespace TCT {
         return true;
     }
 
+    // FIXME add explenation here
     void Scanning::SwitchAxis(Int_t sw, Int_t& nPoints, Float_t& step, Float_t& p0) {
         switch(sw)
           {
@@ -1516,6 +1522,7 @@ namespace TCT {
             delete wf[j];
         }
     }
+
     TGraph** Scanning::NormedCharge(TGraph** sensor, TGraph** photodiode, Int_t numP) {
 
         TGraph** normed_charge = new TGraph*[numP];
@@ -1587,6 +1594,8 @@ namespace TCT {
 
     }
 
+
+    // find position of two edge for a fixed voltage (at least fully depleted) and for one optical distance
     void Scanning::FindEdges(TGraph* gr, Int_t numS, Float_t dx, Double_t& left_edge, Double_t& right_edge) {
 
         TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])-[3]",0,dx*numS);
@@ -1637,6 +1646,7 @@ namespace TCT {
 
     }
 
+    // find position of two edge for a fixed voltage (at least fully depleted) and for all optical distances
     void Scanning::FindEdges(TGraph** gr, Int_t numP, Int_t numS, Float_t dx, Float_t* left_pos, Float_t* left_width, Float_t* right_pos, Float_t* right_width) {
 
         TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])-[3]",0,dx*numS);
@@ -1796,10 +1806,10 @@ namespace TCT {
             gStyle->SetOptFit(0);
             gr[j]->SetLineColor(j%8+1);
             gr[j]->SetMarkerSize(0);
-            mg->Add(gr[j]);
+            mg->Add(gr[j],"p");
           }
 
-        mg->Draw("AP");
+        mg->Draw("A");
         mg->SetName(write_name);
         mg->SetTitle(title);
         mg->GetXaxis()->SetTitle(namex);
@@ -1837,8 +1847,8 @@ namespace TCT {
 
     Double_t Scanning::Mu(Double_t E, Int_t Type) {
 
-        if(Type==1) return mu_holes/(1.+mu_holes*E/v_sat_h);
-        if(Type==0) return mu_els/sqrt(1.+mu_els*E/v_sat_el);
+        if(Type==1) return mu_holes/(1.+mu_holes*E/v_sat_h); // FIXME get this values from config file
+        if(Type==0) return mu_els/sqrt(1.+mu_els*E/v_sat_el); // FIXME squared!
 
     }
 

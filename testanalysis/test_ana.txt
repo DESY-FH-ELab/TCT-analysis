@@ -35,7 +35,7 @@ LeCroyRAW       =       1
 [Scanning]
 #Channels of oscilloscope connected to detector, photodiode, trigger. Put numbers 1,2,3,4 - corresponding to channels, no such device connected put 0.
 CH_Detector	=	1
-#Turning on of the Photodiode channel also adds normalisation to all scans;
+#Turning on of the Photodiode channel also adds normalisation to all scans; 
 CH_Photodiode	=	3
 CH_Trigger	=	4
 #Set optical Axis. 1-x,2-y,3-z
@@ -53,24 +53,25 @@ TCT_Mode             =       1
 #!!!
 Focus_Search	=	0
 #!!!
-#Integrate signal from TLow to THigh - ns
+#Integrate signal from TestSenorLow to TestSensorHigh - ns // FIXME
 F_TLow		=	50.7
 F_THigh		=	140
 #F_TLow		=	40
 #F_THigh		=	140
-#Integrate photodiode signal from DLow to DHigh - ns
+#Integrate photodiode signal from DLow to DHigh - ns //FIXME
 F_DLow          =       46
 F_DHigh         =       51
 #F_DLow          =       0
 #F_DHigh         =       53.2
 #Plot charge, normed charge and photodiode charge for each Z, voltage
-F_PlSCharges	=	1
+F_PlotSeperrateCharges	=	1 // FIXME
 #!!!
 EdgeDepletionVoltage    =   1
 EdgeVelocityProfile     =   1
 #!!!
 #Averaging the current for Velocity profile from F_TLow to F_TLow+EV_Time
 EV_Time                 = 0.3
+
 [Sensor]
 SampleCard	=	../testsensor/SC_CE2339.txt
 
