@@ -73,14 +73,22 @@ EdgeVelocityProfile     =   1
 EV_Time                 = 0.3
 
 [Parameters]
+#low-field mobility for electrons, cm2*V^-1*s^-1
 Mu0_Electrons           =   1400
+#low-field mobility for holes, cm2*V^-1*s^-1
 Mu0_Holes               =   450
+#saturation velocity cm/s
 SaturationVelocity      =   1e7
+# amplifier amplification
 Amplification           =   300
+# factor between charge in sensor and photodiode due to light splitting: Nsensor/Ndiode
 LightSplitter           =   9.65
+# resistance of the sensor and diode output, Ohm
 ResistanceSensor        =   50
 ResistancePhotoDetector =   50
+# pohotodetector responce for certain wavelength, A/W
 ResponcePhotoDetector   =   0.7
+# electron-hole pair creation energy, eV
 EnergyPair              =   3.61
 
 [Sensor]

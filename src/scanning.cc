@@ -30,8 +30,15 @@
 namespace TCT {
     bool Scanning::ReadTCT(char* filename, analysis *ana1, bool HasSubs) {
         ana = ana1;
+
+        // -3 is the time shift, you can shift a signal to start at t=0. FIXME
         stct = new PSTCT(filename,-3,2);
-        stct->CorrectBaseLine(10.); // FIXME1 what is 10
+
+        // Function corrects the baseline (DC offset) of all wafeforms
+        // Float_t xc ; time denoting the start of the pulse
+        //              correction factor is calculated from all the bins before xc
+        // it integrates from first bin to bin with t=10, and then shifts by the mean value
+        stct->CorrectBaseLine(10.);
 
         // CheckData: check if channels are set in config file 
         if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; return false;}
@@ -1109,218 +1116,7 @@ namespace TCT {
         delete temp_integral;
 
     }
-/*
-    bool Scanning::SimulateDoFocus() { //FIXME1 include it, add short explanation
 
-        TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
-        dir_fsearch->cd();
-        Int_t numO,numS;
-        Int_t numWF=1000;
-
-        TGraph *cc[numWF];                  // charge collection graph
-        TGraph *cc_norm[numWF];
-
-        Float_t abs_pos[numWF];      // array of FWHM values and transition positions
-        Float_t width_new[numWF],pos_new[numWF];
-        Float_t optical_axis_co[numWF];     // optical axis coordinate
-        Float_t scanning_axis_co[numWF];     // optical axis coordinate
-        Float_t minQ_new[numWF];
-        Float_t strip_w_new[numWF];
-        Float_t Ss,Os;                       // Optical axis step
-        Float_t Sc0,Opt0;
-        Float_t Pi = 3.1415926535;
-
-        Opt0 = 8600;
-        Os = 50;
-        numO = 24;
-        Sc0 = 0;
-        Ss = 2;
-        numS = 40;
-        Float_t strip_w = 6.8;
-        Float_t data_strip_x = 40;
-
-        Float_t beam_sigma[numWF];
-        Float_t maximal_beam_sigma = 15;
-        Float_t minimal_beam_sigma = 5.7;
-        Float_t norm=0;
-        for(int i=1;i<numO/2;i++) norm+=i*i;
-        norm = 2*norm;
-        for(int j=0;j<numO;j++) {
-            optical_axis_co[j] = Opt0 + Os*j;
-            beam_sigma[j] = minimal_beam_sigma + 6.85e-5/numO*10*(j-numO/2)*(j-numO/2)*Os*Os;
-            //std::cout<<beam_sigma[j]<<std::endl;
-        }
-        for(int j=0;j<numS;j++) {
-            scanning_axis_co[j] = Sc0 + Ss*numS;
-        }
-
-
-        // fit definition
-
-        Float_t LowLim=Sc0;             //   low limit for fit
-        Float_t HiLim=Sc0+Ss*numS;
-        Float_t FWHM=maximal_beam_sigma/2;               //   expected FWHM
-        Float_t Level=data_strip_x;               //  start of flat level
-
-
-
-        TF1 *ff2=new TF1("ff2","[2]/2.*(TMath::Erfc((x-[0])/[1]) + (TMath::Erf((x-[0]-[3])/[1]) + 1))",LowLim,HiLim);
-
-
-
-        ff2->SetParameter(0,Level);
-        ff2->SetParameter(1,FWHM);
-        ff2->SetParameter(2,3);
-        ff2->SetParameter(3,0.7*FWHM);
-
-        Float_t *temp_Y3 = new Float_t[numS];
-        Float_t beam_x;
-
-        TF1 *fgaus = new TF1("ff1","gaus",LowLim,HiLim);
-
-        for(int j=0;j<numO;j++) {
-            //while(beam_x<=Sc0+Ss*numS) {
-            for(Int_t counts=0;counts<numS;counts++) {
-                beam_x = Sc0+Ss*counts;
-                fgaus->SetParameters(1.0/sqrt(2*Pi)/beam_sigma[j],beam_x,beam_sigma[j]);
-                temp_Y3[counts] = fgaus->Integral(Sc0-4*beam_sigma[j],data_strip_x-strip_w/2)+fgaus->Integral(data_strip_x+strip_w/2,Sc0+Ss*numS+4*beam_sigma[j]);
-                scanning_axis_co[counts] = beam_x;
-
-            }
-            cc_norm[j] = new TGraph(numS,scanning_axis_co,temp_Y3);
-            if(j==0) ff2->SetParameter(2,cc_norm[j]->GetHistogram()->GetMaximum());
-            cc_norm[j]->Fit("ff2","Rq");
-            gStyle->SetOptFit(1);
-
-            width_new[j]=ff2->GetParameter(1)*2.35/TMath::Sqrt(2);
-            pos_new[j]=ff2->GetParameter(0)+ ff2->GetParameter(3)/2;
-            minQ_new[j] = ff2->Eval(ff2->GetParameter(0) + ff2->GetParameter(3)/2)/ff2->GetParameter(2);
-            strip_w_new[j] = ff2->GetParameter(3);
-        }
-
-
-        if(ana->FSeparateCharges()) {
-
-            TDirectory* dir_charges_normed = dir_fsearch->mkdir("charges_normed");
-            dir_charges_normed->cd();
-
-            for(int j=0;j<numO;j++) {
-                std::stringstream ss;
-                ss<<"Z = "<<optical_axis_co[j];
-                std::string name = ss.str();
-                cc_norm[j]->SetTitle("ChargeVsDist");
-                cc_norm[j]->GetXaxis()->SetTitle("scanning distance [#mum]");
-                cc_norm[j]->Write(name.c_str());
-            }
-
-            dir_fsearch->cd();
-        }
-
-        //plot graphs at different positions along optical axis with normed data
-
-        TMultiGraph *mg1 = new TMultiGraph();
-        mg1->SetTitle("scanning distance [#mum]");
-
-        for(int j=0;j<numO;j++)
-        {
-            cc_norm[j]->SetLineColor(j%8+1);
-            if(j==0)
-            {
-                cc_norm[j]->Draw("AL");
-            }
-            else cc_norm[j]->Draw("L");
-            mg1->Add(cc_norm[j]);
-        }
-
-        mg1->Draw("AP");
-        mg1->SetName("ChargeVsDist_Normed");
-        mg1->GetYaxis()->SetTitle("Charge [arb]");
-        mg1->GetXaxis()->SetTitle("scanning distance [#mum]");
-        mg1->Write();
-
-
-        TF1 *ff_pol2 = new TF1("my_pol2","[1]*(x-[0])*(x-[0])+[2]");
-        ff_pol2->SetParName(0,"Focus Position");
-        TF1 *ff_pol4 = new TF1("my_pol4","[1]*(x-[0])*(x-[0])+[2]");
-        ff_pol4->SetParName(0,"Focus Position");
-        TPaveStats *st;
-
-
-        //draw the gaussian beam profile with normed charge
-        TGraph *FWHMg1=new TGraph(numO,optical_axis_co,width_new);
-        FWHMg1->SetMarkerStyle(21);
-        FWHMg1->Draw("AP");
-        FWHMg1->GetHistogram()->GetXaxis()->SetTitle("optical distance [#mum]");
-        FWHMg1->GetHistogram()->GetYaxis()->SetTitle("FWHM [#mum]");
-        ff_pol2->SetParameter(0,FWHMg1->GetMean());
-        ff_pol2->SetParameter(2,FWHMg1->GetMinimum());
-        FWHMg1->Fit("my_pol2","q");
-        gStyle->SetOptFit(1);
-        st = (TPaveStats*)FWHMg1->FindObject("stats");
-        st->SetFitFormat(".5g");
-        FWHMg1->SetTitle("Gaussian Beam Profile");
-        FWHMg1->Write("FWHM_Normed");
-
-        // Plotting the minimum charge of the fitted Erfs a.f.o. optical distance with normed data
-
-        TGraph *MINQg1=new TGraph(numO,optical_axis_co,minQ_new);
-        MINQg1->SetMarkerStyle(21);
-        MINQg1->Draw("AP");
-        MINQg1->GetHistogram()->GetXaxis()->SetTitle("optical distance [#mum]");
-        MINQg1->GetHistogram()->GetYaxis()->SetTitle("min Q [rel. to max]");
-        ff_pol4->SetParameter(0,MINQg1->GetMean());
-        ff_pol4->SetParameter(2,MINQg1->GetMinimum());
-        MINQg1->Fit("my_pol4","q");
-        gStyle->SetOptFit(1);
-        st = (TPaveStats*)MINQg1->FindObject("stats");
-        st->SetFitFormat(".5g");
-        MINQg1->SetTitle("Minimum Charge");
-        MINQg1->Write("MinCharge_Normed");
-
-        // Find the missalignment between z and optical axis
-        for(int j=0;j<numO;j++) abs_pos[j]=pos_new[j]+Sc0;
-
-        TGraph *POSg1=new TGraph(numO,optical_axis_co,abs_pos);
-        POSg1->SetMarkerStyle(21);
-        POSg1->Draw("AP");
-        POSg1->GetHistogram()->GetXaxis()->SetTitle("optical distance [#mum]");
-        POSg1->GetHistogram()->GetYaxis()->SetTitle("position of the edge [#mum]");
-        POSg1->Fit("pol1","q");
-        gStyle->SetOptFit(1);
-        POSg1->SetTitle("Missalignment");
-        POSg1->Write("Missalignment_Normed");
-
-        // Plotting best strip width
-
-        TGraph *StrWg1=new TGraph(numO,optical_axis_co,strip_w_new);
-        StrWg1->SetMarkerStyle(21);
-        StrWg1->Draw("AP");
-        StrWg1->GetHistogram()->GetXaxis()->SetTitle("optical distance [#mum]");
-        StrWg1->GetHistogram()->GetYaxis()->SetTitle("strip width [#mum]");
-        //ff_pol3->SetParameter(0,MINQg->GetMean());
-        // ff_pol3->SetParameter(2,MINQg->GetMinimum());
-        //MINQg->Fit("my_pol3","q");
-        //gStyle->SetOptFit(1);
-        //st = (TPaveStats*)MINQg->FindObject("stats");
-        //st->SetFitFormat(".5g");
-        StrWg1->SetTitle("Strip Width");
-        StrWg1->Write("StripWidth_Normed");
-
-
-        // Correlation between Qmin and FWHM
-        TGraph *CORg=new TGraph(numO,width_new,minQ_new);
-        CORg->SetMarkerStyle(21);
-        CORg->Draw("P");
-        CORg->GetHistogram()->GetXaxis()->SetTitle("FWHM [#mum]");
-        CORg->GetHistogram()->GetYaxis()->SetTitle("min Q from fit [arb]");
-        //CORg->Fit("pol2");
-        CORg->SetTitle("Correlation between FWHM and Qmin");
-        CORg->Write("Corr_FWHM_Q");
-
-
-        return true;
-    }
-*/
     bool Scanning::CheckData() {
 
         std::cout<<"Checking Channels set:"<<std::endl;
@@ -1749,9 +1545,11 @@ namespace TCT {
         main->cd();
 
     }
-//FIXME1 axis
+
     void Scanning::MultiGraphWriter(Int_t N, TGraph **gr, const char *namex, const char *namey, const char *title, const char *write_name) {
 
+        TCanvas *canva = new TCanvas(write_name,title,640,480);
+        canva->cd();
         TMultiGraph *mg = new TMultiGraph();
 
         for(int j=0;j<N;j++)
@@ -1759,15 +1557,17 @@ namespace TCT {
             gStyle->SetOptFit(0);
             gr[j]->SetLineColor(j%8+1);
             gr[j]->SetMarkerSize(0);
-            mg->Add(gr[j]);
+            mg->Add(gr[j],"l");
           }
 
-        mg->Draw("AP");
+        mg->Draw("A");
         mg->SetName(write_name);
         mg->SetTitle(title);
         mg->GetXaxis()->SetTitle(namex);
         mg->GetYaxis()->SetTitle(namey);
-        mg->Write();
+        //mg->Write();
+        canva->Write(write_name);
+        canva->Close();
 
     }
 
