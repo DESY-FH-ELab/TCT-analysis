@@ -4,8 +4,14 @@
 
 [General]
 ProjectFolder	=	../
-DataFolder	=	../testdata/S57
+DataFolder	=	../testdata/channels_check
+#DataFolder	=	../testdata/test_2_red
+
 Outfolder	=	../results
+#Set acq mode.
+# 0 - taking the sets of single measurements (*.txt or *.raw files by oscilloscope). Settings are in [Analysis]
+# 1 - taking the data from *.tct file produced by DAQ software. Settings are in [Scanning]
+Mode		=	1
 
 [Analysis]
 MaxAcqs		=	100
@@ -22,9 +28,69 @@ DoSmearing	=	0
 AddNoise	=	0.000	# in volts
 AddJitter	=	0.0	# in ns
 SaveToFile	=	1
-SaveSingles	=	0
-#Temp and Volt is not set at the moment, need to writ this into header file during measurement
+SaveSingles	=	1
+LeCroyRAW       =       1
+#Temp and Volt is not set at the moment, need to write this into header file during measurement
+
+[Scanning]
+#Channels of oscilloscope connected to detector, photodiode, trigger. Put numbers 1,2,3,4 - corresponding to channels, no such device connected put 0.
+CH_Detector	=	1
+#Turning on of the Photodiode channel also adds normalisation to all scans; 
+CH_Photodiode	=	3
+CH_Trigger	=	4
+#Set optical Axis. 1-x,2-y,3-z
+Optical_Axis	=	3
+#Scanning Axis.
+Scanning_Axis	=	1
+#Set voltage source number (1 or 2)
+Voltage_Source   =       1
+#Time between stage movements in seconds.
+Movements_dt        =       1
+#Perform next operations. Analysis will start only if all needed data is present:
+# 0-top,1-edge,2-bottom
+TCT_Mode             =       1
+#Scanning over optical and perpendiculr to strip axes (or along the detector depth in case of edge-tct), fitting the best position.
+#!!!
+Focus_Search	=	0
+#!!!
+#Integrate sensor signal from TimeSensorLow to TimeSensorHigh - ns
+TimeSensorLow		=	50.7
+TimeSensorHigh		=	140
+#Integrate photodiode signal from TimeDiodeLow to TimeDiodeHigh - ns
+TimeDiodeLow          =       46
+TimeDiodeDHigh         =       51
+#Save charge, normed charge and photodiode charge for each Z, voltage
+SaveSeparateCharges	=	1
+#Save waveforms for each position and voltage
+SaveSeparateWaveforms   =       1
+#!!!
+#search for depletion voltage
+EdgeDepletionVoltage    =   1
+#extracting the velocity and electric field profiles
+EdgeVelocityProfile     =   1
+#!!!
+#Averaging the current for electric field profile from F_TLow to F_TLow+EV_Time
+EV_Time                 = 0.3
+
+[Parameters]
+#low-field mobility for electrons, cm2*V^-1*s^-1
+Mu0_Electrons           =   1400
+#low-field mobility for holes, cm2*V^-1*s^-1
+Mu0_Holes               =   450
+#saturation velocity cm/s
+SaturationVelocity      =   1e7
+# amplifier amplification
+Amplification           =   300
+# factor between charge in sensor and photodiode due to light splitting: Nsensor/Ndiode
+LightSplitter           =   9.65
+# resistance of the sensor and diode output, Ohm
+ResistanceSensor        =   50
+ResistancePhotoDetector =   50
+# pohotodetector responce for certain wavelength, A/W
+ResponcePhotoDetector   =   0.7
+# electron-hole pair creation energy, eV
+EnergyPair              =   3.61
 
 [Sensor]
-SampleCard	=	../testsensor/SC_S57.txt
+SampleCard	=	../testsensor/SC_CE2339.txt
 

@@ -71,7 +71,7 @@ namespace TCT {
       bool IsMIP() { return _IsMIP;} 
       void SetIsMIP(bool Is) { _IsMIP = Is;} 
 
-      bool AcqsLoader(std::vector<TCT::acquisition_single> *acqs, uint32_t maxAcqs = -1);
+      bool AcqsLoader(std::vector<TCT::acquisition_single> *acqs, uint32_t maxAcqs = -1, bool LeCroyRAW = false);
 
   };
 }
