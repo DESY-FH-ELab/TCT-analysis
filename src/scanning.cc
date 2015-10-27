@@ -25,14 +25,15 @@
 #include "TROOT.h"
 #include "TLegend.h"
 // External includes
-#include "TCTScan.h"
+//#include "TCTScan.h"
+#include "TCTReader.h"
 
 namespace TCT {
     bool Scanning::ReadTCT(char* filename, analysis *ana1, bool HasSubs) {
         ana = ana1;
 
         // -3 is the time shift, you can shift a signal to start at t=0. FIXME
-        stct = new PSTCT(filename,-3,2);
+        stct = new TCTReader(filename,-3,2);
 
         // Function corrects the baseline (DC offset) of all wafeforms
         // Float_t xc ; time denoting the start of the pulse
@@ -90,7 +91,6 @@ namespace TCT {
                 f_rootfile->cd("sample_signals");
             }
         }
-
         if(ana->DO_focus() && ana->TCT_Mode()==0) DoTopFocus();
         if(ana->DO_focus() && ana->TCT_Mode()==1) DoEdgeFocus();
         //if(ana->DO_focus() && ana->TCT_Mode()==2) BottomDoFocus(); // FIXME needs implementation
@@ -100,7 +100,7 @@ namespace TCT {
         if(ana->CH_PhDiode()) BeamSigma();
 
         f_rootfile->Close();
-        stct->~PSTCT();
+
         delete stct;
 
         return true;
@@ -720,6 +720,11 @@ namespace TCT {
             dir_depl->cd();
         }
 
+        for(int i=0;i<numVolt;i++) {
+            delete cc[i];
+            delete cc_norm[i];
+            delete ph_charge[i];
+        }
 
         delete total_charge;
         delete total_charge_normed;
@@ -775,13 +780,14 @@ namespace TCT {
         CalculateCharges(ChNumber,volt_source+2,numVolt,scanning_axis,numS,cc,ana->FTlow(),ana->FTlow()+ana->EV_Time());
 
         //find integration ranges
-        MeasureWF *wf0;
+        TCTWaveform *wf0;
         switch(volt_source)
           {
           case 1: wf0 = stct->Projection(ChNumber,scanning_axis,0,0,0,numVolt-1,0,numS); break;
           case 2: wf0 = stct->Projection(ChNumber,scanning_axis,0,0,0,0,numVolt-1,numS); break;
           }
         TGraph *charge_max_bias = wf0->CCE(ana->FTlow(),ana->FThigh());
+        delete wf0;
         Double_t left_edge,right_edge;
         FindEdges(charge_max_bias,numS,Ss,left_edge,right_edge);
         std::cout<<std::endl;
@@ -1253,7 +1259,7 @@ namespace TCT {
     }
 
     void Scanning::CalculateCharges(Int_t Channel, Int_t Ax, Int_t numAx, Int_t scanning, Int_t numS, TGraph **charges, Float_t tstart, Float_t tfinish) {
-        MeasureWF **wf = new MeasureWF*[numAx];
+        TCTWaveform **wf = new TCTWaveform*[numAx];
         for(int j=0;j<numAx;j++)
         {
             switch(Ax)
@@ -1267,7 +1273,7 @@ namespace TCT {
 
             wf[j]->SetTemperatures(stct->T);
             charges[j]=wf[j]->CCE(tstart,tfinish);   //integrate the charge in time window
-            wf[j]->Clear();
+            //wf[j]->Clear();
             delete wf[j];
         }
     }
@@ -1548,8 +1554,8 @@ namespace TCT {
 
     void Scanning::MultiGraphWriter(Int_t N, TGraph **gr, const char *namex, const char *namey, const char *title, const char *write_name) {
 
-        TCanvas *canva = new TCanvas(write_name,title,640,480);
-        canva->cd();
+        //TCanvas *canva = new TCanvas(write_name,title,640,480);
+        //canva->cd();
         TMultiGraph *mg = new TMultiGraph();
 
         for(int j=0;j<N;j++)
@@ -1565,9 +1571,9 @@ namespace TCT {
         mg->SetTitle(title);
         mg->GetXaxis()->SetTitle(namex);
         mg->GetYaxis()->SetTitle(namey);
-        //mg->Write();
-        canva->Write(write_name);
-        canva->Close();
+        mg->Write();
+        //canva->Write(write_name);
+        //canva->Close();
 
     }
 

@@ -15,8 +15,10 @@
 #include "TGraph.h"
 #include "TMultiGraph.h"
 // TCT includes
-#include "TCTScan.h"
+//#include "TCTScan.h"
 #include "analysis.h"
+
+class TCTReader;
 
 namespace TCT {
 
@@ -25,7 +27,7 @@ namespace TCT {
     private :
         int _Nsamples;
         TFile* f_rootfile;
-        PSTCT* stct;
+        TCTReader* stct;
         analysis* ana;
 
     protected:

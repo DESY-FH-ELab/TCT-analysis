@@ -1,0 +1,8 @@
+#comments have to start with a #
+#put group key words in []
+#always specify ID, TAB, "=", TAB, value
+
+[Sensor]
+SampleCardFolder	=	../testsensor/
+SampleID	=	CE2339
+Thickness	=	280.	# in um 
