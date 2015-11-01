@@ -16,7 +16,9 @@
 #include "TRandom3.h" 
 
 // External includes
-#include "LeCroy.h"
+#ifdef USE_LECROY_RAW
+    #include "LeCroy.h"
+#endif
 
 //#define DEBUG
 
@@ -118,7 +120,7 @@ namespace TCT {
 
     return kTRUE;
   }
-
+#ifdef USE_LECROY_RAW
   bool acquisition_single::ReadRAW(std::string fullfname, uint32_t iFile){
 
 	#ifdef DEBUG 
@@ -175,6 +177,14 @@ namespace TCT {
 
 	
   }
+#else
+  bool acquisition_single::ReadRAW(std::string fullfname, uint32_t iFile){
+
+    std::cout<<"Impossible without LeCroy Library. Recompile Application with -DWITH_LECROY_RAW=ON flag."<<std::endl;
+
+    return kFALSE;
+  }
+#endif
 
   void acquisition_single::SetName(std::string name){
 

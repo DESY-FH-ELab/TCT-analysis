@@ -127,6 +127,13 @@ int main(int argc, char* argv[])
       TCT::analysis ana(ana_card.ID_val());
       //std::cout << ana << std::endl;
 
+#ifndef USE_LECROY_RAW
+      if(ana.LeCroyRAW()) {
+          std::cout<<"   *** Config says to process LeCroy RAW files. Impossible without LeCroy Library. Recompile Application with -DWITH_LECROY_RAW=ON flag."<<std::endl;
+          exit(1);
+      }
+#endif
+
       // find all subfolders in datafolder
       if(ana.DataFolder() == "def") {
           std::cout << "   * No data folder was specified in analysis card. Check your analysis card, that \"DataFolder = ...\" is specified correctly" << std::endl;

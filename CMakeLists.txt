@@ -115,9 +115,14 @@ SET(LIB_SOURCE_FILES
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 MESSAGE(STATUS ${ROOT_LIBRARIES})
 
-# Check for LCR Library
-FIND_PACKAGE ( LCR REQUIRED )
-INCLUDE_DIRECTORIES( ${LCR_INCLUDE_DIR} )
+
+# Setting the LeCroy Library Requierment
+OPTION(WITH_LECROY_RAW "Setting the LeCroy Library to read RAW files from the oscilloscope" OFF)
+if(WITH_LECROY_RAW)
+	add_definitions(-DUSE_LECROY_RAW)
+	FIND_PACKAGE ( LCR REQUIRED )
+	INCLUDE_DIRECTORIES( ${LCR_INCLUDE_DIR} )
+endif()
 
 # Check for TCTAnalyze library by particulars.si
 #FIND_PACKAGE ( TCTAnalyze REQUIRED )
@@ -126,7 +131,11 @@ INCLUDE_DIRECTORIES( ${LCR_INCLUDE_DIR} )
 # build main TCT-ANALYSIS executable
 add_executable(tct-analysis  src/main.cxx )
 #target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
-target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${LCR_LIBRARY})
+if(WITH_LECROY_RAW)
+	target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${LCR_LIBRARY})
+else()
+	target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES})
+endif()
 # now set up the installation directory
 INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
   RUNTIME DESTINATION bin
@@ -155,5 +164,20 @@ ENDIF(DOXYGEN_FOUND)
 # Print out system information useful for bug reports #
 ############################################### #######
 include(PrintSystemInformation)
+
+#######################
+# Print configuration #
+#######################
+if(NOT WIN32)
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(ColourBold  "${Esc}[1m")
+  set(Red         "${Esc}[31m")
+  set(Green       "${Esc}[32m")
+  set(BoldRed     "${Esc}[1;31m")
+  set(BoldGreen   "${Esc}[1;32m")
+endif()
+message(STATUS "${BoldRed}Build options:${ColourReset}")
+message(STATUS "${Green}WITH_LECROY_RAW: " ${BoldGreen} ${WITH_LECROY_RAW} ${ColourReset})
 
 
