@@ -224,6 +224,9 @@ int main(int argc, char* argv[])
 
           if(!meas.AcqsLoader(&AllAcqs, ana.MaxAcqs(),ana.LeCroyRAW())) {
               std::cout << " Folder empty! Skipping folder" << std::endl;
+              counter++;
+              if( countersubdir == 0) break;
+              if(counter == countersubdir) break;
               continue;
           };
 
