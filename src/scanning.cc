@@ -14,6 +14,7 @@
 #include "TH1F.h"
 #include "TFile.h"
 #include "TCanvas.h"
+#include "TMath.h"
 #include "TSystem.h"
 #include "TFitResultPtr.h"
 #include "TStyle.h"
@@ -29,8 +30,8 @@
 #include "TCTReader.h"
 
 namespace TCT {
-    bool Scanning::ReadTCT(char* filename, analysis *ana1, bool HasSubs) {
-        ana = ana1;
+    bool Scanning::ReadTCT(char* filename, tct_config *config1) {
+        config = config1;
 
         // -3 is the time shift, you can shift a signal to start at t=0. FIXME
         stct = new TCTReader(filename,-3,2);
@@ -44,15 +45,12 @@ namespace TCT {
         // CheckData: check if channels are set in config file 
         if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; return false;}
 
-        std::string outfolder	= ana->OutFolder();
-        std::string outpath  = outfolder + "/" + ana->OutSample_ID();
+        std::string outfolder	= config->OutFolder();
+        std::string outpath  = outfolder + "/" + config->OutSample_ID();
         gSystem->MakeDirectory(outpath.c_str());
-        if(HasSubs) outpath  = outpath + "/" + ana->OutSubFolder();
-        if(HasSubs) gSystem->MakeDirectory(outpath.c_str());
 
         std::string pathandfilename;
-        if(HasSubs) pathandfilename = outpath  + "/" + ana->OutSample_ID() + "_" + ana->OutSubFolder() + "_" + ana->OutSubsubFolder() + "_";
-        else pathandfilename = outpath  + "/" + ana->OutSample_ID() + "_";
+        pathandfilename = outpath  + "/" + config->OutSample_ID() + "_";
         char name[100];
         sprintf(name,"%02d.%02d.%02d_%02d.%02d.%02d",stct->Date[0],stct->Date[1],stct->Date[2],stct->Date[3],stct->Date[4],stct->Date[5]);
         pathandfilename = pathandfilename + name + ".root";
@@ -66,21 +64,21 @@ namespace TCT {
         f_rootfile->cd("sample_signals");
 
 
-        if(ana->FSeparateWaveforms()) f_rootfile->mkdir("detector_signals");
+        if(config->FSeparateWaveforms()) f_rootfile->mkdir("detector_signals");
 
         for(int i=0;i<4;i++) { // scan over channels
             if(stct->WFOnOff[i]) {
                 sample_hist = stct->GetHA(i,0,0,0,0,0); // get one sample from each channel
                 sample_hist->Write();
             }
-            if(ana->FSeparateWaveforms() && (i+1)==ana->CH_Det() && stct->WFOnOff[i]) { //loop over all waveforms
+            if(config->FSeparateWaveforms() && (i+1)==config->CH_Det() && stct->WFOnOff[i]) { //loop over all waveforms
                 f_rootfile->cd("detector_signals");
                 for(int l=0;l<stct->NU2;l++) {
                     for(int n=0;n<stct->NU1;n++) {
                         for(int j=0;j<stct->Nz;j++) {
                             for(int k=0;k<stct->Ny;k++) {
                                 for(int m=0;m<stct->Nx;m++) {
-                                    sample_hist = stct->GetHA(ana->CH_Det()-1,m,k,j,n,l);
+                                    sample_hist = stct->GetHA(config->CH_Det()-1,m,k,j,n,l);
                                     sample_hist->Write();
                                 }
                             }
@@ -91,13 +89,13 @@ namespace TCT {
                 f_rootfile->cd("sample_signals");
             }
         }
-        if(ana->DO_focus() && ana->TCT_Mode()==0) DoTopFocus();
-        if(ana->DO_focus() && ana->TCT_Mode()==1) DoEdgeFocus();
-        //if(ana->DO_focus() && ana->TCT_Mode()==2) BottomDoFocus(); // FIXME needs implementation
-        if(ana->DO_EdgeDepletion() && ana->TCT_Mode()==1) DoEdgeDepletion();
-        if(ana->DO_EdgeVelocity() && ana->TCT_Mode()==1) DoEdgeVelocity();
-        if(ana->CH_PhDiode()) LaserPowerDrop();
-        if(ana->CH_PhDiode()) BeamSigma();
+        if(config->DO_focus() && config->TCT_Mode()==0) DoTopFocus();
+        if(config->DO_focus() && config->TCT_Mode()==1) DoEdgeFocus();
+        //if(config->DO_focus() && config->TCT_Mode()==2) BottomDoFocus(); // FIXME needs implementation
+        if(config->DO_EdgeDepletion() && config->TCT_Mode()==1) DoEdgeDepletion();
+        if(config->DO_EdgeVelocity() && config->TCT_Mode()==1) DoEdgeVelocity();
+        if(config->CH_PhDiode()) LaserPowerDrop();
+        if(config->CH_PhDiode()) BeamSigma();
 
         f_rootfile->Close();
 
@@ -111,16 +109,16 @@ namespace TCT {
         if(!CheckFocus()) {std::cout<<"No data for focusing. Skipping..."<<std::endl; return false;}
         TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
         TDirectory *dir_fsearch_normed;
-        if(ana->CH_PhDiode()) dir_fsearch_normed = f_rootfile->mkdir("FocusSearch_Normed");
+        if(config->CH_PhDiode()) dir_fsearch_normed = f_rootfile->mkdir("FocusSearch_Normed");
         dir_fsearch->cd();
         Int_t numO,numS;
 
         Float_t Ss,Os;                       // Optical axis step
         Float_t Sc0,Opt0;
 
-        Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
-        Int_t optic_axis=(ana->OptAxis())-1;            // select optic axis (0=x,1=y,2=z)
-        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t ChNumber=(config->CH_Det())-1;              // select the oscilloscope channel
+        Int_t optic_axis=(config->OptAxis())-1;            // select optic axis (0=x,1=y,2=z)
+        Int_t scanning_axis=config->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
 
         SwitchAxis(optic_axis,numO,Os,Opt0);
 
@@ -142,13 +140,13 @@ namespace TCT {
         SwitchAxis(scanning_axis,numS,Ss,Sc0);
 
         //calculate the arb charge from the current
-        CalculateCharges(ChNumber,optic_axis,numO,scanning_axis,numS,cc,ana->FTlow(),ana->FThigh());
+        CalculateCharges(ChNumber,optic_axis,numO,scanning_axis,numS,cc,config->FTlow(),config->FThigh());
 
         //laser charge distribution
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
 
             //calculate the photodetector charge
-            CalculateCharges(ana->CH_PhDiode()-1,optic_axis,numO,scanning_axis,numS,ph_charge,ana->FDLow(),ana->FDHigh());
+            CalculateCharges(config->CH_PhDiode()-1,optic_axis,numO,scanning_axis,numS,ph_charge,config->FDLow(),config->FDHigh());
 
             dir_fsearch_normed->cd();
             ChargeCorrelationHist(cc,ph_charge,numO);
@@ -157,7 +155,7 @@ namespace TCT {
 
         // fit definition
 
-        Float_t FWHM=ana->FFWHM();               //   expected FWHM, can be specified in config file, dafaulted to 10. in header
+        Float_t FWHM=config->FFWHM();               //   expected FWHM, can be specified in config file, dafaulted to 10. in header
 
         TF1 *ff2=new TF1("ff2","[2]/2.*(TMath::Erfc((x-[0])/[1]) + (TMath::Erf((x-[0]-[3])/[1]) + 1))",0,Ss*numS);
 
@@ -195,7 +193,7 @@ namespace TCT {
 
 
         //calculating the normed charge distribution
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
 
             cc_norm = NormedCharge(cc,ph_charge,numO);
 
@@ -226,10 +224,10 @@ namespace TCT {
             }
         }
 
-        if(ana->FSeparateCharges()) {
+        if(config->FSeparateCharges()) {
             dir_fsearch->cd();
             GraphSeparate(numO,cc,"charges","scanning distance, [#mum]","Charge,[arb.]","Charge vs Distance","Z = ",optical_axis_co);
-            if(ana->CH_PhDiode()) {
+            if(config->CH_PhDiode()) {
                 dir_fsearch_normed->cd();
                 GraphSeparate(numO,ph_charge,"photodiode","scanning distance, [#mum]","Charge,[arb.]","Laser Charge vs Distance","Z = ",optical_axis_co);
                 GraphSeparate(numO,cc_norm,"charges_normed","scanning distance, [#mum]","Charge,[arb.]","Charge vs Distance","Z = ",optical_axis_co);
@@ -241,7 +239,7 @@ namespace TCT {
         MultiGraphWriter(numO,cc,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance");
 
         //plot graphs at different positions along optical axis with normed data
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             dir_fsearch_normed->cd();
             MultiGraphWriter(numO,cc_norm,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance_Normed");
             dir_fsearch->cd();
@@ -289,7 +287,7 @@ namespace TCT {
         // Plotting best strip width
         GraphBuilder(numO,optical_axis_co,strip_w,"optical distance [#mum]","strip width [#mum]","Strip Width","StripWidth");
 
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             dir_fsearch_normed->cd();
 
             //draw the gaussian beam profile with normed charge
@@ -347,7 +345,7 @@ namespace TCT {
         if(!CheckFocus()) {std::cout<<"No data for focusing. Skipping..."<<std::endl; return false;}
         TDirectory *dir_fsearch = f_rootfile->mkdir("FocusSearch");
         TDirectory *dir_fsearch_normed;
-        if(ana->CH_PhDiode()) dir_fsearch_normed = f_rootfile->mkdir("FocusSearch_Normed");
+        if(config->CH_PhDiode()) dir_fsearch_normed = f_rootfile->mkdir("FocusSearch_Normed");
         dir_fsearch->cd();
 
         Int_t numO,numS;
@@ -355,9 +353,9 @@ namespace TCT {
         Float_t Ss,Os;                       // Optical axis step
         Float_t Sc0,Opt0;
 
-        Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
-        Int_t optic_axis=(ana->OptAxis())-1;            // select optic axis (0=x,1=y,2=z)
-        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t ChNumber=(config->CH_Det())-1;              // select the oscilloscope channel
+        Int_t optic_axis=(config->OptAxis())-1;            // select optic axis (0=x,1=y,2=z)
+        Int_t scanning_axis=config->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
 
         SwitchAxis(optic_axis,numO,Os,Opt0);
 
@@ -383,13 +381,13 @@ namespace TCT {
         SwitchAxis(scanning_axis,numS,Ss,Sc0);
 
         //calculate the arb charge from the current
-        CalculateCharges(ChNumber,optic_axis,numO,scanning_axis,numS,cc,ana->FTlow(),ana->FThigh());
+        CalculateCharges(ChNumber,optic_axis,numO,scanning_axis,numS,cc,config->FTlow(),config->FThigh());
 
         //laser charge distribution
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
 
             //calculate the photodetector charge
-            CalculateCharges(ana->CH_PhDiode()-1,optic_axis,numO,scanning_axis,numS,ph_charge,ana->FDLow(),ana->FDHigh());
+            CalculateCharges(config->CH_PhDiode()-1,optic_axis,numO,scanning_axis,numS,ph_charge,config->FDLow(),config->FDHigh());
 
             dir_fsearch_normed->cd();
             ChargeCorrelationHist(cc,ph_charge,numO);
@@ -404,7 +402,7 @@ namespace TCT {
         }
 
         //calculating the normed charge distribution
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
 
             cc_norm = NormedCharge(cc,ph_charge,numO);
             //find edges
@@ -412,10 +410,10 @@ namespace TCT {
             for(int j=0;j<numO;j++) sensor_thick_normed[j]=pos_right_normed[j]-pos_left_normed[j];
         }
 
-        if(ana->FSeparateCharges()) {
+        if(config->FSeparateCharges()) {
             dir_fsearch->cd();
             GraphSeparate(numO,cc,"charges","scanning distance, [#mum]","Charge,[arb.]","Charge vs Distance","Z = ",optical_axis_co);
-            if(ana->CH_PhDiode()) {
+            if(config->CH_PhDiode()) {
                 dir_fsearch_normed->cd();
                 GraphSeparate(numO,ph_charge,"photodiode","scanning distance, [#mum]","Charge,[arb.]","Laser Charge vs Distance","Z = ",optical_axis_co);
                 GraphSeparate(numO,cc_norm,"charges_normed","scanning distance, [#mum]","Charge,[arb.]","Charge vs Distance","Z = ",optical_axis_co);
@@ -427,7 +425,7 @@ namespace TCT {
         MultiGraphWriter(numO,cc,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance");
 
         //plot graphs at different positions along optical axis with normed data
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             dir_fsearch_normed->cd();
             MultiGraphWriter(numO,cc_norm,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance_Normed");
             dir_fsearch->cd();
@@ -477,7 +475,7 @@ namespace TCT {
         GraphBuilder(numO,optical_axis_co,sensor_thick,"optical distance [#mum]","sensor thickness [#mum]","Sensor Thickness","SensorThickness");
 
 
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             dir_fsearch_normed->cd();
 
             //draw the gaussian beam profile with normed charge
@@ -543,14 +541,14 @@ namespace TCT {
         if(!CheckEdgeDepletion()) {std::cout<<"No data for depletion voltage search. Skipping..."<<std::endl; return false;}
         TDirectory *dir_depl = f_rootfile->mkdir("DepletionVoltage");
         TDirectory *dir_depl_normed;
-        if(ana->CH_PhDiode()) dir_depl_normed = f_rootfile->mkdir("DepletionVoltage_Normed");
+        if(config->CH_PhDiode()) dir_depl_normed = f_rootfile->mkdir("DepletionVoltage_Normed");
         dir_depl->cd();
         Int_t numVolt,numS;
         Float_t Ss,Sc0;
 
-        Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
-        Int_t volt_source=(ana->VoltSource());            // select
-        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t ChNumber=(config->CH_Det())-1;              // select the oscilloscope channel
+        Int_t volt_source=(config->VoltSource());            // select
+        Int_t scanning_axis=config->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
         Float_t *voltages;
 
         switch(volt_source)
@@ -566,23 +564,23 @@ namespace TCT {
         SwitchAxis(scanning_axis,numS,Ss,Sc0);
 
         //calculate charge profiles for different voltages
-        CalculateCharges(ChNumber,volt_source+2,numVolt,scanning_axis,numS,cc,ana->FTlow(),ana->FThigh());
+        CalculateCharges(ChNumber,volt_source+2,numVolt,scanning_axis,numS,cc,config->FTlow(),config->FThigh());
 
         //calculate laser charge profiles
-        if(ana->CH_PhDiode()) CalculateCharges(ana->CH_PhDiode()-1,volt_source+2,numVolt,scanning_axis,numS,ph_charge,ana->FDLow(),ana->FDHigh());
+        if(config->CH_PhDiode()) CalculateCharges(config->CH_PhDiode()-1,volt_source+2,numVolt,scanning_axis,numS,ph_charge,config->FDLow(),config->FDHigh());
 
         //calculating the normed charge distribution
-        if(ana->CH_PhDiode()) cc_norm=NormedCharge(cc,ph_charge,numVolt);
+        if(config->CH_PhDiode()) cc_norm=NormedCharge(cc,ph_charge,numVolt);
 
         // integrate charge through the detector
 
         Double_t right_edge,left_edge;
 
         FindEdges(cc[numVolt-1],numS,Ss,left_edge,right_edge);
-        if(abs((right_edge-left_edge)-ana->SampleThickness())>0.1*ana->SampleThickness()) {
+        if(abs((right_edge-left_edge)-config->SampleThickness())>0.1*config->SampleThickness()) {
             std::cout<<"\tSorry, the detector thickness found for the highest bias voltage is more than 10% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
             std::cout<<"\tLeft Edge = "<<left_edge<<" Right Edge = "<<right_edge<<std::endl;
-            std::cout<<"\tOriginal Thickness is "<<ana->SampleThickness()<<" micrometers"<<std::endl;
+            std::cout<<"\tOriginal Thickness is "<<config->SampleThickness()<<" micrometers"<<std::endl;
             std::cout<<std::endl;
         }
         else {
@@ -601,10 +599,10 @@ namespace TCT {
         }
 
         FindEdges(cc_norm[numVolt-1],numS,Ss,left_edge,right_edge);
-        if(abs((right_edge-left_edge)-ana->SampleThickness())>0.1*ana->SampleThickness()) {
+        if(abs((right_edge-left_edge)-config->SampleThickness())>0.1*config->SampleThickness()) {
             std::cout<<"\tNORMED Sorry, the detector thickness found for the highest bias voltage is more than 10% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
             std::cout<<"\tNORMED Left Edge = "<<left_edge<<" Right Edge = "<<right_edge<<std::endl;
-            std::cout<<"\tNORMED Original Thickness is "<<ana->SampleThickness()<<" micrometers"<<std::endl;
+            std::cout<<"\tNORMED Original Thickness is "<<config->SampleThickness()<<" micrometers"<<std::endl;
             std::cout<<"\tNORMED Aborting the depletion voltage search"<<std::endl;
             return false;
         }
@@ -622,10 +620,10 @@ namespace TCT {
         }
 
         //write separate charges
-        if(ana->FSeparateCharges()) {
+        if(config->FSeparateCharges()) {
             dir_depl->cd();
             GraphSeparate(numVolt,cc,"charges","scanning distance, [#mum]","Charge,[arb.]","Charge vs Distance","U = ",voltages);
-            if(ana->CH_PhDiode()) {
+            if(config->CH_PhDiode()) {
                 dir_depl_normed->cd();
                 GraphSeparate(numVolt,ph_charge,"photodiode","scanning distance, [#mum]","Charge,[arb.]","Laser Charge vs Distance","U = ",voltages);
                 GraphSeparate(numVolt,cc_norm,"charges_normed","scanning distance, [#mum]","Charge,[arb.]","Charge vs Distance","U = ",voltages);
@@ -637,7 +635,7 @@ namespace TCT {
         MultiGraphWriter(numVolt,cc,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance");
 
         //plot graphs for different voltages with normed data
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             dir_depl_normed->cd();
             MultiGraphWriter(numVolt,cc_norm,"scanning distance [#mum]","Charge [arb.]","Charge Vs Distance","ChargeVsDistance_Normed");
             dir_depl->cd();
@@ -686,7 +684,7 @@ namespace TCT {
         TotalCg->Write("DeplVoltage");
 
 
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             dir_depl_normed->cd();
 
             max_der=0;
@@ -739,17 +737,17 @@ namespace TCT {
         if(!CheckEdgeVelocity()) {std::cout<<"No data for velocity profile. Skipping..."<<std::endl; return false;}
         TDirectory *dir_vel = f_rootfile->mkdir("Velocity");
         TDirectory *dir_vel_normed;
-        if(ana->CH_PhDiode()) dir_vel_normed = f_rootfile->mkdir("Velocity_Normed");
+        if(config->CH_PhDiode()) dir_vel_normed = f_rootfile->mkdir("Velocity_Normed");
         TDirectory *dir_vel_diode;
-        if(ana->CH_PhDiode()) dir_vel_diode = f_rootfile->mkdir("Velocity_Diode");
+        if(config->CH_PhDiode()) dir_vel_diode = f_rootfile->mkdir("Velocity_Diode");
         dir_vel->cd();
 
         Int_t numVolt,numS;
         Float_t Ss,Sc0;
 
-        Int_t ChNumber=(ana->CH_Det())-1;              // select the oscilloscope channel
-        Int_t volt_source=(ana->VoltSource());            // select
-        Int_t scanning_axis=ana->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
+        Int_t ChNumber=(config->CH_Det())-1;              // select the oscilloscope channel
+        Int_t volt_source=(config->VoltSource());            // select
+        Int_t scanning_axis=config->ScAxis()-1;         // select scanning axis (0=x,1=y,2=z)
         Float_t *voltages;
 
         switch(volt_source)
@@ -777,7 +775,7 @@ namespace TCT {
 
 
         //calculate charge profiles for different voltages
-        CalculateCharges(ChNumber,volt_source+2,numVolt,scanning_axis,numS,cc,ana->FTlow(),ana->FTlow()+ana->EV_Time());
+        CalculateCharges(ChNumber,volt_source+2,numVolt,scanning_axis,numS,cc,config->FTlow(),config->FTlow()+config->EV_Time());
 
         //find integration ranges
         TCTWaveform *wf0;
@@ -786,7 +784,7 @@ namespace TCT {
           case 1: wf0 = stct->Projection(ChNumber,scanning_axis,0,0,0,numVolt-1,0,numS); break;
           case 2: wf0 = stct->Projection(ChNumber,scanning_axis,0,0,0,0,numVolt-1,numS); break;
           }
-        TGraph *charge_max_bias = wf0->CCE(ana->FTlow(),ana->FThigh());
+        TGraph *charge_max_bias = wf0->CCE(config->FTlow(),config->FThigh());
         delete wf0;
         Double_t left_edge,right_edge;
         FindEdges(charge_max_bias,numS,Ss,left_edge,right_edge);
@@ -806,7 +804,7 @@ namespace TCT {
         if(ix2==-1) ix2=numS-1;
 
         //calculate laser charge profiles
-        if(ana->CH_PhDiode()) CalculateCharges(ana->CH_PhDiode()-1,volt_source+2,numVolt,scanning_axis,numS,ph_charge,ana->FDLow(),ana->FDHigh());
+        if(config->CH_PhDiode()) CalculateCharges(config->CH_PhDiode()-1,volt_source+2,numVolt,scanning_axis,numS,ph_charge,config->FDLow(),config->FDHigh());
 
         //calculating the velocity profile asuuming integral(E)dx = Vbias
         Double_t eps = 1e-3;
@@ -836,8 +834,8 @@ namespace TCT {
             std::cout<<"U = "<<voltages[j]<<" norm const: "<<a<<std::endl;
             for(int i=0;i<numS;i++) {
                 temp_field[i] = 1e-4*temp_field[i];
-                temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/ana->v_sat());
-                temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/ana->v_sat());
+                temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/config->v_sat());
+                temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/config->v_sat());
             }
             field[j] = GraphBuilder(numS,cc[0]->GetX(),temp_field,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field");
             velocity_holes[j] = GraphBuilder(numS,cc[0]->GetX(),temp_vel_h,"scanning distance [#mum]", "Velocity [cm/s]","Holes Velocity Profile");
@@ -847,7 +845,7 @@ namespace TCT {
 
         //calculating the velocity profile asuuming integral(E)dx = Vbias with normed data
         Float_t *normcoeff = new Float_t[numVolt];
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             //calculating the mean charge from the photodetector
             cc_norm=NormedCharge(cc,ph_charge,numVolt);
 
@@ -876,8 +874,8 @@ namespace TCT {
                 //std::cout<<"U = "<<voltages[j]<<" norm const: "<<a<<std::endl;
                 for(int i=0;i<numS;i++) {
                     temp_field[i] = 1e-4*temp_field[i];
-                    temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/ana->v_sat());
-                    temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/ana->v_sat());
+                    temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/config->v_sat());
+                    temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/config->v_sat());
                 }
                 field_normed[j] = GraphBuilder(numS,cc[0]->GetX(),temp_field,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field");
                 velocity_holes_normed[j] = GraphBuilder(numS,cc[0]->GetX(),temp_vel_h,"scanning distance [#mum]", "Velocity [cm/s]","Holes Velocity Profile");
@@ -892,7 +890,7 @@ namespace TCT {
 
 
         //calculating the velocity profile using photodiode for estimate of N_e,h, Factor 100 to many :(
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
 
             Double_t temp_sr_general = 0;
             Double_t *temp_diode;
@@ -908,13 +906,13 @@ namespace TCT {
             }
             temp_sr_general=temp_sr_general/(numVolt);
 
-            Double_t ampl = ana->ampl(); // FIXME needs accurate update!
-            Double_t Res_sensor = ana->R_sensor();
-            Double_t Res_photo = ana->R_diode();
-            Double_t Response_photo = ana->RespPhoto();
-            Double_t Eweight = 1./(ana->SampleThickness()*1e-4);
-            Double_t E_pair = ana->E_pair();
-            Double_t diode_multi = ana->light_split();
+            Double_t ampl = config->ampl(); // FIXME needs accurate update!
+            Double_t Res_sensor = config->R_sensor();
+            Double_t Res_photo = config->R_diode();
+            Double_t Response_photo = config->RespPhoto();
+            Double_t Eweight = 1./(config->SampleThickness()*1e-4);
+            Double_t E_pair = config->E_pair();
+            Double_t diode_multi = config->light_split();
 
             Double_t *temp_sensor_charge;
             Double_t *temp_diode_charge;
@@ -930,8 +928,8 @@ namespace TCT {
                 temp_sensor_charge = cc[j]->GetY();
                 temp_diode_charge = ph_charge[j]->GetY();
                 for(int i=0;i<numS;i++) {
-                    temp_velocity_avg[i] = -1e9*0.624*temp_sr_general*temp_sensor_charge[i]/(ana->EV_Time()*temp_diode_charge[i]*Eweight*ampl*Res_sensor*Neh);
-                    temp_field[i] = 1e-4*temp_velocity_avg[i]/(ana->mu0_els()+ana->mu0_holes());
+                    temp_velocity_avg[i] = -1e9*0.624*temp_sr_general*temp_sensor_charge[i]/(config->EV_Time()*temp_diode_charge[i]*Eweight*ampl*Res_sensor*Neh);
+                    temp_field[i] = 1e-4*temp_velocity_avg[i]/(config->mu0_els()+config->mu0_holes());
                 }
                 velocity_diode[j] = GraphBuilder(numS,cc[0]->GetX(),temp_velocity_avg,"scanning distance [#mum]", "Velocity [cm/s]","Velocity Profile");
                 field_diode[j] = GraphBuilder(numS,cc[0]->GetX(),temp_field,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field Profile");
@@ -943,12 +941,12 @@ namespace TCT {
         }
 
         //write separate charges
-        if(ana->FSeparateCharges()) {
+        if(config->FSeparateCharges()) {
             dir_vel->cd();
             GraphSeparate(numVolt,velocity_holes,"velocity_profiles_holes","scanning distance, [#mum]","Velocity [cm/s]","Holes Velocity Profile","U = ",voltages);
             GraphSeparate(numVolt,velocity_electrons,"velocity_profiles_electrons","scanning distance, [#mum]","Velocity [cm/s]","Electrons Velocity Profile","U = ",voltages);
             GraphSeparate(numVolt,field,"field_profiles","scanning distance, [#mum]","Electric Field, [V/#mum]","Electric Field Profile","U = ",voltages);
-            if(ana->CH_PhDiode()) {
+            if(config->CH_PhDiode()) {
                 dir_vel_normed->cd();
                 GraphSeparate(numVolt,velocity_holes_normed,"velocity_profiles_holes","scanning distance, [#mum]","Velocity [cm/s]","Holes Velocity Profile","U = ",voltages);
                 GraphSeparate(numVolt,velocity_electrons_normed,"velocity_profiles_electrons","scanning distance, [#mum]","Velocity [cm/s]","Electrons Velocity Profile","U = ",voltages);
@@ -967,7 +965,7 @@ namespace TCT {
         MultiGraphWriter(numVolt,velocity_electrons,"scanning distance [#mum]","Velocity, [cm/s]","Electrons Velocity Profile","Vel_Electrons");
 
         //plot graphs for different voltages with normed data
-        if(ana->CH_PhDiode()) {
+        if(config->CH_PhDiode()) {
             dir_vel_normed->cd();
             MultiGraphWriter(numVolt,field_normed,"scanning distance [#mum]","Electric Field, [V/#mum]","Electric Field","Electric_Field");
             MultiGraphWriter(numVolt,velocity_holes_normed,"scanning distance [#mum]","Velocity, [cm/s]","Holes Velocity Profile","Vel_Holes");
@@ -994,9 +992,9 @@ namespace TCT {
         f_rootfile->cd();
 
         Double_t dt;
-        if(ana->Movements_dt()>0) dt = ana->Movements_dt()/60.;
+        if(config->Movements_dt()>0) dt = config->Movements_dt()/60.;
         else dt = 0.001;
-        Int_t photo_channel = ana->CH_PhDiode();
+        Int_t photo_channel = config->CH_PhDiode();
 
         Int_t N1=stct->Nx;
         Int_t N2=stct->Ny;
@@ -1043,9 +1041,9 @@ namespace TCT {
     // this is independent of the sensor (and hence position), as it only uses the photo diode
     bool Scanning::BeamSigma() {
 
-        Double_t dt = ana->Movements_dt();
+        Double_t dt = config->Movements_dt();
         f_rootfile->cd();
-        Int_t photo_channel = ana->CH_PhDiode();
+        Int_t photo_channel = config->CH_PhDiode();
         Int_t N1=stct->Nx;
         Int_t N2=stct->Ny;
         Int_t N3=stct->Nz;
@@ -1126,25 +1124,25 @@ namespace TCT {
     bool Scanning::CheckData() {
 
         std::cout<<"Checking Channels set:"<<std::endl;
-        std::cout<<"\t- Detector Signal Channel: "<< ana->CH_Det() <<std::endl;
-        if(ana->CH_Det()) {
-            if(stct->WFOnOff[ana->CH_Det()-1]) std::cout<<"\t\t Data OK"<<std::endl;
+        std::cout<<"\t- Detector Signal Channel: "<< config->CH_Det() <<std::endl;
+        if(config->CH_Det()) {
+            if(stct->WFOnOff[config->CH_Det()-1]) std::cout<<"\t\t Data OK"<<std::endl;
             else {
                 std::cout<<"\t\t This channel has no data. Please check the settings."<<std::endl;
                 return false;
             }
         }
-        std::cout<<"\t- Trigger Channel: "<< ana->CH_Trig() <<std::endl;
-        if(ana->CH_Trig()) {
-            if(stct->WFOnOff[ana->CH_Trig()-1]) std::cout<<"\t\t Data OK"<<std::endl;
+        std::cout<<"\t- Trigger Channel: "<< config->CH_Trig() <<std::endl;
+        if(config->CH_Trig()) {
+            if(stct->WFOnOff[config->CH_Trig()-1]) std::cout<<"\t\t Data OK"<<std::endl;
             else {
                 std::cout<<"\t\t This channel has no data. Please check the settings."<<std::endl;
                 return false;
             }
         }
-        std::cout<<"\t- Photodiode Channel: "<< ana->CH_PhDiode() <<std::endl;
-        if(ana->CH_PhDiode()) {
-            if(stct->WFOnOff[ana->CH_PhDiode()-1]) std::cout<<"\t\t Data OK"<<std::endl;
+        std::cout<<"\t- Photodiode Channel: "<< config->CH_PhDiode() <<std::endl;
+        if(config->CH_PhDiode()) {
+            if(stct->WFOnOff[config->CH_PhDiode()-1]) std::cout<<"\t\t Data OK"<<std::endl;
             else {
                 std::cout<<"\t\t This channel has no data. Please check the settings."<<std::endl;
                 return false;
@@ -1157,12 +1155,12 @@ namespace TCT {
 
     bool Scanning::CheckFocus() {
 
-        std::cout<<"\t- DO Find Focus: "<< ana->DO_focus() <<std::endl;
+        std::cout<<"\t- DO Find Focus: "<< config->DO_focus() <<std::endl;
 
         Int_t NOpt;
         Int_t NSc;
-        std::cout<<"\t\t-- Optical Axis: "<< ana->OptAxis() <<std::endl;
-        switch(ana->OptAxis()) {
+        std::cout<<"\t\t-- Optical Axis: "<< config->OptAxis() <<std::endl;
+        switch(config->OptAxis()) {
         case 1: NOpt = stct->Nx; break;
         case 2: NOpt = stct->Ny; break;
         case 3: NOpt = stct->Nz; break;
@@ -1172,8 +1170,8 @@ namespace TCT {
             std::cout<<"\t\t\tOptical axis contains only "<<NOpt<<" points. Not enough for focusing."<<std::endl;
             return false;
         }
-        std::cout<<"\t\t-- Scanning Axis: "<< ana->ScAxis() <<std::endl;
-        switch(ana->ScAxis()) {
+        std::cout<<"\t\t-- Scanning Axis: "<< config->ScAxis() <<std::endl;
+        switch(config->ScAxis()) {
         case 1: NSc = stct->Nx; break;
         case 2: NSc = stct->Ny; break;
         case 3: NSc = stct->Nz; break;
@@ -1190,12 +1188,12 @@ namespace TCT {
 
     bool Scanning::CheckEdgeDepletion() {
 
-        std::cout<<"\t- DO Edge Depletion: "<< ana->DO_EdgeDepletion() <<std::endl;
+        std::cout<<"\t- DO Edge Depletion: "<< config->DO_EdgeDepletion() <<std::endl;
 
         Int_t NSource;
         Int_t NSc;
-        std::cout<<"\t\t-- Voltage Source: "<< ana->VoltSource() <<std::endl;
-        switch(ana->VoltSource()) {
+        std::cout<<"\t\t-- Voltage Source: "<< config->VoltSource() <<std::endl;
+        switch(config->VoltSource()) {
         case 1: NSource = stct->NU1; break;
         case 2: NSource = stct->NU2; break;
         }
@@ -1204,8 +1202,8 @@ namespace TCT {
             std::cout<<"\t\t\tVoltage scan contains only "<<NSource<<" points. Not enough for depletion voltage search."<<std::endl;
             return false;
         }
-        std::cout<<"\t\t-- Scanning Axis: "<< ana->ScAxis() <<std::endl;
-        switch(ana->ScAxis()) {
+        std::cout<<"\t\t-- Scanning Axis: "<< config->ScAxis() <<std::endl;
+        switch(config->ScAxis()) {
         case 1: NSc = stct->Nx; break;
         case 2: NSc = stct->Ny; break;
         case 3: NSc = stct->Nz; break;
@@ -1222,18 +1220,18 @@ namespace TCT {
 
     bool Scanning::CheckEdgeVelocity() {
 
-        std::cout<<"\t- DO Edge Velocity profile: "<< ana->DO_EdgeDepletion() <<std::endl;
+        std::cout<<"\t- DO Edge Velocity profile: "<< config->DO_EdgeDepletion() <<std::endl;
 
         Int_t NSource;
         Int_t NSc;
-        std::cout<<"\t\t-- Voltage Source: "<< ana->VoltSource() <<std::endl;
-        switch(ana->VoltSource()) {
+        std::cout<<"\t\t-- Voltage Source: "<< config->VoltSource() <<std::endl;
+        switch(config->VoltSource()) {
         case 1: NSource = stct->NU1; break;
         case 2: NSource = stct->NU2; break;
         }
         if(NSource>=1) std::cout<<"\t\t\tVoltage scan contains "<<NSource<<" points. OK"<<std::endl;
-        std::cout<<"\t\t-- Scanning Axis: "<< ana->ScAxis() <<std::endl;
-        switch(ana->ScAxis()) {
+        std::cout<<"\t\t-- Scanning Axis: "<< config->ScAxis() <<std::endl;
+        switch(config->ScAxis()) {
         case 1: NSc = stct->Nx; break;
         case 2: NSc = stct->Ny; break;
         case 3: NSc = stct->Nz; break;
@@ -1357,7 +1355,7 @@ namespace TCT {
         TF1 *ff_right=new TF1("ff_right","[2]*TMath::Erf((x-[0])/[1])-[3]",0,dx*numS);
 
         double *yy_temp;
-        Float_t FWHM = ana->FFWHM();
+        Float_t FWHM = config->FFWHM();
         Float_t *yy = new Float_t[numS];
         Int_t i_max, i_min;
         Float_t max, min, der_max, der_min;
@@ -1413,7 +1411,7 @@ namespace TCT {
         ff_right->SetParName(1,"#sigma_right");
 
         double *yy_temp;
-        Float_t FWHM = ana->FFWHM();
+        Float_t FWHM = config->FFWHM();
         Float_t *yy = new Float_t[numS];
         Int_t i_max, i_min;
         Float_t max, min, der_max, der_min;
@@ -1606,8 +1604,8 @@ namespace TCT {
 
     Double_t Scanning::Mu(Double_t E, Int_t Type) {
 
-        if(Type==1) return ana->mu0_holes()/(1.+ana->mu0_holes()*E/ana->v_sat());
-        if(Type==0) return ana->mu0_els()/sqrt(1.+ana->mu0_els()*E/ana->v_sat()*ana->mu0_els()*E/ana->v_sat());
+        if(Type==1) return config->mu0_holes()/(1.+config->mu0_holes()*E/config->v_sat());
+        if(Type==0) return config->mu0_els()/sqrt(1.+config->mu0_els()*E/config->v_sat()*config->mu0_els()*E/config->v_sat());
 
     }
 

@@ -16,7 +16,7 @@
 #include "TMultiGraph.h"
 // TCT includes
 //#include "TCTScan.h"
-#include "analysis.h"
+#include "tct_config.h"
 
 class TCTReader;
 
@@ -28,7 +28,7 @@ namespace TCT {
         int _Nsamples;
         TFile* f_rootfile;
         TCTReader* stct;
-        analysis* ana;
+        tct_config* config;
 
     protected:
 
@@ -41,7 +41,7 @@ namespace TCT {
 
         // Destructor
         ~Scanning() = default;
-        bool ReadTCT(char* filename, analysis* ana1, bool HasSubs);
+        bool ReadTCT(char* filename, tct_config* config1);
         bool DoTopFocus();
         bool DoEdgeFocus();
         bool DoEdgeDepletion();

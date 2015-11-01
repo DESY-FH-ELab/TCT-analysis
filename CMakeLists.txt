@@ -108,6 +108,7 @@ SET(LIB_SOURCE_FILES
   "src/measurement.cc"
   "src/util.cc"
   "src/analysis.cc"
+  "src/tct_config.cc"
   "src/scanning.cc"
   "src/TCTReader.cc"
   )
