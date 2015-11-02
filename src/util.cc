@@ -14,7 +14,6 @@
 //  includes from TCT classes
 #include "util.h"
 
-
 namespace TCT {
 
   void util::parse(std::ifstream & cfgfile) {
@@ -38,11 +37,12 @@ namespace TCT {
       }
 
     }
-
+#ifndef USE_GUI
     std::cout << "\n identifiers and values from passed file" << std::endl; 
     for(auto i : _id_val) {
       std::cout << i.first << " " << i.second << " " << "\n";
     }
+#endif
 
     _IsRead = true;
 

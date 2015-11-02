@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Parameters</class>
+ <widget class="QDialog" name="Parameters">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>493</width>
+    <height>367</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Setting Parameters</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_1">
+     <property name="text">
+      <string>Low-field mobility, Electrons</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="mobility_els"/>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_units_1">
+     <property name="text">
+      <string>cm2*V^-1*s^-1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Low-field mobility, Holes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="mobility_holes"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="label_units_2">
+     <property name="text">
+      <string>cm2*V^-1*s^-1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Saturation Velocity</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="sat_vel"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="QLabel" name="label_units_3">
+     <property name="text">
+      <string>cm/s</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Amplification</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="ampl"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Input Resistance TestSensor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="res_input"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLabel" name="label_units_5">
+     <property name="text">
+      <string>Ohm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Electron-Hole Pair Energy</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="epair"/>
+   </item>
+   <item row="5" column="2">
+    <widget class="QLabel" name="label_units_6">
+     <property name="text">
+      <string>eV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="3">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Light Splitter Fraction</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="splitter"/>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Input Resistance Diode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLineEdit" name="res_input_diode"/>
+   </item>
+   <item row="8" column="2">
+    <widget class="QLabel" name="label_units_8">
+     <property name="text">
+      <string>Ohm</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Photodetector Response</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QLineEdit" name="response_diode"/>
+   </item>
+   <item row="9" column="2">
+    <widget class="QLabel" name="label_units_9">
+     <property name="text">
+      <string>A/W</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="3">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Parameters</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Parameters</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

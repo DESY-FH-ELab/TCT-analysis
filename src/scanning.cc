@@ -30,7 +30,7 @@
 #include "TCTReader.h"
 
 namespace TCT {
-    bool Scanning::ReadTCT(char* filename, tct_config *config1) {
+    bool Scanning::ReadTCT(char *filename, tct_config *config1) {
         config = config1;
 
         // -3 is the time shift, you can shift a signal to start at t=0. FIXME

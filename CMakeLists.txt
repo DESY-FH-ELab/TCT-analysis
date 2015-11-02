@@ -99,19 +99,45 @@ INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIR} )
 ADD_DEFINITIONS(-DROOT_FOUND)
 
 # include directories
-INCLUDE_DIRECTORIES( ./include )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/include )
 
-# CORE LIBRARY:
-SET(LIB_SOURCE_FILES
-  "src/sample.cc"
-  "src/acquisition.cc"
-  "src/measurement.cc"
-  "src/util.cc"
-  "src/analysis.cc"
-  "src/tct_config.cc"
-  "src/scanning.cc"
-  "src/TCTReader.cc"
-  )
+# GUI Option, if yes - Qt installation needed
+OPTION(WITH_GUI "Setting the compiler to build GUI" OFF)
+if(WITH_GUI)
+    add_definitions(-DUSE_GUI)
+    # Qt4
+    FIND_PACKAGE(Qt4 REQUIRED)
+    INCLUDE(${QT_USE_FILE})
+    QT4_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui )
+    QT4_WRAP_CPP(MOCSrcs include/base.h)
+
+    # CORE LIBRARY:
+    SET(LIB_SOURCE_FILES
+      "src/sample.cc"
+      "src/acquisition.cc"
+      "src/measurement.cc"
+      "src/util.cc"
+      "src/analysis.cc"
+      "src/tct_config.cc"
+      "src/scanning.cc"
+      "src/TCTReader.cc"
+      "src/base.cc"
+      ${MOCSrcs}
+      ${UISrcs}
+      )
+else()
+    # CORE LIBRARY:
+    SET(LIB_SOURCE_FILES
+      "src/sample.cc"
+      "src/acquisition.cc"
+      "src/measurement.cc"
+      "src/util.cc"
+      "src/analysis.cc"
+      "src/tct_config.cc"
+      "src/scanning.cc"
+      "src/TCTReader.cc"
+      )
+endif()
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 MESSAGE(STATUS ${ROOT_LIBRARIES})
 
@@ -129,19 +155,33 @@ endif()
 #INCLUDE_DIRECTORIES( ${TCTAnalyze_INCLUDE} )
 
 # build main TCT-ANALYSIS executable
-add_executable(tct-analysis  src/main.cxx )
-#target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
-if(WITH_LECROY_RAW)
-	target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${LCR_LIBRARY})
+if(WITH_GUI)
+    add_executable(tct-analysis  src/main_gui.cxx )
 else()
-	target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES})
+    add_executable(tct-analysis  src/main.cxx )
 endif()
+#target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
+if(WITH_LECROY_RAW AND WITH_GUI)
+        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${QT_LIBRARIES} ${LCR_LIBRARY})
+elseif(WITH_GUI)
+        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${QT_LIBRARIES})
+elseif(WITH_LECROY_RAW)
+        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${LCR_LIBRARY})
+else()
+        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES})
+endif()
+
 # now set up the installation directory
 INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+# creating and installing default config file
+if(WITH_GUI)
+	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/default.conf "DefaultFile = ../testanalysis/test_ana.txt")
+	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/default.conf DESTINATION bin)
+endif()
 
 
 
@@ -179,5 +219,6 @@ if(NOT WIN32)
 endif()
 message(STATUS "${BoldRed}Build options:${ColourReset}")
 message(STATUS "${Green}WITH_LECROY_RAW: " ${BoldGreen} ${WITH_LECROY_RAW} ${ColourReset})
+message(STATUS "${Green}WITH_GUI: " ${BoldGreen} ${WITH_GUI} ${ColourReset})
 
 

@@ -161,14 +161,23 @@ public:
     //begin coeffiecients
 
     float mu0_els() { return _mu0_els; }
+    void Setmu0_els(float val) { _mu0_els = val;}
     float mu0_holes() { return _mu0_holes; }
+    void Setmu0_holes(float val) { _mu0_holes = val;}
     float v_sat() { return _v_sat; }
+    void Setv_sat(float val) { _v_sat = val;}
     float ampl() { return _ampl; }
+    void Setampl(float val) { _ampl = val;}
     float light_split() { return _light_split; }
+    void Setlight_split(float val) { _light_split = val;}
     float R_sensor() { return  _R_sensor; }
+    void SetR_sensor(float val) { _R_sensor = val;}
     float R_diode() { return  _R_diode; }
+    void SetR_diode(float val) { _R_diode = val;}
     float RespPhoto() { return  _RespPhoto; }
+    void SetRespPhoto(float val) { _RespPhoto = val;}
     float E_pair() { return  _E_pair; }
+    void SetE_pair(float val) { _E_pair = val;}
 
     //end coefficients
 

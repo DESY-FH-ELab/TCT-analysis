@@ -54,9 +54,11 @@ namespace TCT {
       ~sample() = default;
 
       double Thickness(){ return _Thickness;}
+      void SetThickness(float val) {_Thickness = val;}
       const double & Thickness() const{ return _Thickness;}
 
       std::string SampleID() {return _SampleID;}
+      void SetSampleID(std::string val) {_SampleID = val;}
       const std::string & SampleID() const {return _SampleID;}
 
       //void SetThickness(double thick) { _Thickness = thick;}
