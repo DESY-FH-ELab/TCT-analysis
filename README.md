@@ -19,13 +19,13 @@ Minimal requirements are: a C++11 compliant compiler, ROOT v5.x or later (includ
 ----------------------------
 
   * Install CMake.
+  * IF GUI needed - install Qt4
   * Install ROOT. 
   * Source ROOT 5.x before compilation. 
-  * Put the external LeCroyConverter lib to the external/LeCroyConverter/lib/libLeCroy.so
-  * Download and compile TCTAnalyse class from http://particulars.si/TCTAnalyse , put the lib to the external/TCTAnalyze.V1.0/lib/libTCTAnalyse.so directory.
+  * IF LeCroyRAW data converter needed - put the external LeCroyConverter lib to the external/LeCroyConverter/lib/libLeCroy.so
   * Go to /TCT-analysis/build
   * `> cd <.../TCT-analysis/>`
-  * Let CMake create the makefile for you
+  * Let CMake create the makefile for you (available optionds -DWITH_GUI, -DWITH_LECROY_RAW)
   * `> cmake ..`
   * Now compile:
   * `> make install`
