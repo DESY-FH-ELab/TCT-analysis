@@ -6,6 +6,7 @@
 #include "util.h"
 #include "tct_config.h"
 #include "sample.h"
+#include "analysis.h"
 namespace Ui {
 class base;
 }
@@ -30,6 +31,8 @@ private slots:
 
     void on_start_clicked();
 
+    void on_start_osc_clicked();
+
     void on_actionChange_config_triggered();
 
     void on_actionSave_config_triggered();
@@ -37,7 +40,8 @@ private slots:
 private:
     Ui::base *ui;
     std::string _DefConfigName = "def";
-    TCT::tct_config *config_analysis = NULL;
+    TCT::tct_config *config_tct = NULL;
+    TCT::analysis *config_analysis = NULL;
     TCT::sample *config_sample = NULL;
     TCT::mode_selector *config_mode = NULL;
     void read_config(const char*);

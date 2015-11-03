@@ -48,6 +48,428 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
+    <widget class="QWidget" name="mode_osc">
+     <attribute name="title">
+      <string>Oscilloscope Data</string>
+     </attribute>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>31</x>
+        <y>11</y>
+        <width>623</width>
+        <height>457</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_9">
+       <property name="verticalSpacing">
+        <number>10</number>
+       </property>
+       <item row="0" column="0" colspan="4">
+        <widget class="QCommandLinkButton" name="window_folders_2">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>55</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Folders</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>false</bool>
+         </property>
+         <property name="description">
+          <string>Set Data and Output folders</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="4" colspan="3">
+        <widget class="QCommandLinkButton" name="window_sample_2">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>55</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>View Sample Config</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="description">
+          <string>Change sample config (sensor name, thickness)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_osc_input">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Input Data:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="QRadioButton" name="mode_txt">
+         <property name="text">
+          <string>Text Files (*.txt)</string>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup_input_type</string>
+         </attribute>
+        </widget>
+       </item>
+       <item row="1" column="3" colspan="2">
+        <widget class="QRadioButton" name="mode_raw">
+         <property name="text">
+          <string>RAW Files (*.trc)</string>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup_input_type</string>
+         </attribute>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QCheckBox" name="savetofile">
+         <property name="text">
+          <string>Save to file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" colspan="3">
+        <widget class="QCheckBox" name="savesingles">
+         <property name="text">
+          <string>Save single waveforms</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5" colspan="2">
+        <widget class="QCheckBox" name="dosmearing">
+         <property name="text">
+          <string>Do Smearing</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QLabel" name="label_osc_1">
+         <property name="text">
+          <string>Maximum Acqistions</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" colspan="2">
+        <widget class="QSpinBox" name="MaxAcqs">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+         <property name="maximum">
+          <number>1000000</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="4" colspan="2">
+        <widget class="QLabel" name="label_osc_9">
+         <property name="text">
+          <string>Ampl. Neg. Late Cut</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="6">
+        <widget class="QDoubleSpinBox" name="AmplNegLate_Cut">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_osc_2">
+         <property name="text">
+          <string>Noise Cut</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" colspan="2">
+        <widget class="QDoubleSpinBox" name="Noise_Cut">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4" colspan="2">
+        <widget class="QLabel" name="label_osc_13">
+         <property name="text">
+          <string>Ampl. Pos. Late Cut</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="6">
+        <widget class="QDoubleSpinBox" name="AmplPosLate_Cut">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QLabel" name="label_osc_3">
+         <property name="text">
+          <string>Noise End Cut</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2" colspan="2">
+        <widget class="QDoubleSpinBox" name="NoiseEnd_Cut">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="4" colspan="2">
+        <widget class="QLabel" name="label_osc_14">
+         <property name="text">
+          <string>Ampl. Neg. Early Cut</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="6">
+        <widget class="QDoubleSpinBox" name="AmplNegEarly_Cut">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2">
+        <widget class="QLabel" name="label_osc_4">
+         <property name="text">
+          <string>N of Samples Start</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2" colspan="2">
+        <widget class="QSpinBox" name="Nsamples_start">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+         <property name="maximum">
+          <number>1000000</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="4" colspan="2">
+        <widget class="QLabel" name="label_osc_15">
+         <property name="text">
+          <string>Ampl. Pos. Early Cut</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="6">
+        <widget class="QDoubleSpinBox" name="AmplPosEarly_Cut">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QLabel" name="label_osc_5">
+         <property name="text">
+          <string>N of Samples End</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2" colspan="2">
+        <widget class="QSpinBox" name="Nsamples_end">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+         <property name="maximum">
+          <number>1000000</number>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="4" colspan="2">
+        <widget class="QLabel" name="label_osc_10">
+         <property name="text">
+          <string>Add Noise, V</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="6">
+        <widget class="QDoubleSpinBox" name="AddNoise">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" colspan="2">
+        <widget class="QLabel" name="label_osc_6">
+         <property name="text">
+          <string>Pre Pulse Interval, ns</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="2" colspan="2">
+        <widget class="QDoubleSpinBox" name="PrePulseInterval">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="4" colspan="2">
+        <widget class="QLabel" name="label_osc_11">
+         <property name="text">
+          <string>Add Jitter, ns</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="6">
+        <widget class="QDoubleSpinBox" name="AddJitter">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_osc_7">
+         <property name="text">
+          <string>S2n Cut</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="2" colspan="2">
+        <widget class="QDoubleSpinBox" name="S2n_Cut">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="4" colspan="2">
+        <widget class="QLabel" name="label_osc_12">
+         <property name="text">
+          <string>Print Event</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="6">
+        <widget class="QSpinBox" name="PrintEvent">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+         <property name="maximum">
+          <number>1000000</number>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" colspan="2">
+        <widget class="QLabel" name="label_osc_8">
+         <property name="text">
+          <string>S2n Reference</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2" colspan="2">
+        <widget class="QDoubleSpinBox" name="S2n_Ref">
+         <property name="decimals">
+          <number>6</number>
+         </property>
+         <property name="minimum">
+          <double>-100000.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="6">
+        <widget class="QPushButton" name="start_osc">
+         <property name="text">
+          <string>Start</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
     <widget class="QWidget" name="mode_tct">
      <attribute name="title">
       <string>TCT Data</string>
@@ -941,11 +1363,6 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="mode_osc">
-     <attribute name="title">
-      <string>Oscilloscope Data</string>
-     </attribute>
-    </widget>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -1215,10 +1632,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>window_folders_2</sender>
+   <signal>clicked()</signal>
+   <receiver>window_folders</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>481</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>481</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>window_sample_2</sender>
+   <signal>clicked()</signal>
+   <receiver>window_sample</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>481</x>
+     <y>209</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>481</x>
+     <y>209</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <buttongroups>
   <buttongroup name="buttonGroup_optical"/>
   <buttongroup name="buttonGroup_mode"/>
   <buttongroup name="buttonGroup_scanning"/>
+  <buttongroup name="buttonGroup_input_type"/>
  </buttongroups>
 </ui>

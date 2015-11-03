@@ -9,7 +9,7 @@ namespace TCT {
 void tct_config::SetParameters(std::map<std::string, std::string> id_val){
 
     for( auto i : id_val){
-        if(i.first == "Outfolder")	_OutFolder = i.second;
+        if(i.first == "OutFolder")	_OutFolder = i.second;
         if(i.first == "DataFolder")	_DataFolder = i.second;
 
         //tct scanning mode parameters

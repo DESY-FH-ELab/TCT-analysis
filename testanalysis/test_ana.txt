@@ -6,8 +6,9 @@
 ProjectFolder	=	../
 DataFolder	=	../testdata/channels_check
 #DataFolder	=	../testdata/test_2_red
+#DataFolder      =       ../testdata/S57
 
-Outfolder	=	../results
+OutFolder	=	../results
 #Set acq mode.
 # 0 - taking the sets of single measurements (*.txt or *.raw files by oscilloscope). Settings are in [Analysis]
 # 1 - taking the data from *.tct file produced by DAQ software. Settings are in [Scanning]
