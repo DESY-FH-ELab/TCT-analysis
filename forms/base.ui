@@ -561,7 +561,7 @@
           <string>X</string>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_2</string>
+          <string notr="true">buttonGroup_scanning</string>
          </attribute>
         </widget>
        </item>
@@ -571,7 +571,7 @@
           <string>Y</string>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_2</string>
+          <string notr="true">buttonGroup_scanning</string>
          </attribute>
         </widget>
        </item>
@@ -581,7 +581,7 @@
           <string>Z</string>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_2</string>
+          <string notr="true">buttonGroup_scanning</string>
          </attribute>
         </widget>
        </item>
@@ -608,7 +608,7 @@
           <string>X</string>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_3</string>
+          <string notr="true">buttonGroup_optical</string>
          </attribute>
         </widget>
        </item>
@@ -618,7 +618,7 @@
           <string>Y</string>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_3</string>
+          <string notr="true">buttonGroup_optical</string>
          </attribute>
         </widget>
        </item>
@@ -628,7 +628,7 @@
           <string>Z</string>
          </property>
          <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_3</string>
+          <string notr="true">buttonGroup_optical</string>
          </attribute>
         </widget>
        </item>
@@ -836,7 +836,7 @@
         <bool>true</bool>
        </property>
        <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
+        <string notr="true">buttonGroup_mode</string>
        </attribute>
       </widget>
      </item>
@@ -852,7 +852,7 @@
         <string>Top TCT</string>
        </property>
        <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
+        <string notr="true">buttonGroup_mode</string>
        </attribute>
       </widget>
      </item>
@@ -868,7 +868,7 @@
         <string>Edge TCT</string>
        </property>
        <attribute name="buttonGroup">
-        <string notr="true">buttonGroup</string>
+        <string notr="true">buttonGroup_mode</string>
        </attribute>
       </widget>
      </item>
@@ -1064,8 +1064,8 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
-  <buttongroup name="buttonGroup_2"/>
-  <buttongroup name="buttonGroup_3"/>
+  <buttongroup name="buttonGroup_scanning"/>
+  <buttongroup name="buttonGroup_optical"/>
+  <buttongroup name="buttonGroup_mode"/>
  </buttongroups>
 </ui>

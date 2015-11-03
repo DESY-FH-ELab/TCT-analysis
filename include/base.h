@@ -32,7 +32,7 @@ private slots:
 
     void on_cc_ch_trig_toggled(bool checked);
 
-    void on_buttonGroup_buttonClicked(int index);
+    void on_buttonGroup_mode_buttonClicked(int index);
 
     void on_window_sample_clicked();
 

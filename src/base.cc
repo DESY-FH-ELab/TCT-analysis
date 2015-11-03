@@ -32,18 +32,18 @@ base::base(QWidget *parent) :
 #endif
 
     //on_comboBox_activated(0);
-    ui->buttonGroup->setId(ui->mode_top,0);
-    ui->buttonGroup->setId(ui->mode_edge,1);
-    ui->buttonGroup->setId(ui->mode_bottom,2);
-    on_buttonGroup_buttonClicked(3);
+    ui->buttonGroup_mode->setId(ui->mode_top,0);
+    ui->buttonGroup_mode->setId(ui->mode_edge,1);
+    ui->buttonGroup_mode->setId(ui->mode_bottom,2);
+    on_buttonGroup_mode_buttonClicked(3);
 
-    ui->buttonGroup_2->setId(ui->sc_x,1);
-    ui->buttonGroup_2->setId(ui->sc_y,2);
-    ui->buttonGroup_2->setId(ui->sc_z,3);
+    ui->buttonGroup_scanning->setId(ui->sc_x,1);
+    ui->buttonGroup_scanning->setId(ui->sc_y,2);
+    ui->buttonGroup_scanning->setId(ui->sc_z,3);
 
-    ui->buttonGroup_3->setId(ui->opt_x,1);
-    ui->buttonGroup_3->setId(ui->opt_y,2);
-    ui->buttonGroup_3->setId(ui->opt_z,3);
+    ui->buttonGroup_optical->setId(ui->opt_x,1);
+    ui->buttonGroup_optical->setId(ui->opt_y,2);
+    ui->buttonGroup_optical->setId(ui->opt_z,3);
 
     on_cc_ch_1_toggled(false);
     on_cc_ch_2_toggled(false);
@@ -151,7 +151,7 @@ void base::on_cc_ch_trig_toggled(bool checked)
     ui->cc_ch_num_trig->setEnabled(checked);
 }
 
-void base::on_buttonGroup_buttonClicked(int index)
+void base::on_buttonGroup_mode_buttonClicked(int index)
 {
     ui->group_0->setVisible(!(bool)abs(index-0));
     ui->group_0->setGeometry(300,230,360,300);
@@ -219,8 +219,8 @@ void base::fill_config() {
         ui->cc_ch_num_trig->setCurrentIndex(config_analysis->CH_Trig()-1);
     }
 
-    ui->buttonGroup_2->button(config_analysis->ScAxis())->setChecked(true);
-    ui->buttonGroup_3->button(config_analysis->OptAxis())->setChecked(true);
+    ui->buttonGroup_scanning->button(config_analysis->ScAxis())->setChecked(true);
+    ui->buttonGroup_optical->button(config_analysis->OptAxis())->setChecked(true);
 
     ui->cc_volt_source->setCurrentIndex(config_analysis->VoltSource()-1);
 
@@ -228,8 +228,8 @@ void base::fill_config() {
     ui->save_sep_waveforms->setChecked(config_analysis->FSeparateWaveforms());
     ui->timebetween->setValue(config_analysis->Movements_dt());
 
-    ui->buttonGroup->button(config_analysis->TCT_Mode())->setChecked(true);
-    on_buttonGroup_buttonClicked(config_analysis->TCT_Mode());
+    ui->buttonGroup_mode->button(config_analysis->TCT_Mode())->setChecked(true);
+    on_buttonGroup_mode_buttonClicked(config_analysis->TCT_Mode());
 
     ui->top_focus->setChecked(config_analysis->DO_focus());
     ui->edge_focus->setChecked(config_analysis->DO_focus());
@@ -262,8 +262,8 @@ void base::tovariables_config() {
     }
     else config_analysis->SetCH_Trig(0);
 
-    config_analysis->SetScAxis(ui->buttonGroup_2->checkedId());
-    config_analysis->SetOptAxis(ui->buttonGroup_3->checkedId());
+    config_analysis->SetScAxis(ui->buttonGroup_scanning->checkedId());
+    config_analysis->SetOptAxis(ui->buttonGroup_optical->checkedId());
     config_analysis->SetVoltSource(ui->cc_volt_source->currentText().toInt());
 
     config_analysis->SetFSeparateCharges(ui->save_sep_chrges->isChecked());
@@ -271,7 +271,7 @@ void base::tovariables_config() {
 
     config_analysis->SetMovements_dt(ui->timebetween->value());
 
-    config_analysis->SetTCT_Mode(ui->buttonGroup->checkedId());
+    config_analysis->SetTCT_Mode(ui->buttonGroup_mode->checkedId());
 
     config_analysis->SetDO_focus(ui->edge_focus->isChecked());
     config_analysis->SetDO_EdgeDepletion(ui->edge_depl->isChecked());
