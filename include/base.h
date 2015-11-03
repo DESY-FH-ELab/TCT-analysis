@@ -24,14 +24,6 @@ private slots:
 
     void on_chdir_output_clicked();
 
-    void on_cc_ch_1_toggled(bool checked);
-
-    void on_cc_ch_2_toggled(bool checked);
-
-    void on_cc_ch_ph_toggled(bool checked);
-
-    void on_cc_ch_trig_toggled(bool checked);
-
     void on_buttonGroup_mode_buttonClicked(int index);
 
     void on_window_sample_clicked();

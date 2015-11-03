@@ -45,10 +45,10 @@ base::base(QWidget *parent) :
     ui->buttonGroup_optical->setId(ui->opt_y,2);
     ui->buttonGroup_optical->setId(ui->opt_z,3);
 
-    on_cc_ch_1_toggled(false);
-    on_cc_ch_2_toggled(false);
-    on_cc_ch_ph_toggled(false);
-    on_cc_ch_trig_toggled(false);
+    ui->cc_ch_1->toggle();
+    ui->cc_ch_2->toggle();
+    ui->cc_ch_ph->toggle();
+    ui->cc_ch_trig->toggle();
 
     TCT::util basic_config;
     std::ifstream basic_config_file("default.conf");
@@ -123,32 +123,6 @@ void base::on_chdir_sensor_clicked()
     config_analysis->SetSampleThickness(config_sample->Thickness());
     config_analysis->SetOutSample_ID(config_sample->SampleID());
 
-}
-
-void base::on_cc_ch_1_toggled(bool checked)
-{
-    ui->cc_ch_num_1->setEnabled(checked);
-    ui->thigh_1->setEnabled(checked);
-    ui->tlow_1->setEnabled(checked);
-}
-
-void base::on_cc_ch_2_toggled(bool checked)
-{
-    ui->cc_ch_num_2->setEnabled(checked);
-    ui->thigh_2->setEnabled(checked);
-    ui->tlow_2->setEnabled(checked);
-}
-
-void base::on_cc_ch_ph_toggled(bool checked)
-{
-    ui->cc_ch_num_ph->setEnabled(checked);
-    ui->thigh_diode->setEnabled(checked);
-    ui->tlow_diode->setEnabled(checked);
-}
-
-void base::on_cc_ch_trig_toggled(bool checked)
-{
-    ui->cc_ch_num_trig->setEnabled(checked);
 }
 
 void base::on_buttonGroup_mode_buttonClicked(int index)
@@ -340,6 +314,9 @@ void base::on_windows_parameters_clicked()
 
 void base::on_start_clicked()
 {
+    ui->centralWidget->setVisible(!ui->centralWidget->isVisible());
+    return;
+
     tovariables_config();
 
     if(ui->tct_single->isChecked()) {
