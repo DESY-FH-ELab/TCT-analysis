@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>662</width>
-    <height>538</height>
+    <width>671</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>662</width>
-    <height>538</height>
+    <width>671</width>
+    <height>591</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>662</width>
-    <height>538</height>
+    <width>671</width>
+    <height>591</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -36,942 +36,917 @@
    <property name="visible">
     <bool>true</bool>
    </property>
-   <widget class="QGroupBox" name="group_ch">
+   <widget class="QTabWidget" name="modes">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>281</width>
-      <height>254</height>
+      <x>0</x>
+      <y>0</y>
+      <width>671</width>
+      <height>531</height>
      </rect>
     </property>
-    <property name="title">
-     <string>Channels</string>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
-    <layout class="QGridLayout" name="gridLayout_4">
-     <item row="0" column="0">
-      <widget class="QCheckBox" name="cc_ch_1">
-       <property name="font">
-        <font>
-         <strikeout>false</strikeout>
-         <stylestrategy>PreferDefault</stylestrategy>
-         <kerning>true</kerning>
-        </font>
-       </property>
-       <property name="acceptDrops">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
+    <widget class="QWidget" name="mode_tct">
+     <attribute name="title">
+      <string>TCT Data</string>
+     </attribute>
+     <widget class="QGroupBox" name="group_1">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>300</y>
+        <width>360</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Edge TCT Options Available</string>
+      </property>
+      <widget class="QCheckBox" name="edge_focus">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>201</width>
+         <height>20</height>
+        </rect>
        </property>
        <property name="text">
-        <string>Readout Channel 1</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="tristate">
-        <bool>false</bool>
+        <string>Find Focus</string>
        </property>
       </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="cc_ch_num_1">
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="0" colspan="2">
-      <layout class="QGridLayout" name="gridLayout">
-       <property name="horizontalSpacing">
-        <number>2</number>
+      <widget class="QCheckBox" name="edge_depl">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>50</y>
+         <width>201</width>
+         <height>20</height>
+        </rect>
        </property>
+       <property name="text">
+        <string>Find Depletion Voltage</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="edge_profiles">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>70</y>
+         <width>251</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Build Field and Velocity Profiles</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="start">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>450</y>
+        <width>141</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="group_ch">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>281</width>
+        <height>254</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Channels</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4">
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="maximumSize">
-          <size>
-           <width>81</width>
-           <height>21</height>
-          </size>
-         </property>
+        <widget class="QCheckBox" name="cc_ch_1">
          <property name="font">
           <font>
-           <pointsize>9</pointsize>
+           <strikeout>false</strikeout>
+           <stylestrategy>PreferDefault</stylestrategy>
+           <kerning>true</kerning>
           </font>
          </property>
+         <property name="acceptDrops">
+          <bool>false</bool>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="inputMethodHints">
+          <set>Qt::ImhNone</set>
+         </property>
          <property name="text">
-          <string>Integrate from</string>
+          <string>Readout Channel 1</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="tristate">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="tlow_1">
-         <property name="maximumSize">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
+        <widget class="QComboBox" name="cc_ch_num_1">
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>3</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4</string>
+          </property>
+         </item>
         </widget>
        </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_2">
-         <property name="maximumSize">
-          <size>
-           <width>35</width>
-           <height>21</height>
-          </size>
+       <item row="1" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout">
+         <property name="horizontalSpacing">
+          <number>2</number>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="maximumSize">
+            <size>
+             <width>81</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Integrate from</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="tlow_1">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_2">
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>ns to</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QLineEdit" name="thigh_1">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="label_3">
+           <property name="maximumSize">
+            <size>
+             <width>16</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>ns</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="cc_ch_2">
          <property name="text">
-          <string>ns to</string>
+          <string>Readout Channel 2</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QLineEdit" name="thigh_1">
-         <property name="maximumSize">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="cc_ch_num_2">
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>3</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4</string>
+          </property>
+         </item>
         </widget>
        </item>
-       <item row="0" column="4">
-        <widget class="QLabel" name="label_3">
-         <property name="maximumSize">
-          <size>
-           <width>16</width>
-           <height>21</height>
-          </size>
+       <item row="3" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_2">
+         <property name="horizontalSpacing">
+          <number>2</number>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="maximumSize">
+            <size>
+             <width>81</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Integrate from</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="tlow_2">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_5">
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>ns to</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QLineEdit" name="thigh_2">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="label_6">
+           <property name="maximumSize">
+            <size>
+             <width>16</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>ns</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="cc_ch_ph">
          <property name="text">
-          <string>ns</string>
+          <string>Photodiode Channel</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="cc_ch_num_ph">
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>3</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_3">
+         <property name="horizontalSpacing">
+          <number>2</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="maximumSize">
+            <size>
+             <width>81</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Integrate from</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="tlow_diode">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="label_8">
+           <property name="maximumSize">
+            <size>
+             <width>35</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>ns to</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QLineEdit" name="thigh_diode">
+           <property name="maximumSize">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QLabel" name="label_9">
+           <property name="maximumSize">
+            <size>
+             <width>16</width>
+             <height>21</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>ns</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="cc_ch_trig">
+         <property name="text">
+          <string>Trigger Channel</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QComboBox" name="cc_ch_num_trig">
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>3</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>
-     </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="cc_ch_2">
-       <property name="text">
-        <string>Readout Channel 2</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="cc_ch_num_2">
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="3" column="0" colspan="2">
-      <layout class="QGridLayout" name="gridLayout_2">
-       <property name="horizontalSpacing">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="maximumSize">
-          <size>
-           <width>81</width>
-           <height>21</height>
-          </size>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>190</y>
+        <width>341</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="2">
+        <widget class="QRadioButton" name="mode_bottom">
+         <property name="enabled">
+          <bool>false</bool>
          </property>
          <property name="font">
           <font>
-           <pointsize>9</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
           </font>
          </property>
          <property name="text">
-          <string>Integrate from</string>
+          <string>Bottom TCT</string>
          </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup_mode</string>
+         </attribute>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QRadioButton" name="mode_top">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Top TCT</string>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup_mode</string>
+         </attribute>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="tlow_2">
-         <property name="maximumSize">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
+        <widget class="QRadioButton" name="mode_edge">
          <property name="font">
           <font>
-           <pointsize>8</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
           </font>
+         </property>
+         <property name="text">
+          <string>Edge TCT</string>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">buttonGroup_mode</string>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="group_0">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>230</y>
+        <width>360</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Top TCT Options Available</string>
+      </property>
+      <widget class="QCheckBox" name="top_focus">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>171</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Find Focus</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="group_2">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>410</y>
+        <width>360</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Bottom TCT Options Available</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>260</y>
+        <width>281</width>
+        <height>234</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Others</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="source_label">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Voltage Source</string>
          </property>
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QLabel" name="label_5">
-         <property name="maximumSize">
-          <size>
-           <width>35</width>
-           <height>21</height>
-          </size>
-         </property>
+        <widget class="QComboBox" name="cc_volt_source">
+         <item>
+          <property name="text">
+           <string>1</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="sc_label">
          <property name="font">
           <font>
-           <pointsize>9</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>ns to</string>
+          <string>Scanning Axis</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QLineEdit" name="thigh_2">
-         <property name="maximumSize">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
-        </widget>
+       <item row="1" column="1" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_6">
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="sc_x">
+           <property name="text">
+            <string>X</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_scanning</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QRadioButton" name="sc_y">
+           <property name="text">
+            <string>Y</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_scanning</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QRadioButton" name="sc_z">
+           <property name="text">
+            <string>Z</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_scanning</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="0" column="4">
-        <widget class="QLabel" name="label_6">
-         <property name="maximumSize">
-          <size>
-           <width>16</width>
-           <height>21</height>
-          </size>
-         </property>
+       <item row="2" column="0">
+        <widget class="QLabel" name="opt_label">
          <property name="font">
           <font>
-           <pointsize>9</pointsize>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>ns</string>
+          <string>Optical Axis</string>
          </property>
         </widget>
+       </item>
+       <item row="2" column="1" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_7">
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="opt_x">
+           <property name="text">
+            <string>X</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_optical</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QRadioButton" name="opt_y">
+           <property name="text">
+            <string>Y</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_optical</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QRadioButton" name="opt_z">
+           <property name="text">
+            <string>Z</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_optical</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0" colspan="3">
+        <widget class="QCheckBox" name="save_sep_chrges">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Save Separate Charges</string>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3">
+        <widget class="QCheckBox" name="save_sep_waveforms">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Save Separate Waveforms</string>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QLabel" name="timebetween_label">
+         <property name="font">
+          <font>
+           <weight>50</weight>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Time Between Moves</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QDoubleSpinBox" name="timebetween"/>
        </item>
       </layout>
-     </item>
-     <item row="4" column="0">
-      <widget class="QCheckBox" name="cc_ch_ph">
-       <property name="text">
-        <string>Photodiode Channel</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QComboBox" name="cc_ch_num_ph">
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
-      <layout class="QGridLayout" name="gridLayout_3">
-       <property name="horizontalSpacing">
-        <number>2</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="maximumSize">
-          <size>
-           <width>81</width>
-           <height>21</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Integrate from</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="tlow_diode">
-         <property name="maximumSize">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_8">
-         <property name="maximumSize">
-          <size>
-           <width>35</width>
-           <height>21</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>ns to</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QLineEdit" name="thigh_diode">
-         <property name="maximumSize">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QLabel" name="label_9">
-         <property name="maximumSize">
-          <size>
-           <width>16</width>
-           <height>21</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>ns</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="6" column="0">
-      <widget class="QCheckBox" name="cc_ch_trig">
-       <property name="text">
-        <string>Trigger Channel</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QComboBox" name="cc_ch_num_trig">
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QGroupBox" name="group_0">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>230</y>
-      <width>360</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Top TCT Options Available</string>
-    </property>
-    <widget class="QCheckBox" name="top_focus">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>30</y>
-       <width>171</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Find Focus</string>
-     </property>
+     </widget>
+     <widget class="QCheckBox" name="tct_single">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>450</y>
+        <width>101</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select Files</string>
+      </property>
+     </widget>
+     <widget class="QCommandLinkButton" name="window_folders">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>10</y>
+        <width>360</width>
+        <height>55</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Folders</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="description">
+       <string>Set Data and Output folders</string>
+      </property>
+     </widget>
+     <widget class="QCommandLinkButton" name="window_parameters">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>65</y>
+        <width>360</width>
+        <height>55</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Physical Parameters</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="description">
+       <string>Setting physical parameters like mobility, amplification, etc</string>
+      </property>
+     </widget>
+     <widget class="QCommandLinkButton" name="window_sample">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>120</y>
+        <width>360</width>
+        <height>55</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>View Sample Config</string>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="description">
+       <string>Change sample config (sensor name, thickness)</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="mode_osc">
+     <attribute name="title">
+      <string>Oscilloscope Data</string>
+     </attribute>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="group_2">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>410</y>
-      <width>360</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Bottom TCT Options Available</string>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>260</y>
-      <width>281</width>
-      <height>234</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Others</string>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_8">
-     <item row="0" column="0" colspan="2">
-      <widget class="QLabel" name="source_label">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Voltage Source</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QComboBox" name="cc_volt_source">
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="sc_label">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Scanning Axis</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="2">
-      <layout class="QGridLayout" name="gridLayout_6">
-       <item row="0" column="0">
-        <widget class="QRadioButton" name="sc_x">
-         <property name="text">
-          <string>X</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_scanning</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QRadioButton" name="sc_y">
-         <property name="text">
-          <string>Y</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_scanning</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QRadioButton" name="sc_z">
-         <property name="text">
-          <string>Z</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_scanning</string>
-         </attribute>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="opt_label">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Optical Axis</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1" colspan="2">
-      <layout class="QGridLayout" name="gridLayout_7">
-       <item row="0" column="0">
-        <widget class="QRadioButton" name="opt_x">
-         <property name="text">
-          <string>X</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_optical</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QRadioButton" name="opt_y">
-         <property name="text">
-          <string>Y</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_optical</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QRadioButton" name="opt_z">
-         <property name="text">
-          <string>Z</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">buttonGroup_optical</string>
-         </attribute>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="3" column="0" colspan="3">
-      <widget class="QCheckBox" name="save_sep_chrges">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Save Separate Charges</string>
-       </property>
-       <property name="autoExclusive">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="3">
-      <widget class="QCheckBox" name="save_sep_waveforms">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Save Separate Waveforms</string>
-       </property>
-       <property name="autoExclusive">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
-      <widget class="QLabel" name="timebetween_label">
-       <property name="font">
-        <font>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Time Between Moves</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QDoubleSpinBox" name="timebetween"/>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QGroupBox" name="group_folders">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>10</y>
-      <width>360</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Files</string>
-    </property>
-    <property name="flat">
-     <bool>false</bool>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_9">
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_out">
-       <property name="text">
-        <string>Output folder</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="cc_data"/>
-     </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="chdir_sensor">
-       <property name="text">
-        <string>Change</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_data">
-       <property name="text">
-        <string>Data folder</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QPushButton" name="chdir_data">
-       <property name="text">
-        <string>Change</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="cc_sensor"/>
-     </item>
-     <item row="1" column="2">
-      <widget class="QPushButton" name="chdir_output">
-       <property name="text">
-        <string>Change</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_sensor">
-       <property name="text">
-        <string>Sensor File</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="cc_out"/>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QGroupBox" name="group_1">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>300</y>
-      <width>360</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Edge TCT Options Available</string>
-    </property>
-    <widget class="QCheckBox" name="edge_focus">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>30</y>
-       <width>201</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Find Focus</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="edge_depl">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>201</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Find Depletion Voltage</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="edge_profiles">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>70</y>
-       <width>251</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Build Field and Velocity Profiles</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>190</y>
-      <width>341</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_5">
-     <item row="0" column="2">
-      <widget class="QRadioButton" name="mode_bottom">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Bottom TCT</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup_mode</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QRadioButton" name="mode_top">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Top TCT</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup_mode</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QRadioButton" name="mode_edge">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Edge TCT</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">buttonGroup_mode</string>
-       </attribute>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>309</x>
-      <y>150</y>
-      <width>360</width>
-      <height>39</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout_10">
-     <item row="0" column="1">
-      <widget class="QCommandLinkButton" name="window_sample">
-       <property name="text">
-        <string>View Sample Config</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QCommandLinkButton" name="windows_parameters">
-       <property name="text">
-        <string>Physical Parameters</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QPushButton" name="start">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>450</y>
-      <width>141</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="tct_single">
-    <property name="geometry">
-     <rect>
-      <x>394</x>
-      <y>450</y>
-      <width>111</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Select Files</string>
-    </property>
-   </widget>
-   <zorder>layoutWidget</zorder>
-   <zorder>group_ch</zorder>
-   <zorder>group_0</zorder>
-   <zorder>group_2</zorder>
-   <zorder>groupBox</zorder>
-   <zorder>group_folders</zorder>
-   <zorder>group_1</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>start</zorder>
-   <zorder>tct_single</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -979,7 +954,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>662</width>
+     <width>671</width>
      <height>27</height>
     </rect>
    </property>

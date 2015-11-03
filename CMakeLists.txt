@@ -108,8 +108,8 @@ if(WITH_GUI)
     # Qt4
     FIND_PACKAGE(Qt4 REQUIRED)
     INCLUDE(${QT_USE_FILE})
-    QT4_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui )
-    QT4_WRAP_CPP(MOCSrcs include/base.h)
+    QT4_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui forms/form_folders.ui )
+    QT4_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h)
 
     # CORE LIBRARY:
     SET(LIB_SOURCE_FILES
@@ -122,6 +122,8 @@ if(WITH_GUI)
       "src/scanning.cc"
       "src/TCTReader.cc"
       "src/base.cc"
+      "src/gui_folders.cc"
+      "src/gui_sample.cc"
       ${MOCSrcs}
       ${UISrcs}
       )

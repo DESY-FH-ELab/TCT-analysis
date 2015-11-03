@@ -20,17 +20,13 @@ public:
 
 private slots:
 
-    void on_chdir_data_clicked();
-
-    void on_chdir_output_clicked();
-
     void on_buttonGroup_mode_buttonClicked(int index);
+
+    void on_window_folders_clicked();
 
     void on_window_sample_clicked();
 
-    void on_windows_parameters_clicked();
-
-    void on_chdir_sensor_clicked();
+    void on_window_parameters_clicked();
 
     void on_start_clicked();
 

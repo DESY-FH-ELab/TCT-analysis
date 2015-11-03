@@ -6,6 +6,9 @@
 #include "QFileDialog"
 #include "ui_form_parameters.h"
 #include "ui_form_sample.h"
+#include "ui_form_folders.h"
+#include "gui_folders.h"
+#include "gui_sample.h"
 #include "QMessageBox"
 #include "QDateTime"
 
@@ -79,52 +82,6 @@ base::~base()
     delete ui;
 }
 
-void base::on_chdir_data_clicked()
-{
-    QString cpart = "";
-    cpart = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                              ui->cc_data->text(),
-                                              QFileDialog::ShowDirsOnly
-                                              | QFileDialog::DontResolveSymlinks);
-    if(cpart=="") return;
-    ui->cc_data->setText(cpart);
-
-}
-
-void base::on_chdir_output_clicked()
-{
-    QString cpart = "";
-    cpart = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                              ui->cc_out->text(),
-                                              QFileDialog::ShowDirsOnly
-                                              | QFileDialog::DontResolveSymlinks);
-    if(cpart=="") return;
-    ui->cc_out->setText(cpart);
-
-}
-
-void base::on_chdir_sensor_clicked()
-{
-    QString cpart = "";
-    cpart = QFileDialog::getOpenFileName(this,
-                                              tr("Open Sample Card"), QString(config_sample->Folder().c_str()), tr("Text Files (*.txt)"));
-    if(cpart=="" || cpart==ui->cc_sensor->text()) return;
-
-
-    ui->cc_sensor->setText(cpart);
-    config_mode->SetSampleCard(cpart.toStdString());
-    delete config_sample;
-
-    TCT::util sample_card;
-    std::ifstream sample_file(config_mode->SampleCard().c_str());
-    sample_card.parse(sample_file);
-    config_sample = new TCT::sample(sample_card.ID_val());
-
-    config_analysis->SetSampleThickness(config_sample->Thickness());
-    config_analysis->SetOutSample_ID(config_sample->SampleID());
-
-}
-
 void base::on_buttonGroup_mode_buttonClicked(int index)
 {
     ui->group_0->setVisible(!(bool)abs(index-0));
@@ -170,9 +127,7 @@ void base::read_config(const char *config_file) {
 }
 void base::fill_config() {
 
-    ui->cc_data->setText(config_analysis->DataFolder().c_str());
-    ui->cc_out->setText(config_analysis->OutFolder().c_str());
-    ui->cc_sensor->setText(config_mode->SampleCard().c_str());
+    // tct config
 
     ui->cc_ch_1->setChecked(config_analysis->CH_Det());
     if(config_analysis->CH_Det()) {
@@ -209,13 +164,14 @@ void base::fill_config() {
     ui->edge_focus->setChecked(config_analysis->DO_focus());
     ui->edge_depl->setChecked(config_analysis->DO_EdgeDepletion());
     ui->edge_profiles->setChecked(config_analysis->DO_EdgeVelocity());
+
+    // oscilloscope config
+
 }
 
 void base::tovariables_config() {
 
-    config_analysis->SetDataFolder(ui->cc_data->text().toStdString());
-    config_analysis->SetOutFolder(ui->cc_out->text().toStdString());
-    config_mode->SetSampleCard(ui->cc_sensor->text().toStdString());
+    // tct part
 
     if(ui->cc_ch_1->isChecked()) {
         config_analysis->SetCH_Det(ui->cc_ch_num_1->currentText().toInt());
@@ -250,34 +206,49 @@ void base::tovariables_config() {
     config_analysis->SetDO_focus(ui->edge_focus->isChecked());
     config_analysis->SetDO_EdgeDepletion(ui->edge_depl->isChecked());
     config_analysis->SetDO_EdgeVelocity(ui->edge_profiles->isChecked());
+
+    // oscilloscope part
+}
+
+void base::on_window_folders_clicked()
+{
+    Folders *folders = new Folders(this);
+
+    folders->ui->cc_data->setText(config_analysis->DataFolder().c_str());
+    folders->ui->cc_out->setText(config_analysis->OutFolder().c_str());
+
+    if(folders->exec()) {
+        config_analysis->SetDataFolder(folders->ui->cc_data->text().toStdString());
+        config_analysis->SetOutFolder(folders->ui->cc_out->text().toStdString());
+    }
+
+    delete folders;
 }
 
 void base::on_window_sample_clicked()
 {
-    QDialog *sample = new QDialog(0,0);
 
-    Ui_Sample *sampleUi = new Ui_Sample;
-    sampleUi->setupUi(sample);
+    Sample *sampleUi = new Sample(this);
 
-    sampleUi->folder->setText(config_sample->Folder().c_str());
-    sampleUi->id->setText(config_sample->SampleID().c_str());
-    sampleUi->thickness->setText(QString::number(config_sample->Thickness()));
+    sampleUi->ui->cc_sensor->setText(config_mode->SampleCard().c_str());
+    sampleUi->ui->folder->setText(config_sample->Folder().c_str());
+    sampleUi->ui->id->setText(config_sample->SampleID().c_str());
+    sampleUi->ui->thickness->setText(QString::number(config_sample->Thickness()));
 
-    if(sample->exec()) {
-        config_sample->SetFolder(sampleUi->folder->text().toStdString());
-        config_sample->SetSampleID(sampleUi->id->text().toStdString());
-        config_sample->SetThickness(sampleUi->thickness->text().toFloat());
+    if(sampleUi->exec()) {
+        config_sample->SetFolder(sampleUi->ui->folder->text().toStdString());
+        config_sample->SetSampleID(sampleUi->ui->id->text().toStdString());
+        config_sample->SetThickness(sampleUi->ui->thickness->text().toFloat());
         config_analysis->SetSampleThickness(config_sample->Thickness());
         config_analysis->SetOutSample_ID(config_sample->SampleID());
-
+        config_mode->SetSampleCard(sampleUi->ui->cc_sensor->text().toStdString());
     }
 
     delete sampleUi;
-    delete sample;
 
 }
 
-void base::on_windows_parameters_clicked()
+void base::on_window_parameters_clicked()
 {
     QDialog *parameters = new QDialog(0,0);
 
@@ -314,8 +285,6 @@ void base::on_windows_parameters_clicked()
 
 void base::on_start_clicked()
 {
-    ui->centralWidget->setVisible(!ui->centralWidget->isVisible());
-    return;
 
     tovariables_config();
 
