@@ -183,22 +183,18 @@ TCTReader::TCTReader(char *FileName, Float_t time0, Int_t Bin)
 TCTReader::~TCTReader()
 {
     if(histo1) {
-        histo1->Delete();
         delete histo1;
         histo1 = NULL;
     }
     if(histo2) {
-        histo2->Delete();
         delete histo2;
         histo2 = NULL;
     }
     if(histo3) {
-        histo3->Delete();
         delete histo3;
         histo3 = NULL;
     }
     if(histo4) {
-        histo4->Delete();
         delete histo4;
         histo4 = NULL;
     }
@@ -937,7 +933,6 @@ TCTWaveform::~TCTWaveform()
     if(pt!=NULL) delete pt;
     //Clear();
     if(histo) {
-        histo->Delete();
         delete histo;
         histo = NULL;
     }
