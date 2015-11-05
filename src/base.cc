@@ -11,6 +11,10 @@
 #include "gui_sample.h"
 #include "QMessageBox"
 #include "QDateTime"
+#include "qdebugstream.h"
+#include "QProgressDialog"
+#include "qdebug.h"
+#include "QDirIterator"
 
 //TCT includes
 #include "acquisition.h"
@@ -27,13 +31,6 @@ base::base(QWidget *parent) :
     ui(new Ui::base)
 {
     ui->setupUi(this);
-
-#ifdef USE_GUI
-    freopen ("execution.log","a",stdout);
-    QDateTime datetime;
-    std::cout<<"<-------------- NEW RUN -------------->"<<std::endl;
-    std::cout<<"Run Started At: "<<datetime.currentDateTime().toString().toStdString()<<std::endl;
-#endif
 
     //on_comboBox_activated(0);
     ui->buttonGroup_mode->setId(ui->mode_top,0);
@@ -83,11 +80,6 @@ base::base(QWidget *parent) :
 
 base::~base()
 {
-#ifdef USE_GUI
-    QDateTime datetime;
-    std::cout<<"Run Finished At: "<<datetime.currentDateTime().toString().toStdString()<<std::endl;
-    fclose(stdout);
-#endif
     delete ui;
 }
 
@@ -355,75 +347,74 @@ void base::on_start_clicked()
 {
 
     tovariables_config();
+    QStringList names;
 
     if(ui->tct_single->isChecked()) {
-        QStringList names;
-        /*names = QFileDialog::getOpenFileNames(this,
-                                                  tr("Select Files"), QString(config_tct->DataFolder().c_str()), tr("TCT Files (*.tct)"));*/
-        QFileDialog dialog;
+
+        QFileDialog dialog(this);
         dialog.setNameFilter(tr("TCT Files (*.tct)"));
         dialog.setFileMode(QFileDialog::ExistingFiles);
         dialog.setDirectory(QString(config_tct->DataFolder().c_str()));
+        dialog.setModal(true);
         if(dialog.exec()) {
             names = dialog.selectedFiles();
-            ui->statusBar->showMessage(QString("Number of files selected: %1").arg(names.length()),500);
         }
         else {
              ui->statusBar->showMessage(tr("No files selected"));
              return;
         }
-
-        for(int i=0;i<names.length();i++) {
-            ui->statusBar->showMessage(QString("Reading file %1").arg(names.at(i).split("/").last()),1000);
-            char pathandfile[250];
-            strcpy(pathandfile,names.at(i).toStdString().c_str());
-            TCT::Scanning daq_data;
-            bool read = daq_data.ReadTCT(pathandfile,config_tct);
-            if(!read) {
-                ui->statusBar->showMessage(QString("Processing of file %1 failed. Skipping").arg(names.at(i).split("/").last()));
-                continue;
-            }
-        }
-
     }
     else {
         if(config_tct->DataFolder() == "def") {
             error("No data folder was specified in analysis card. Check your analysis card, that \"DataFolder = ...\" is specified correctly");
-            //exit(1);
+            return;
+        }
+
+        QDir dirp(config_tct->DataFolder().c_str());
+        if(!dirp.exists()) {
+            error("Data Folder not found. Check \"DataFolder\" in analysis card.");
+            return;
         }
         ui->statusBar->showMessage(tr("Searching for Data in Folder"));
+        QStringList filters;
+        filters << "*.tct";
+        QStringList filenames = dirp.entryList(filters);
+        for(int i=0;i<filenames.length();i++) names<<dirp.absoluteFilePath(filenames.at(i));
+    }
+    if(names.length()==0) {
+        error("No files in specified folder!");
+        return;
+    }
 
+    ui->statusBar->showMessage(QString("Number of files selected: %1").arg(names.length()),500);
+    progress = new Ui::ConsoleOutput(names.length(),this);
 
-        void *dirp = gSystem->OpenDirectory(config_tct->DataFolder().c_str());
-        if (!dirp) {
-            error("Data Folder not found. Check \"DataFolder\" in analysis card.");
-            //exit(1);
-        }
-        std::string path = config_tct->DataFolder();
-        if (path.length() > 0) {
-            std::string::iterator it = path.end() - 1;
-            if (*it != '/') {
-                path.append("/");
-            }
-        }
-        config_tct->SetDataFolder(path);
+    // begin redirecting output
+    std::ofstream log_file("execution.log",std::fstream::app);
+    QDebugStream *debug = new QDebugStream(std::cout, log_file, progress->Console());
+    print_run(true);
 
-        const char *infile;
-        while((infile = gSystem->GetDirEntry(dirp))) {
-
-            if (strstr(infile,".tct")) {
-                char pathandfile[250];
-                strcpy(pathandfile,config_tct->DataFolder().c_str());
-                strcat(pathandfile,infile);
-                ui->statusBar->showMessage(QString("Reading file %1").arg(infile));
-
-                TCT::Scanning daq_data;
-                bool read = daq_data.ReadTCT(pathandfile,config_tct);
-                if(!read) {ui->statusBar->showMessage(QString("Processing of file %1 failed. Skipping").arg(infile));  continue;}
-            }
-
+    for(int i=0;i<names.length();i++) {
+        progress->setValue(i);
+        if(progress->wasCanceled()) break;
+        ui->statusBar->showMessage(QString("Reading file %1").arg(names.at(i).split("/").last()),1000);
+        char pathandfile[250];
+        strcpy(pathandfile,names.at(i).toStdString().c_str());
+        TCT::Scanning daq_data;
+        bool read = daq_data.ReadTCT(pathandfile,config_tct);
+        if(!read) {
+            ui->statusBar->showMessage(QString("Processing of file %1 failed. Skipping").arg(names.at(i).split("/").last()));
+            continue;
         }
     }
+    progress->setValue(names.length());
+    progress->finished(1);
+    print_run(false);
+    delete debug;
+    connect(progress,SIGNAL(canceled()),this,SLOT(deleteprogress()));
+    log_file.close();
+    // end redirecting output
+
     ui->statusBar->showMessage(tr("Finished"));
 
 }
@@ -436,6 +427,13 @@ void base::on_start_osc_clicked()
         error("No data folder was specified in analysis card. Check your analysis card, that \"DataFolder = ...\" is specified correctly");
         return;
     }
+
+    progress_osc = new Ui::ConsoleOsc(this);
+    progress_osc->show();
+    // begin redirecting output
+    std::ofstream log_file("execution.log",std::fstream::app);
+    QDebugStream *debug = new QDebugStream(std::cout, log_file, progress_osc->Console());
+    print_run(true);
 
     ui->statusBar->showMessage(tr("Searching data in folders"));
 
@@ -606,10 +604,24 @@ void base::on_start_osc_clicked()
 #ifdef DEBUG
         std::cout << "   AllAcqs has " << AllAcqs.size() << " objects left" << std::endl;
 #endif
-
     }
+    progress_osc->SetButtonEnabled();
+    print_run(false);
+    delete debug;
+    connect(progress_osc,SIGNAL(rejected()),this,SLOT(deleteprogress_osc()));
+    log_file.close();
+    // end redirecting output
 
     ui->statusBar->showMessage(tr("Finished"));
+}
+
+void base::deleteprogress() {
+    delete progress;
+    progress = NULL;
+}
+void base::deleteprogress_osc() {
+    delete progress_osc;
+    progress_osc = NULL;
 }
 
 void base::on_actionChange_config_triggered()
@@ -617,7 +629,7 @@ void base::on_actionChange_config_triggered()
 
     QString cpart = "";
     cpart = QFileDialog::getOpenFileName(this,
-                                              tr("Open Config File"), ".", tr("Text Files (*.txt)"));
+                                              tr("Open Config File"), "../testanalysis", tr("Text Files (*.txt)"));
     if(cpart=="") return;
     else {
         read_config(cpart.toStdString().c_str());
@@ -747,6 +759,17 @@ void base::error(const char *text) {
     messageBox->setFixedSize(500,200);
     delete messageBox;
 }
+void base::print_run(bool start) {
+
+    QDateTime datetime;
+    if(start) {
+        std::cout<<"<-------------- NEW RUN -------------->"<<std::endl;
+        std::cout<<"Run Started At: "<<datetime.currentDateTime().toString().toStdString()<<std::endl;
+    }
+    else std::cout<<"Run Finished At: "<<datetime.currentDateTime().toString().toStdString()<<std::endl;
+
+}
+
 /*
 void base::not_run() {
     std::cout<<"before"<<std::endl;

@@ -52,7 +52,7 @@
      <attribute name="title">
       <string>Oscilloscope Data</string>
      </attribute>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>31</x>
@@ -1666,9 +1666,9 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_optical"/>
+  <buttongroup name="buttonGroup_input_type"/>
   <buttongroup name="buttonGroup_mode"/>
   <buttongroup name="buttonGroup_scanning"/>
-  <buttongroup name="buttonGroup_input_type"/>
+  <buttongroup name="buttonGroup_optical"/>
  </buttongroups>
 </ui>

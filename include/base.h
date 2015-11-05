@@ -7,6 +7,8 @@
 #include "tct_config.h"
 #include "sample.h"
 #include "analysis.h"
+#include "gui_consoleoutput.h"
+
 namespace Ui {
 class base;
 }
@@ -37,6 +39,10 @@ private slots:
 
     void on_actionSave_config_triggered();
 
+    void deleteprogress();
+
+    void deleteprogress_osc();
+
 private:
     Ui::base *ui;
     std::string _DefConfigName = "def";
@@ -44,11 +50,15 @@ private:
     TCT::analysis *config_analysis = NULL;
     TCT::sample *config_sample = NULL;
     TCT::mode_selector *config_mode = NULL;
+    Ui::ConsoleOutput *progress = NULL;
+    Ui::ConsoleOsc *progress_osc = NULL;
     void read_config(const char*);
     void fill_config();
     void tovariables_config();
     void error(const char*);
     void not_run();
+    void print_run(bool start);
+
 };
 
 #endif // BASE_H
