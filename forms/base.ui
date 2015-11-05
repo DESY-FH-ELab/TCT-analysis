@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>icons/ico.png</normaloff>icons/ico.png</iconset>
+    <normaloff>../icons/ico.png</normaloff>../icons/ico.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="enabled">
@@ -1413,6 +1413,10 @@
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset>
+     <normaloff>../icons/ico.png</normaloff>../icons/ico.png</iconset>
+   </property>
    <property name="text">
     <string>About</string>
    </property>

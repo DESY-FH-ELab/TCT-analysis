@@ -46,6 +46,8 @@ private slots:
 
     void kill_tbrowser();
 
+    void on_actionAbout_triggered();
+
 private:
     Ui::base *ui;
     std::string _DefConfigName = "def";
