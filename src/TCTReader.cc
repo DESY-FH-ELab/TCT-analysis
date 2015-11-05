@@ -97,7 +97,7 @@ TCTReader::TCTReader(char *FileName, Float_t time0, Int_t Bin)
 
         //get the file type
         type=(Int_t) header[0];
-        printf("File type = %d - reading \n",type); // print the file type
+        std::cout<<"File type = "<<type<<" - reading \n"; // print the file type
 
         //read in the buffer
         rewind(in);
@@ -820,7 +820,7 @@ void TCTReader::CorrectBaseLine(Float_t xc)
 
     for(j=0;j<Num;j++)
     {
-        if(j==0)  printf("Baseline correction (%d waveforms) :: ",Num);
+        if(j==0)  std::cout<<"Baseline correction ("<<Num<<" waveforms) :: ";
 
         if(WFOnOff[0]==1) his[0]=((TH1F *)histo1->At(j));
         if(WFOnOff[1]==1) his[1]=((TH1F *)histo2->At(j));
@@ -838,7 +838,7 @@ void TCTReader::CorrectBaseLine(Float_t xc)
             }
         }
 
-        if(j%100==0) printf(".");
+        if(j%100==0) std::cout<<".";
         //printf("%d :: Baseline correction = %e , Integral before trigger=%e , Nbins=%d!\n",j,corr,his->Integral(left,right),right-left);
 
         for(k=0;k<3;k++)
@@ -848,7 +848,7 @@ void TCTReader::CorrectBaseLine(Float_t xc)
 
     }
 
-    printf(" finished\n");
+    std::cout<<" finished\n";
 
 }
 

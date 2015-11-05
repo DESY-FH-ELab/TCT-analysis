@@ -43,7 +43,7 @@ namespace TCT {
         stct->CorrectBaseLine(10.);
 
         // CheckData: check if channels are set in config file 
-        if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; return false;}
+        if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; delete stct; return false;}
 
         std::string outfolder	= config->OutFolder();
         std::string outpath  = outfolder + "/" + config->OutSample_ID();
@@ -89,11 +89,24 @@ namespace TCT {
                 f_rootfile->cd("sample_signals");
             }
         }
-        if(config->DO_focus() && config->TCT_Mode()==0) DoTopFocus();
-        if(config->DO_focus() && config->TCT_Mode()==1) DoEdgeFocus();
+        if(config->DO_focus() && config->TCT_Mode()==0)
+        {
+            if(DoTopFocus()) std::cout<<"-- Focusing finished succesfully!"<<std::endl;
+        }
+
+        if(config->DO_focus() && config->TCT_Mode()==1)
+        {
+            if(DoEdgeFocus()) std::cout<<"-- Focusing finished succesfully!"<<std::endl;
+        }
         //if(config->DO_focus() && config->TCT_Mode()==2) BottomDoFocus(); // FIXME needs implementation
-        if(config->DO_EdgeDepletion() && config->TCT_Mode()==1) DoEdgeDepletion();
-        if(config->DO_EdgeVelocity() && config->TCT_Mode()==1) DoEdgeVelocity();
+        if(config->DO_EdgeDepletion() && config->TCT_Mode()==1)
+        {
+            if(DoEdgeDepletion()) std::cout<<"-- Depletion Votage search finished succesfully!"<<std::endl;
+        }
+        if(config->DO_EdgeVelocity() && config->TCT_Mode()==1)
+        {
+            if(DoEdgeVelocity()) std::cout<<"-- Profiles building finished succesfully!"<<std::endl;
+        }
         if(config->CH_PhDiode()) LaserPowerDrop();
         if(config->CH_PhDiode()) BeamSigma();
 
@@ -1036,6 +1049,8 @@ namespace TCT {
 
         delete xxx;
         delete temp_integral;
+
+        return true;
     }
 
     // this is independent of the sensor (and hence position), as it only uses the photo diode
@@ -1119,6 +1134,7 @@ namespace TCT {
         delete xxx;
         delete temp_integral;
 
+        return true;
     }
 
     bool Scanning::CheckData() {

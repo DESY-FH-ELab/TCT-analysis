@@ -9,6 +9,7 @@
 // STD includes
 #include <iostream>
 #include <vector>
+#include <cstdint>
 
 // ROOT includes
 #include "TH1F.h"
