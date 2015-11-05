@@ -5,6 +5,7 @@
 #include <QLayout>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QCommandLinkButton>
 
 namespace Ui {
 
@@ -18,10 +19,15 @@ public:
         setCancelButtonText("Abort");
 
         console = new QTextEdit();
+        tbrowser = new QCommandLinkButton("Run TBrowser");
+        //tbrowser->setGeometry(10,300,120,31);
+        tbrowser->setMaximumHeight(40);
 
         layout1 = new QGridLayout();
-        layout1->addWidget(console);
-        layout1->setContentsMargins(10,10,10,100);
+        layout1->addWidget(console,0,0,9,4);
+        layout1->addWidget(tbrowser,9,0,1,1);
+        layout1->setVerticalSpacing(50);
+        //layout1->setContentsMargins(10,10,10,100);
         setLayout(layout1);
 
         setWindowTitle("Analysis Progress");
@@ -34,17 +40,27 @@ public:
         setAutoReset(true);
         setMinimumDuration(0);
         connect(this,SIGNAL(finished(int)),this,SLOT(rename()));
+        connect(tbrowser,SIGNAL(clicked()),this,SLOT(on_tbrowser_clicked()));
     };
     ~ConsoleOutput() {
         delete console;
+        delete tbrowser;
         delete layout1;
     }
     QTextEdit* Console() {return console;}
 
+signals:
+    void OpenTBrowser();
+
 private:
     QTextEdit *console;
+    QCommandLinkButton *tbrowser;
     QGridLayout *layout1;
 private slots:
+    void on_tbrowser_clicked() {
+        emit OpenTBrowser();
+        this->reject();
+    }
     void rename() {
         setCancelButtonText("Close");
     }
@@ -61,7 +77,9 @@ public:
         layout1 = new QGridLayout();
         console = new QTextEdit();
         close = new QPushButton("Ok");
+        tbrowser = new QCommandLinkButton("Run TBrowser");
         layout1->addWidget(console,0,0,1,4);
+        layout1->addWidget(tbrowser,1,0,1,1);
         layout1->addWidget(close,1,3,1,1);
         layout1->setContentsMargins(10,10,10,10);
         setLayout(layout1);
@@ -72,20 +90,31 @@ public:
         setWindowModality(Qt::WindowModal);
         close->setEnabled(false);
         connect(close,SIGNAL(clicked()),this,SLOT(close()));
+        connect(tbrowser,SIGNAL(clicked()),this,SLOT(on_tbrowser_clicked()));
 
     };
     ~ConsoleOsc() {
         delete console;
         delete close;
+        delete tbrowser;
         delete layout1;
     }
     QTextEdit* Console() {return console;}
     void SetButtonEnabled() {close->setEnabled(true);}
 
+signals:
+    void OpenTBrowser();
+
 private:
     QTextEdit *console;
     QPushButton *close;
+    QCommandLinkButton *tbrowser;
     QGridLayout *layout1;
+private slots:
+    void on_tbrowser_clicked() {
+        emit OpenTBrowser();
+        close->click();
+    }
 
 };
 

@@ -109,7 +109,7 @@ if(WITH_GUI)
     FIND_PACKAGE(Qt4 REQUIRED)
     INCLUDE(${QT_USE_FILE})
     QT4_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui forms/form_folders.ui )
-    QT4_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h)
+    QT4_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h include/gui_consoleoutput.h)
 
     # CORE LIBRARY:
     SET(LIB_SOURCE_FILES
@@ -159,14 +159,17 @@ endif()
 # build main TCT-ANALYSIS executable
 if(WITH_GUI)
     add_executable(tct-analysis  src/main_gui.cxx )
+    add_executable(tbrowser  src/tbrowser.cxx )
 else()
     add_executable(tct-analysis  src/main.cxx )
 endif()
 #target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
 if(WITH_LECROY_RAW AND WITH_GUI)
         target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${QT_LIBRARIES} ${LCR_LIBRARY})
+        target_link_libraries(tbrowser ${ROOT_LIBRARIES})
 elseif(WITH_GUI)
         target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${QT_LIBRARIES})
+        target_link_libraries(tbrowser ${ROOT_LIBRARIES})
 elseif(WITH_LECROY_RAW)
         target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${LCR_LIBRARY})
 else()
@@ -174,15 +177,19 @@ else()
 endif()
 
 # now set up the installation directory
-INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-# creating and installing default config file
 if(WITH_GUI)
-	file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/default.conf "DefaultFile = ../testanalysis/test_ana.txt")
-	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/default.conf DESTINATION bin)
+    # creating and installing default config file
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/default.conf "DefaultFile = ../testanalysis/test_ana.txt")
+    INSTALL(TARGETS ${PROJECT_NAME} tct-analysis tbrowser
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
+    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/default.conf DESTINATION bin)
+else()
+    INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
 endif()
 
 

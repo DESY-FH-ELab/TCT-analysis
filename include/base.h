@@ -8,6 +8,7 @@
 #include "sample.h"
 #include "analysis.h"
 #include "gui_consoleoutput.h"
+#include "QProcess"
 
 namespace Ui {
 class base;
@@ -33,8 +34,6 @@ private slots:
 
     void on_start_clicked();
 
-    void on_start_osc_clicked();
-
     void on_actionChange_config_triggered();
 
     void on_actionSave_config_triggered();
@@ -42,6 +41,10 @@ private slots:
     void deleteprogress();
 
     void deleteprogress_osc();
+
+    void on_tbrowser_clicked();
+
+    void kill_tbrowser();
 
 private:
     Ui::base *ui;
@@ -52,12 +55,14 @@ private:
     TCT::mode_selector *config_mode = NULL;
     Ui::ConsoleOutput *progress = NULL;
     Ui::ConsoleOsc *progress_osc = NULL;
+    QProcess *browserProcess = NULL;
     void read_config(const char*);
     void fill_config();
     void tovariables_config();
     void error(const char*);
-    void not_run();
     void print_run(bool start);
+    void start_tct();
+    void start_osc();
 
 };
 

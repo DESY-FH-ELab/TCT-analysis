@@ -15,6 +15,7 @@
 #include "QProgressDialog"
 #include "qdebug.h"
 #include "QDirIterator"
+#include "QProcess"
 
 //TCT includes
 #include "acquisition.h"
@@ -345,7 +346,11 @@ void base::on_window_parameters_clicked()
 
 void base::on_start_clicked()
 {
+    if(ui->modes->currentIndex() == 0) start_osc();
+    if(ui->modes->currentIndex() == 1) start_tct();
+}
 
+void base::start_tct() {
     tovariables_config();
     QStringList names;
 
@@ -388,6 +393,7 @@ void base::on_start_clicked()
 
     ui->statusBar->showMessage(QString("Number of files selected: %1").arg(names.length()),500);
     progress = new Ui::ConsoleOutput(names.length(),this);
+    connect(progress,SIGNAL(OpenTBrowser()),this,SLOT(on_tbrowser_clicked()));
 
     // begin redirecting output
     std::ofstream log_file("execution.log",std::fstream::app);
@@ -408,7 +414,7 @@ void base::on_start_clicked()
         }
     }
     progress->setValue(names.length());
-    progress->finished(1);
+    //progress->finished(names.length());
     print_run(false);
     delete debug;
     connect(progress,SIGNAL(canceled()),this,SLOT(deleteprogress()));
@@ -416,10 +422,9 @@ void base::on_start_clicked()
     // end redirecting output
 
     ui->statusBar->showMessage(tr("Finished"));
-
 }
 
-void base::on_start_osc_clicked()
+void base::start_osc()
 {
     tovariables_config();
 
@@ -429,6 +434,7 @@ void base::on_start_osc_clicked()
     }
 
     progress_osc = new Ui::ConsoleOsc(this);
+    connect(progress_osc,SIGNAL(OpenTBrowser()),this,SLOT(on_tbrowser_clicked()));
     progress_osc->show();
     // begin redirecting output
     std::ofstream log_file("execution.log",std::fstream::app);
@@ -770,10 +776,15 @@ void base::print_run(bool start) {
 
 }
 
-/*
-void base::not_run() {
-    std::cout<<"before"<<std::endl;
-    std::vector<TCT::acquisition_single> AllAcqs;
-    TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
-    std::cout<<"before"<<std::endl;
-}*/
+void base::on_tbrowser_clicked()
+{
+    if(browserProcess != NULL && browserProcess->isOpen()) browserProcess->kill();
+    QString program = QDir::currentPath()+"/tbrowser";
+    browserProcess = new QProcess(this);
+    browserProcess->setWorkingDirectory(config_tct->OutFolder().c_str());
+    browserProcess->setProcessChannelMode(QProcess::ForwardedChannels);
+    browserProcess->start(program);
+}
+void base::kill_tbrowser() {
+    if(browserProcess != NULL && browserProcess->isOpen()) browserProcess->kill();
+}
