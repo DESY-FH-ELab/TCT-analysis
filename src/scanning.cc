@@ -277,6 +277,7 @@ namespace TCT {
         st = (TPaveStats*)FWHMg->FindObject("stats");
         st->SetFitFormat(".5g");
         FWHMg->Write("FWHM");
+        delete FWHMg;
 
         // Plotting the minimum charge of the fitted Erfs a.f.o. optical distance
 
@@ -288,6 +289,7 @@ namespace TCT {
         st = (TPaveStats*)MINQg->FindObject("stats");
         st->SetFitFormat(".5g");
         MINQg->Write("MinCharge");
+        delete MINQg;
 
         // Find the missalignment between z and optical axis
         for(int j=0;j<numO;j++) abs_pos[j]=pos[j]+Sc0;
@@ -296,6 +298,7 @@ namespace TCT {
         POSg->Fit("pol1","q");
         gStyle->SetOptFit(1);
         POSg->Write("Missalignment");
+        delete POSg;
 
         // Plotting best strip width
         GraphBuilder(numO,optical_axis_co,strip_w,"optical distance [#mum]","strip width [#mum]","Strip Width","StripWidth");
@@ -312,6 +315,7 @@ namespace TCT {
             st = (TPaveStats*)FWHMg1->FindObject("stats");
             st->SetFitFormat(".5g");
             FWHMg1->Write("FWHM_Normed");
+            delete FWHMg1;
 
             // Plotting the minimum charge of the fitted Erfs a.f.o. optical distance with normed data
 
@@ -323,6 +327,7 @@ namespace TCT {
             st = (TPaveStats*)MINQg->FindObject("stats");
             st->SetFitFormat(".5g");
             MINQg1->Write("MinCharge_Normed");
+            delete MINQg1;
 
             // Find the missalignment between z and optical axis
             for(int j=0;j<numO;j++) abs_pos[j]=pos_normed[j]+Sc0;
@@ -331,6 +336,7 @@ namespace TCT {
             POSg1->Fit("pol1","q");
             gStyle->SetOptFit(1);
             POSg1->Write("Missalignment_Normed");
+            delete POSg1;
 
             // Plotting best strip width
             GraphBuilder(numO,optical_axis_co,strip_w,"optical distance [#mum]","strip width [#mum]","Strip Width","StripWidth_Normed");
@@ -349,6 +355,10 @@ namespace TCT {
         delete minQ;
         delete minQ_normed;
         delete optical_axis_co;
+
+        delete cc;
+        if(config->CH_PhDiode()) delete cc_norm;
+        delete ph_charge;
 
         return true;
     }
@@ -458,6 +468,7 @@ namespace TCT {
         st = (TPaveStats*)FWHMg_Left->FindObject("stats");
         st->SetFitFormat(".5g");
         FWHMg_Left->Write("FWHM_Left");
+        delete FWHMg_Left;
 
         TGraph *FWHMg_Right = GraphBuilder(numO,optical_axis_co,width_right,"Voltage [V]","FWHM [#mum]","Gaussian Beam Profile");
         ff_pol1->SetParameter(0,FWHMg_Right->GetMean());
@@ -467,6 +478,7 @@ namespace TCT {
         st = (TPaveStats*)FWHMg_Right->FindObject("stats");
         st->SetFitFormat(".5g");
         FWHMg_Right->Write("FWHM_Right");
+        delete FWHMg_Right;
 
         // Find the missalignment between z and optical axis
         for(int j=0;j<numO;j++) {
@@ -478,11 +490,13 @@ namespace TCT {
         POSg_Left->Fit("pol1","q");
         gStyle->SetOptFit(1);
         POSg_Left->Write("Missalignment_Left");
+        delete POSg_Left;
 
         TGraph *POSg_Right = GraphBuilder(numO,optical_axis_co,abs_pos_right,"optical distance [#mum]","position of the edge [#mum]","Missalignment");
         POSg_Right->Fit("pol1","q");
         gStyle->SetOptFit(1);
         POSg_Right->Write("Missalignment_Right");
+        delete POSg_Right;
 
         // Plotting the sensor thickness
         GraphBuilder(numO,optical_axis_co,sensor_thick,"optical distance [#mum]","sensor thickness [#mum]","Sensor Thickness","SensorThickness");
@@ -500,6 +514,7 @@ namespace TCT {
             st = (TPaveStats*)FWHMg1_Left->FindObject("stats");
             st->SetFitFormat(".5g");
             FWHMg1_Left->Write("FWHM_Left_Normed");
+            delete FWHMg1_Left;
 
             //draw the gaussian beam profile with normed charge
             TGraph *FWHMg1_Right = GraphBuilder(numO,optical_axis_co,width_right_normed,"Voltage [V]","FWHM [#mum]","Gaussian Beam Profile");
@@ -510,6 +525,7 @@ namespace TCT {
             st = (TPaveStats*)FWHMg1_Right->FindObject("stats");
             st->SetFitFormat(".5g");
             FWHMg1_Right->Write("FWHM_Right_Normed");
+            delete FWHMg1_Right;
 
             // Find the missalignment between z and optical axis
             for(int j=0;j<numO;j++) {
@@ -521,11 +537,13 @@ namespace TCT {
             POSg1_Left->Fit("pol1","q");
             gStyle->SetOptFit(1);
             POSg1_Left->Write("Missalignment_Left_Normed");
+            delete POSg1_Left;
 
             TGraph *POSg1_Right = GraphBuilder(numO,optical_axis_co,abs_pos_right,"optical distance [#mum]","position of the edge [#mum]","Missalignment");
             POSg1_Right->Fit("pol1","q");
             gStyle->SetOptFit(1);
             POSg1_Right->Write("Missalignment_Right_Normed");
+            delete POSg1_Right;
 
             // Plotting the sensor thickness
             GraphBuilder(numO,optical_axis_co,sensor_thick_normed,"optical distance [#mum]","sensor thickness [#mum]","Sensor Thickness","SensorThickness_Normed");
@@ -545,6 +563,10 @@ namespace TCT {
         delete sensor_thick;
         delete sensor_thick_normed;
         delete optical_axis_co;
+
+        delete cc;
+        if(config->CH_PhDiode()) delete cc_norm;
+        delete ph_charge;
 
         return true;
     }
@@ -570,9 +592,10 @@ namespace TCT {
           case 2: numVolt=stct->NU2; voltages=stct->U2.fArray; break; //u2
           }
 
-        TGraph **cc = new TGraph*[numVolt];                  // charge collection graph
-        TGraph **cc_norm = new TGraph*[numVolt];                  // charge collection graph
+        TGraph **cc = new TGraph*[numVolt];
+        TGraph **cc_norm; // charge collection graph
         TGraph **ph_charge = new TGraph*[numVolt];
+
 
         SwitchAxis(scanning_axis,numS,Ss,Sc0);
 
@@ -695,6 +718,7 @@ namespace TCT {
 
         TotalCg->SetTitle(depl);
         TotalCg->Write("DeplVoltage");
+        delete TotalCg;
 
 
         if(config->CH_PhDiode()) {
@@ -726,16 +750,15 @@ namespace TCT {
             sprintf(depl,"U_{depletion} = %.2f V",depl_volt*depl_volt);
 
             TotalCg1->SetTitle(depl);
-            TotalCg1->Write("DeplVoltage_Normed");
+            TotalCg1->Write("DeplVoltage_Normed");            
+            delete TotalCg1;
 
             dir_depl->cd();
         }
 
-        for(int i=0;i<numVolt;i++) {
-            delete cc[i];
-            delete cc_norm[i];
-            delete ph_charge[i];
-        }
+        delete cc;
+        if(config->CH_PhDiode()) delete cc_norm;
+        delete ph_charge;
 
         delete total_charge;
         delete total_charge_normed;
@@ -771,6 +794,7 @@ namespace TCT {
 
         TGraph **cc = new TGraph*[numVolt];
         TGraph **cc_norm; // charge collection graph
+        TGraph **ph_charge = new TGraph*[numVolt];
         TGraph **field = new TGraph*[numVolt];
         TGraph **velocity_electrons = new TGraph*[numVolt];
         TGraph **velocity_holes = new TGraph*[numVolt];
@@ -781,8 +805,6 @@ namespace TCT {
 
         TGraph **velocity_diode = new TGraph*[numVolt];
         TGraph **field_diode = new TGraph*[numVolt];
-
-        TGraph **ph_charge = new TGraph*[numVolt];
 
         SwitchAxis(scanning_axis,numS,Ss,Sc0);
 
@@ -989,12 +1011,29 @@ namespace TCT {
             TF1 *fff = new TF1("log0","[0]*log(x)",10,120);
             coeff->Fit("log0","R");
             coeff->Write("CoeffNorm");
+            delete coeff;
+            delete fff;
 
             dir_vel_diode->cd();
             MultiGraphWriter(numVolt,velocity_diode,"scanning distance [#mum]","Velocity [cm/s]","Velocity Profiles","VelocityVsDist_diode");
             MultiGraphWriter(numVolt,field_diode,"scanning distance [#mum]","Electric Field, [V/#mum]","Electric Field","FieldVsDist_diode");
             dir_vel->cd();
         }
+
+        delete normcoeff;
+
+        delete velocity_holes;
+        delete velocity_electrons;
+        delete velocity_electrons_normed;
+        delete velocity_holes_normed;
+        delete field_normed;
+        delete field_diode;
+        delete velocity_diode;
+        delete field;
+
+        delete cc;
+        if(config->CH_PhDiode()) delete cc_norm;
+        delete ph_charge;
 
         return true;
 
@@ -1290,6 +1329,7 @@ namespace TCT {
             //wf[j]->Clear();
             delete wf[j];
         }
+        delete wf;
     }
 
     TGraph** Scanning::NormedCharge(TGraph** sensor, TGraph** photodiode, Int_t numP) {
@@ -1322,6 +1362,8 @@ namespace TCT {
             }
             normed_charge[j] = new TGraph(numS,sensor[0]->GetX(),temp_normed);
         }
+
+        delete temp_normed;
         return normed_charge;
 
     }
@@ -1411,6 +1453,8 @@ namespace TCT {
         left_edge=ff_left->GetParameter(0);
         right_edge=ff_right->GetParameter(0);
 
+        delete ff_left;
+        delete ff_right;
         delete yy;
 
     }
@@ -1588,6 +1632,8 @@ namespace TCT {
         mg->Write();
         //canva->Write(write_name);
         //canva->Close();
+
+        delete mg;
 
     }
 

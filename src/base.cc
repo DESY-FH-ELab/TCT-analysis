@@ -81,6 +81,10 @@ base::base(QWidget *parent) :
 
 base::~base()
 {
+    if(config_mode) delete config_mode;
+    if(config_tct) delete config_tct;
+    if(config_analysis) delete config_analysis;
+    if(config_sample) delete config_sample;
     delete ui;
 }
 

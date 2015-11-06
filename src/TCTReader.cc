@@ -1166,6 +1166,9 @@ TGraph *TCTWaveform::CCE(Float_t mint, Float_t maxt,Int_t model,Int_t Show)
         gr->GetHistogram()->Draw();
         gr->Draw("APL");
     }
+
+    delete integral;
+    delete index;
     return(gr);
 }
 
