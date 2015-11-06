@@ -30,7 +30,11 @@
 #include "TCTReader.h"
 
 namespace TCT {
-    bool Scanning::ReadTCT(char *filename, tct_config *config1) {
+#ifndef USE_GUI
+        bool Scanning::ReadTCT(char* filename, tct_config* config1) {
+#else
+        bool Scanning::ReadTCT(char* filename, tct_config* config1, Ui::ConsoleOutput *progress) {
+#endif
         config = config1;
 
         // -3 is the time shift, you can shift a signal to start at t=0. FIXME
@@ -89,23 +93,39 @@ namespace TCT {
                 f_rootfile->cd("sample_signals");
             }
         }
+#ifdef USE_GUI
+        if(config->FSeparateWaveforms()) progress->setValue(progress->value()+1);
+#endif
+
         if(config->DO_focus() && config->TCT_Mode()==0)
         {
             if(DoTopFocus()) std::cout<<"-- Focusing finished succesfully!"<<std::endl;
+#ifdef USE_GUI
+            progress->setValue(progress->value()+1);
+#endif
         }
 
         if(config->DO_focus() && config->TCT_Mode()==1)
         {
             if(DoEdgeFocus()) std::cout<<"-- Focusing finished succesfully!"<<std::endl;
+#ifdef USE_GUI
+            progress->setValue(progress->value()+1);
+#endif
         }
         //if(config->DO_focus() && config->TCT_Mode()==2) BottomDoFocus(); // FIXME needs implementation
         if(config->DO_EdgeDepletion() && config->TCT_Mode()==1)
         {
             if(DoEdgeDepletion()) std::cout<<"-- Depletion Votage search finished succesfully!"<<std::endl;
+#ifdef USE_GUI
+            progress->setValue(progress->value()+1);
+#endif
         }
         if(config->DO_EdgeVelocity() && config->TCT_Mode()==1)
         {
             if(DoEdgeVelocity()) std::cout<<"-- Profiles building finished succesfully!"<<std::endl;
+#ifdef USE_GUI
+            progress->setValue(progress->value()+1);
+#endif
         }
         if(config->CH_PhDiode()) LaserPowerDrop();
         if(config->CH_PhDiode()) BeamSigma();

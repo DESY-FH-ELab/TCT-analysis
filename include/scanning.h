@@ -18,6 +18,10 @@
 //#include "TCTScan.h"
 #include "tct_config.h"
 
+//#ifdef USE_GUI
+#include "gui_consoleoutput.h"
+//#endif
+
 class TCTReader;
 
 namespace TCT {
@@ -41,7 +45,11 @@ namespace TCT {
 
         // Destructor
         ~Scanning() = default;
+#ifndef USE_GUI
         bool ReadTCT(char* filename, tct_config* config1);
+#else
+        bool ReadTCT(char* filename, tct_config* config1, Ui::ConsoleOutput *progress);
+#endif
         bool DoTopFocus();
         bool DoEdgeFocus();
         bool DoEdgeDepletion();
@@ -73,7 +81,6 @@ namespace TCT {
         Double_t Mu(Double_t E, Int_t Type);
         template <typename T> int sgn(T val);
         Double_t abs(Double_t x);
-
 
     }; // end of class scanning
 }

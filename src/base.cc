@@ -396,7 +396,14 @@ void base::start_tct() {
     }
 
     ui->statusBar->showMessage(QString("Number of files selected: %1").arg(names.length()),500);
-    progress = new Ui::ConsoleOutput(names.length(),this);
+    int nOps = 0;
+    if(config_tct->FSeparateWaveforms()) nOps++;
+    if(config_tct->DO_focus()) nOps++;
+    if(config_tct->DO_EdgeDepletion()) nOps++;
+    if(config_tct->DO_EdgeVelocity()) nOps++;
+
+    progress = new Ui::ConsoleOutput(names.length()*nOps,this);
+    progress->setValue(0);
     connect(progress,SIGNAL(OpenTBrowser()),this,SLOT(on_tbrowser_clicked()));
 
     // begin redirecting output
@@ -405,19 +412,18 @@ void base::start_tct() {
     print_run(true);
 
     for(int i=0;i<names.length();i++) {
-        progress->setValue(i);
         if(progress->wasCanceled()) break;
         ui->statusBar->showMessage(QString("Reading file %1").arg(names.at(i).split("/").last()),1000);
         char pathandfile[250];
         strcpy(pathandfile,names.at(i).toStdString().c_str());
         TCT::Scanning daq_data;
-        bool read = daq_data.ReadTCT(pathandfile,config_tct);
+        bool read = daq_data.ReadTCT(pathandfile,config_tct,progress);
         if(!read) {
             ui->statusBar->showMessage(QString("Processing of file %1 failed. Skipping").arg(names.at(i).split("/").last()));
             continue;
         }
     }
-    progress->setValue(names.length());
+    progress->setValue(names.length()*nOps);
     //progress->finished(names.length());
     print_run(false);
     delete debug;
@@ -448,173 +454,75 @@ void base::start_osc()
     ui->statusBar->showMessage(tr("Searching data in folders"));
 
     std::cout << "The sample's data folder is = " << config_analysis->DataFolder() << ", searching data in subfolder(s) " <<  std::endl;
-    std::map<std::string, std::vector<std::string>> folder_struc;
-    std::vector<std::string> dirs;
-    std::vector<std::string> dirs2;	// push folder for every subfolder (linearisation of folder matrix)
-    std::vector<std::string> subdirs2;	// push folder for every subfolder (linearisation of folder matrix)
-    std::vector<std::string> pathndirs;
-    std::vector<int> Nsubdirs;
 
-    void *dirp = gSystem->OpenDirectory(config_analysis->DataFolder().c_str());
-    if (!dirp) {
+    QString datafolder(config_analysis->DataFolder().c_str());
+    QDir datadir(datafolder);
+    QStringList filter;
+    filter<<"*.txt";
+    if (!datadir.exists()) {
         error("Data Folder not found. Check \"DataFolder\" in analysis card.");
         return;
     }
-    char *direntry;
-    uint32_t counterdir   = 0;
-    uint32_t countersubdir= 0;
-    while ((direntry = (char*)gSystem->GetDirEntry(dirp))) {
-        if ( strstr(direntry,"..") || strstr(direntry,".") ) continue;
-        counterdir++;
-        //std::cout << "- " << direntry << std::endl;
-        dirs.push_back((std::string)direntry);
+    int countersubdir = 0;
+    QDirIterator subfolders(datafolder,QDir::Dirs | QDir::NoDotAndDotDot,QDirIterator::Subdirectories);
+    while(subfolders.hasNext()){
+        QString dirname = subfolders.next();
+        QDir subdir(dirname);
+        dirname+="/";
+        if(subdir.entryList(filter).length()) {
+            std::vector<TCT::acquisition_single> AllAcqs;
+            TCT::measurement meas(dirname.toStdString());
+            if(!meas.AcqsLoader(&AllAcqs, config_analysis->MaxAcqs(),config_analysis->LeCroyRAW())) {
+                std::cout << " Folder empty! Skipping folder" << std::endl;
+                continue;
+            };
+            // now create instance of avg acquisition using Nsamples from loaded files
+            TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
+            AcqAvg.SetPolarity(AllAcqs[0].Polarity());
 
+            //now analyse all acquisitions
+            int Nselected = 0;
 
-        std::string subDataFolder	= config_analysis->DataFolder() + "/" + direntry;
-        //std::cout << "Subdir = " << subDataFolder << std::endl;
-        std::vector<std::string> subdirs;
-        void *subdirp = gSystem->OpenDirectory(subDataFolder.c_str());
-        char *subdirentry;
-        while ((subdirentry = (char*)gSystem->GetDirEntry(subdirp))) {
-            if ( strstr(subdirentry,"..") || strstr(subdirentry,"." ) ) continue;
-            countersubdir++;
-            //std::cout << "-- " << subdirentry << std::endl;
-            subdirs.push_back(subdirentry);
-            dirs2.push_back((std::string)direntry);
-            subdirs2.push_back((std::string)subdirentry);
-            std::string fullpath = config_analysis->DataFolder() + "/" + direntry + "/" + subdirentry + "/";
-            //std::cout << fullpath << std::endl;
-            pathndirs.push_back(fullpath);
+            AcqAvg.SetNanalysed(AllAcqs.size());
+            for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
 
-        }
-        Nsubdirs.push_back(countersubdir);
-        countersubdir = 0;
+                TCT::acquisition_single* acq = &AllAcqs[i_acq];
+                if(config_analysis->DoSmearing()) config_analysis->AcqsSmearer(acq, config_analysis->AddNoise(), false);
+                config_analysis->AcqsAnalyser(acq, i_acq, &AcqAvg);
+                if(config_analysis->DoSmearing()) config_analysis->AcqsSmearer(acq, false, config_analysis->AddJitter()); // AcqsAnalyser removes jitter by determining each acqs delay. Hence, to add jitter, delay has to be manipulated after AcqsAnalyser (and before filling of profile
 
-        folder_struc[dirs[counterdir-1]] = subdirs;
-
-
-    }
-
-    for (auto i : Nsubdirs) {
-        countersubdir +=i;
-        //std::cout << " i = " << i << std::endl;
-    }
-
-    std::cout << " Found the following folder structure: " << std::endl;
-    for(auto i : folder_struc) {
-        for(auto j : i.second)
-            std::cout << i.first << " " <<  j << " " << "\n";
-    }
-
-    ui->statusBar->showMessage(QString("In total, found %1 subfolder(s)").arg(countersubdir));
-    std::cout << " In total, found " << countersubdir << " subfolder(s) " << std::endl;
-
-    uint32_t counter;
-    //if(countersubdir > 0) {
-    counter=0;
-    while(1){
-
-
-#ifdef DEBUG
-        std::cout << " Start with subfolder # " << counter << std::endl;
-#endif
-        //int i = 0; i < countersubdir; i++) {
-        // create vec with acq_singles in it
-        std::vector<TCT::acquisition_single> AllAcqs;
-
-        if(countersubdir == 0) {
-            // check if DataFolder() ends on "/", if not, add it
-            std::string path = config_analysis->DataFolder();
-            if (path.length() > 0) {
-                std::string::iterator it = path.end() - 1;
-                if (*it != '/') {
-                    path.append("/");
+                if( config_analysis->AcqsSelecter(acq) ) {
+                    Nselected++;
+                    acq->SetSelect(true);
                 }
+                AcqAvg.SetNselected(Nselected);
+                config_analysis->AcqsProfileFiller(acq, &AcqAvg);
+
             }
-            config_analysis->SetDataFolder(path);
-            // push DataFolder to pathndirs (this is a hack to cope with Nsubdir == 0...)
-            pathndirs.push_back(config_analysis->DataFolder());
-        }
-        // create measurement object from one subdir for each cycle
-        TCT::measurement meas(pathndirs[counter]);
 
-        if(!meas.AcqsLoader(&AllAcqs, config_analysis->MaxAcqs(),config_analysis->LeCroyRAW())) {
-            std::cout << " Folder empty! Skipping folder" << std::endl;
-            counter++;
-            if( countersubdir == 0) break;
-            if(counter == countersubdir) break;
-            continue;
-        };
+            config_analysis->SetOutSample_ID(config_sample->SampleID());
+                config_analysis->SetOutSubFolder(dirname.split(datafolder).last().split("/").at(1).toStdString());
+                config_analysis->SetOutSubsubFolder(dirname.split(datafolder).last().split("/").at(2).toStdString());
 
-        // now create instance of avg acquisition using Nsamples from loaded files
-        TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
-        AcqAvg.SetPolarity(AllAcqs[0].Polarity());
 
-        //now analyse all acquisitions
-        int Nselected = 0;
+            if(config_analysis->SaveToFile())
+                config_analysis->AcqsWriter(&AllAcqs, &AcqAvg, true);
+                //else config_analysis->AcqsWriter(&AllAcqs, &AcqAvg, false);
 
-#ifdef DEBUG
-        std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
-#endif
+            std::cout << "   Nselected = " << Nselected << std::endl;
+            std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
 
-        AcqAvg.SetNanalysed(AllAcqs.size());
-        for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
-
-#ifdef DEBUG
-            std::cout << " - Start with Acq #" << i_acq << std::endl;
-#endif
-
-            TCT::acquisition_single* acq = &AllAcqs[i_acq];
-            if(config_analysis->DoSmearing()) config_analysis->AcqsSmearer(acq, config_analysis->AddNoise(), false);
-            config_analysis->AcqsAnalyser(acq, i_acq, &AcqAvg);
-            if(config_analysis->DoSmearing()) config_analysis->AcqsSmearer(acq, false, config_analysis->AddJitter()); // AcqsAnalyser removes jitter by determining each acqs delay. Hence, to add jitter, delay has to be manipulated after AcqsAnalyser (and before filling of profile
-
-#ifdef DEBUG
-            std::cout << *acq << std::endl;
-#endif
-
-            if( config_analysis->AcqsSelecter(acq) ) {
-                Nselected++;
-                acq->SetSelect(true);
+            // now take care of memory management
+            // delete remaning TH1Fs in acquisition_single and then clear AllAcqs
+            for(int j = 0; j < AllAcqs.size(); j++) {
+                AllAcqs[j].Clear();
             }
-            AcqAvg.SetNselected(Nselected);
-            config_analysis->AcqsProfileFiller(acq, &AcqAvg);
+            AllAcqs.clear();
 
-        } // end fot AllAcqs.size()
-
-        //std::cout << "Mean s2nval = " << AcqAvg.M_V_S2nval() << std::endl;
-
-        config_analysis->SetOutSample_ID(config_sample->SampleID());
-        if(countersubdir > 0) {
-            config_analysis->SetOutSubFolder(dirs2[counter]);
-            config_analysis->SetOutSubsubFolder(subdirs2[counter]);
-        } else {
-            config_analysis->SetOutSubFolder("def");
-            config_analysis->SetOutSubsubFolder("def");
+            countersubdir++;
         }
-
-
-        if(config_analysis->SaveToFile())
-            if(countersubdir > 0) config_analysis->AcqsWriter(&AllAcqs, &AcqAvg, true);
-            else config_analysis->AcqsWriter(&AllAcqs, &AcqAvg, false);
-
-        std::cout << "   Nselected = " << Nselected << std::endl;
-        std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
-
-        // now take care of memory management
-        // delete remaning TH1Fs in acquisition_single and then clear AllAcqs
-        for(int j = 0; j < AllAcqs.size(); j++) {
-            AllAcqs[j].Clear();
-        }
-        AllAcqs.clear();
-
-        counter++;
-        if( countersubdir == 0) break;
-        if(counter == countersubdir) break;
-#ifdef DEBUG
-        std::cout << "   AllAcqs has " << AllAcqs.size() << " objects left" << std::endl;
-#endif
     }
+
     progress_osc->SetButtonEnabled();
     print_run(false);
     delete debug;
