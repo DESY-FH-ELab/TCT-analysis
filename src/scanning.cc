@@ -1088,6 +1088,7 @@ namespace TCT {
 
         delete xxx;
         delete temp_integral;
+        delete test_graph;
 
         return true;
     }
@@ -1172,6 +1173,7 @@ namespace TCT {
 
         delete xxx;
         delete temp_integral;
+        delete test_graph;
 
         return true;
     }
@@ -1361,7 +1363,7 @@ namespace TCT {
                 temp_normed[i] = temp_sr_general*temp_sensor[i]/temp_diode[i];
             }
             normed_charge[j] = new TGraph(numS,sensor[0]->GetX(),temp_normed);
-        }
+        }        
 
         delete temp_normed;
         return normed_charge;
@@ -1532,7 +1534,7 @@ namespace TCT {
         return temp;
     }
 
-    TGraph* Scanning::GraphBuilder(Int_t N, Float_t* x, Float_t* y,const char* namex,const char* namey, const char* title, const char* write_name) {
+    void Scanning::GraphBuilder(Int_t N, Float_t* x, Float_t* y,const char* namex,const char* namey, const char* title, const char* write_name) {
         TGraph *temp=new TGraph(N,x,y);
         temp->SetMarkerStyle(21);
         temp->Draw("AP");
@@ -1540,7 +1542,8 @@ namespace TCT {
         temp->GetHistogram()->GetYaxis()->SetTitle(namey);
         temp->SetTitle(title);
         temp->Write(write_name);
-        return temp;
+        delete temp;
+        //return temp;
     }
 
     TGraph* Scanning::GraphBuilder(Int_t N, Double_t* x, Double_t* y,const char* namex,const char* namey, const char* title) {
@@ -1553,7 +1556,7 @@ namespace TCT {
         return temp;
     }
 
-    TGraph* Scanning::GraphBuilder(Int_t N, Double_t* x, Double_t* y,const char* namex,const char* namey, const char* title, const char* write_name) {
+    void Scanning::GraphBuilder(Int_t N, Double_t* x, Double_t* y,const char* namex,const char* namey, const char* title, const char* write_name) {
         TGraph *temp=new TGraph(N,x,y);
         temp->SetMarkerStyle(21);
         temp->Draw("AP");
@@ -1561,7 +1564,8 @@ namespace TCT {
         temp->GetHistogram()->GetYaxis()->SetTitle(namey);
         temp->SetTitle(title);
         temp->Write(write_name);
-        return temp;
+        delete temp;
+        //return temp;
     }
 
     void Scanning::GraphSeparate(Int_t N, TGraph **gr, const char *dir_name, const char *namex, const char *namey, const char *title, const char *name_0, Double_t *name_1) {

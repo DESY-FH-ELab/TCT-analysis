@@ -60,9 +60,9 @@ namespace TCT {
         void FindEdges(TGraph* gr, Int_t numS, Float_t dx, Double_t &left_edge, Double_t &right_edge);
         void FindEdges(TGraph** gr, Int_t numP, Int_t numS, Float_t dx, Float_t* left_pos, Float_t* left_width, Float_t* right_pos, Float_t* right_width);
         TGraph* GraphBuilder(Int_t N, Float_t *x, Float_t *y, const char *namex, const char *namey, const char *title);
-        TGraph* GraphBuilder(Int_t N, Float_t *x, Float_t *y, const char *namex, const char *namey, const char *title, const char *write_name);
+        void GraphBuilder(Int_t N, Float_t *x, Float_t *y, const char *namex, const char *namey, const char *title, const char *write_name);
         TGraph* GraphBuilder(Int_t N, Double_t *x, Double_t *y, const char *namex, const char *namey, const char *title);
-        TGraph* GraphBuilder(Int_t N, Double_t *x, Double_t *y, const char *namex, const char *namey, const char *title, const char *write_name);
+        void GraphBuilder(Int_t N, Double_t *x, Double_t *y, const char *namex, const char *namey, const char *title, const char *write_name);
         void GraphSeparate(Int_t N, TGraph **gr, const char *dir_name, const char *namex, const char *namey, const char *title, const char *name_0, Double_t *name_1);
         void GraphSeparate(Int_t N, TGraph **gr, const char *dir_name, const char *namex, const char *namey, const char *title, const char *name_0, Float_t *name_1);
         void MultiGraphWriter(Int_t N, TGraph **gr, const char *namex, const char *namey, const char *title, const char *write_name);
