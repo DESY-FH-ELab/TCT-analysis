@@ -53,10 +53,18 @@ namespace TCT {
         std::string outpath  = outfolder + "/" + config->OutSample_ID();
         gSystem->MakeDirectory(outpath.c_str());
 
+        char *InpName = stct->FileName;
+        char * pch;
+        pch = strtok (InpName,"/");
+        while (pch != NULL){
+            InpName = pch;
+            pch = strtok (NULL, "/");
+        }
+        std::string inputname(InpName);
         std::string pathandfilename;
-        pathandfilename = outpath  + "/" + config->OutSample_ID() + "_";
+        pathandfilename = outpath  + "/" + config->OutSample_ID() + "_" + inputname + "_";
         char name[100];
-        sprintf(name,"%02d.%02d.%02d_%02d.%02d.%02d",stct->Date[0],stct->Date[1],stct->Date[2],stct->Date[3],stct->Date[4],stct->Date[5]);
+        sprintf(name,"%02d.%02d.%02d",stct->Date[0],stct->Date[1],stct->Date[2]);
         pathandfilename = pathandfilename + name + ".root";
 
         std::cout << "Output file was created: " << pathandfilename << std::endl;
@@ -344,7 +352,7 @@ namespace TCT {
             ff_pol4->SetParameter(2,MINQg1->GetMinimum());
             MINQg1->Fit("my_pol4","q");
             gStyle->SetOptFit(1);
-            st = (TPaveStats*)MINQg->FindObject("stats");
+            st = (TPaveStats*)MINQg1->FindObject("stats");
             st->SetFitFormat(".5g");
             MINQg1->Write("MinCharge_Normed");
             delete MINQg1;
@@ -480,7 +488,7 @@ namespace TCT {
         ff_pol2->SetParName(0,"Focus Position");
         TPaveStats *st;
 
-        TGraph *FWHMg_Left = GraphBuilder(numO,optical_axis_co,width_left,"Voltage [V]","FWHM [#mum]","Gaussian Beam Profile");
+        TGraph *FWHMg_Left = GraphBuilder(numO,optical_axis_co,width_left,"optical distance [#mum]","FWHM [#mum]","Gaussian Beam Profile");
         ff_pol1->SetParameter(0,FWHMg_Left->GetMean());
         ff_pol1->SetParameter(2,FWHMg_Left->GetMinimum());
         FWHMg_Left->Fit("my_pol1","q");
@@ -490,7 +498,7 @@ namespace TCT {
         FWHMg_Left->Write("FWHM_Left");
         delete FWHMg_Left;
 
-        TGraph *FWHMg_Right = GraphBuilder(numO,optical_axis_co,width_right,"Voltage [V]","FWHM [#mum]","Gaussian Beam Profile");
+        TGraph *FWHMg_Right = GraphBuilder(numO,optical_axis_co,width_right,"optical distance [#mum]","FWHM [#mum]","Gaussian Beam Profile");
         ff_pol1->SetParameter(0,FWHMg_Right->GetMean());
         ff_pol1->SetParameter(2,FWHMg_Right->GetMinimum());
         FWHMg_Right->Fit("my_pol1","q");
@@ -526,7 +534,7 @@ namespace TCT {
             dir_fsearch_normed->cd();
 
             //draw the gaussian beam profile with normed charge
-            TGraph *FWHMg1_Left = GraphBuilder(numO,optical_axis_co,width_left_normed,"Voltage [V]","FWHM [#mum]","Gaussian Beam Profile");
+            TGraph *FWHMg1_Left = GraphBuilder(numO,optical_axis_co,width_left_normed,"optical distance [#mum]","FWHM [#mum]","Gaussian Beam Profile");
             ff_pol2->SetParameter(0,FWHMg1_Left->GetMean());
             ff_pol2->SetParameter(2,FWHMg1_Left->GetMinimum());
             FWHMg1_Left->Fit("my_pol2","q");
@@ -537,7 +545,7 @@ namespace TCT {
             delete FWHMg1_Left;
 
             //draw the gaussian beam profile with normed charge
-            TGraph *FWHMg1_Right = GraphBuilder(numO,optical_axis_co,width_right_normed,"Voltage [V]","FWHM [#mum]","Gaussian Beam Profile");
+            TGraph *FWHMg1_Right = GraphBuilder(numO,optical_axis_co,width_right_normed,"optical distance [#mum]","FWHM [#mum]","Gaussian Beam Profile");
             ff_pol2->SetParameter(0,FWHMg1_Right->GetMean());
             ff_pol2->SetParameter(2,FWHMg1_Right->GetMinimum());
             FWHMg1_Right->Fit("my_pol2","q");
@@ -612,6 +620,9 @@ namespace TCT {
           case 2: numVolt=stct->NU2; voltages=stct->U2.fArray; break; //u2
           }
 
+        Float_t* total_charge = new Float_t[numVolt];
+        Float_t* total_charge_normed = new Float_t[numVolt];
+
         TGraph **cc = new TGraph*[numVolt];
         TGraph **cc_norm; // charge collection graph
         TGraph **ph_charge = new TGraph*[numVolt];
@@ -645,7 +656,7 @@ namespace TCT {
             std::cout<<std::endl;
         }
 
-        Float_t* total_charge = new Float_t[numVolt];
+
         //std::cout<<"charge left: "<<charge_left<<" charge right: "<<charge_right<<std::endl;
         for(int j=0;j<numVolt;j++) {
             total_charge[j] = GraphIntegral(cc[j],left_edge,right_edge);
@@ -653,26 +664,27 @@ namespace TCT {
         if(total_charge[numVolt-1]<0) {
             for(int j=0;j<numVolt;j++) total_charge[j]=-total_charge[j];
         }
+        if(config->CH_PhDiode()) {
+            FindEdges(cc_norm[numVolt-1],numS,Ss,left_edge,right_edge);
+            if(abs((right_edge-left_edge)-config->SampleThickness())>0.1*config->SampleThickness()) {
+                std::cout<<"\tNORMED Sorry, the detector thickness found for the highest bias voltage is more than 10% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
+                std::cout<<"\tNORMED Left Edge = "<<left_edge<<" Right Edge = "<<right_edge<<std::endl;
+                std::cout<<"\tNORMED Original Thickness is "<<config->SampleThickness()<<" micrometers"<<std::endl;
+                std::cout<<"\tNORMED Aborting the depletion voltage search"<<std::endl;
+                return false;
+            }
+            else {
+                std::cout<<"\tNORMED Found detector thickness is: "<<right_edge-left_edge<<" micrometers"<<std::endl;
+                std::cout<<"\tNORMED Integrating in the range "<<left_edge<<" - "<<right_edge<<std::endl;
+            }
 
-        FindEdges(cc_norm[numVolt-1],numS,Ss,left_edge,right_edge);
-        if(abs((right_edge-left_edge)-config->SampleThickness())>0.1*config->SampleThickness()) {
-            std::cout<<"\tNORMED Sorry, the detector thickness found for the highest bias voltage is more than 10% differes from the given in the configuration file. Most possible, that the detector is misaligned."<<std::endl;
-            std::cout<<"\tNORMED Left Edge = "<<left_edge<<" Right Edge = "<<right_edge<<std::endl;
-            std::cout<<"\tNORMED Original Thickness is "<<config->SampleThickness()<<" micrometers"<<std::endl;
-            std::cout<<"\tNORMED Aborting the depletion voltage search"<<std::endl;
-            return false;
-        }
-        else {
-            std::cout<<"\tNORMED Found detector thickness is: "<<right_edge-left_edge<<" micrometers"<<std::endl;
-            std::cout<<"\tNORMED Integrating in the range "<<left_edge<<" - "<<right_edge<<std::endl;
-        }
 
-        Float_t* total_charge_normed = new Float_t[numVolt];
-        for(int j=0;j<numVolt;j++) {
-            total_charge_normed[j] = GraphIntegral(cc_norm[j],left_edge,right_edge);
-        }
-        if(total_charge_normed[numVolt-1]<0) {
-            for(int j=0;j<numVolt;j++) total_charge_normed[j]=-total_charge_normed[j];
+            for(int j=0;j<numVolt;j++) {
+                total_charge_normed[j] = GraphIntegral(cc_norm[j],left_edge,right_edge);
+            }
+            if(total_charge_normed[numVolt-1]<0) {
+                for(int j=0;j<numVolt;j++) total_charge_normed[j]=-total_charge_normed[j];
+            }
         }
 
         //write separate charges
@@ -707,6 +719,7 @@ namespace TCT {
         derivative[0]=0;
         derivative[1]=0;
         Float_t max_der=0;
+        Float_t DEPL_THRESHOLD = 0.4;
         for(int i=2;i<numVolt;i++){
             derivative[i] = total_charge[i]-total_charge[i-2];
             if(derivative[i]>max_der) max_der=derivative[i];
@@ -717,20 +730,20 @@ namespace TCT {
         f_start = false;
         f_finish = false;
         for(int i=0;i<numVolt;i++) {
-            if(!f_start && derivative[i]>0.4*max_der) {i_start=i; f_start=true;}
-            if(!f_finish && f_start && derivative[i]<=0.4*max_der) {i_finish=i-1; f_finish=true;}
-            if(f_finish && derivative[i]<=0.4*max_der) {i_plato=i; break;}
+            if(!f_start && derivative[i]>DEPL_THRESHOLD*max_der) {i_start=i; f_start=true;}
+            if(!f_finish && f_start && derivative[i]<=DEPL_THRESHOLD*max_der) {i_finish=i-1; f_finish=true;}
+            if(f_finish && derivative[i]<=DEPL_THRESHOLD*max_der) {i_plato=i; break;}
         }
         Float_t dv = voltages[1]-voltages[0];
         depl_fit1->SetRange(sqrt(i_start*dv),sqrt(i_finish*dv));
-        depl_fit2->SetRange(sqrt(i_plato*dv),sqrt(voltages[numVolt]));
+        depl_fit2->SetRange(sqrt(i_plato*dv),sqrt(voltages[numVolt-1]));
 
         // Plotting the charge
         TGraph *TotalCg=GraphBuilder(numVolt,sq_volt,total_charge,"Sqrt(Voltage) [sqrt(V)]","total charge [.arb]","total charge");
         depl_fit1->SetParameter(0,total_charge[i_start]);
         depl_fit2->SetParameter(0,total_charge[i_plato]);
-        TotalCg->Fit("depl_fit1","RQ");
-        TotalCg->Fit("depl_fit2","RQ+");
+        TotalCg->Fit("depl_fit1","R");
+        TotalCg->Fit("depl_fit2","R+");
 
         char depl[100];
         Float_t depl_volt = (depl_fit2->GetParameter(0)-depl_fit1->GetParameter(0))/(depl_fit1->GetParameter(1)-depl_fit2->GetParameter(1));
@@ -753,12 +766,12 @@ namespace TCT {
             f_start = false;
             f_finish = false;
             for(int i=0;i<numVolt;i++) {
-                if(!f_start && derivative[i]>0.4*max_der) {i_start=i; f_start=true;}
-                if(!f_finish && f_start && derivative[i]<=0.4*max_der) {i_finish=i-1; f_finish=true;}
-                if(f_finish && derivative[i]<=0.4*max_der) {i_plato=i; break;}
+                if(!f_start && derivative[i]>DEPL_THRESHOLD*max_der) {i_start=i; f_start=true;}
+                if(!f_finish && f_start && derivative[i]<=DEPL_THRESHOLD*max_der) {i_finish=i-1; f_finish=true;}
+                if(f_finish && derivative[i]<=DEPL_THRESHOLD*max_der) {i_plato=i; break;}
             }
             depl_fit1->SetRange(sqrt(i_start*dv),sqrt(i_finish*dv));
-            depl_fit2->SetRange(sqrt(i_plato*dv),sqrt(voltages[numVolt]));
+            depl_fit2->SetRange(sqrt(i_plato*dv),sqrt(voltages[numVolt-1]));
 
             // Plotting the charge
             TGraph *TotalCg1=GraphBuilder(numVolt,sq_volt,total_charge_normed,"Sqrt(Voltage) [sqrt(V)]","total charge [.arb]","total charge");
@@ -1208,6 +1221,10 @@ namespace TCT {
                 std::cout<<"\t\t This channel has no data. Please check the settings."<<std::endl;
                 return false;
             }
+        }
+        else {
+            std::cout<<"\t\t No data channel specified! Non-sense!"<<std::endl;
+            return false;
         }
         std::cout<<"\t- Trigger Channel: "<< config->CH_Trig() <<std::endl;
         if(config->CH_Trig()) {

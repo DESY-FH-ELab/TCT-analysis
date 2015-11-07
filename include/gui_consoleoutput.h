@@ -19,9 +19,9 @@ public:
         setCancelButtonText("Abort");
 
         console = new QTextEdit();
-        tbrowser = new QCommandLinkButton("Run TBrowser");
+        tbrowser = new QPushButton("Run TBrowser");
         //tbrowser->setGeometry(10,300,120,31);
-        tbrowser->setMaximumHeight(40);
+        tbrowser->setMaximumHeight(23);
 
         layout1 = new QGridLayout();
         layout1->addWidget(console,0,0,9,4);
@@ -54,7 +54,7 @@ signals:
 
 private:
     QTextEdit *console;
-    QCommandLinkButton *tbrowser;
+    QPushButton *tbrowser;
     QGridLayout *layout1;
 private slots:
     void on_tbrowser_clicked() {

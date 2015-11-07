@@ -50,14 +50,14 @@ private slots:
 
 private:
     Ui::base *ui;
-    std::string _DefConfigName = "def";
-    TCT::tct_config *config_tct = NULL;
-    TCT::analysis *config_analysis = NULL;
-    TCT::sample *config_sample = NULL;
-    TCT::mode_selector *config_mode = NULL;
-    Ui::ConsoleOutput *progress = NULL;
-    Ui::ConsoleOsc *progress_osc = NULL;
-    QProcess *browserProcess = NULL;
+    std::string _DefConfigName;
+    TCT::tct_config *config_tct;
+    TCT::analysis *config_analysis;
+    TCT::sample *config_sample;
+    TCT::mode_selector *config_mode;
+    Ui::ConsoleOutput *progress;
+    Ui::ConsoleOsc *progress_osc;
+    QProcess *browserProcess;
     void read_config(const char*);
     void fill_config();
     void tovariables_config();

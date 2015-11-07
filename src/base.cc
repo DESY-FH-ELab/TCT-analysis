@@ -33,6 +33,15 @@ base::base(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    _DefConfigName = "def";
+    config_tct = NULL;
+    config_analysis = NULL;
+    config_sample = NULL;
+    config_mode = NULL;
+    progress = NULL;
+    progress_osc = NULL;
+    browserProcess = NULL;
+
     //on_comboBox_activated(0);
     ui->buttonGroup_mode->setId(ui->mode_top,0);
     ui->buttonGroup_mode->setId(ui->mode_edge,1);
@@ -81,6 +90,7 @@ base::base(QWidget *parent) :
 
 base::~base()
 {
+    if(browserProcess != NULL && browserProcess->isOpen()) browserProcess->kill();
     if(config_mode) delete config_mode;
     if(config_tct) delete config_tct;
     if(config_analysis) delete config_analysis;
@@ -91,11 +101,11 @@ base::~base()
 void base::on_buttonGroup_mode_buttonClicked(int index)
 {
     ui->group_0->setVisible(!(bool)abs(index-0));
-    ui->group_0->setGeometry(300,230,360,300);
+    ui->group_0->setGeometry(300,230,360,230);
     ui->group_1->setVisible(!(bool)abs(index-1));
-    ui->group_1->setGeometry(300,230,360,300);
+    ui->group_1->setGeometry(300,230,360,230);
     ui->group_2->setVisible(!(bool)abs(index-2));
-    ui->group_2->setGeometry(300,230,360,300);
+    ui->group_2->setGeometry(300,230,360,230);
 }
 void base::read_config(const char *config_file) {
 
@@ -174,6 +184,7 @@ void base::fill_config() {
     ui->edge_focus->setChecked(config_tct->DO_focus());
     ui->edge_depl->setChecked(config_tct->DO_EdgeDepletion());
     ui->edge_profiles->setChecked(config_tct->DO_EdgeVelocity());
+    ui->ev_time->setValue(config_tct->EV_Time());
 
     // oscilloscope config
 
@@ -250,6 +261,7 @@ void base::tovariables_config() {
     config_tct->SetDO_focus(ui->edge_focus->isChecked());
     config_tct->SetDO_EdgeDepletion(ui->edge_depl->isChecked());
     config_tct->SetDO_EdgeVelocity(ui->edge_profiles->isChecked());
+    config_tct->SetEV_Time(ui->ev_time->value());
 
     // oscilloscope part
 
@@ -424,7 +436,7 @@ void base::start_tct() {
         }
     }
     progress->setValue(names.length()*nOps);
-    //progress->finished(names.length());
+    progress->finished(names.length()*nOps);
     print_run(false);
     delete debug;
     connect(progress,SIGNAL(canceled()),this,SLOT(deleteprogress()));
@@ -562,7 +574,7 @@ void base::on_actionSave_config_triggered()
 
     QString cpart = "";
     cpart = QFileDialog::getSaveFileName(this,
-                                              tr("Save Config File"), tr("."));
+                                              tr("Save Config File"), "../testanalysis", tr("Text Files (*.txt)"));
     if(cpart=="") return;
 
     std::ofstream conf_file(cpart.toStdString().c_str(),std::fstream::trunc);

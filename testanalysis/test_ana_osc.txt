@@ -4,7 +4,7 @@
 
 [General]
 ProjectFolder	=	./
-DataFolder	=	/home/maren/TCT-analysis/testdata/S57
+DataFolder	=	../testdata/S57
 Outfolder	=	../results/
 
 #Set acq mode.
@@ -27,7 +27,7 @@ AddNoise	=	0
 AddJitter	=	0
 SaveToFile	=	1
 SaveSingles	=	1
-PrintEvent	=	4294967295
+PrintEvent	=	-1
 LeCroyRAW	=	0
 
 [Scanning]
@@ -89,4 +89,4 @@ ResponcePhotoDetector	=	0.7
 EnergyPair	=	3.61
 
 [Sensor]
-SampleCard	=	/home/maren/TCT-analysis/testsensor/SC_S57.txt
+SampleCard	=	../testsensor/SC_S57.txt

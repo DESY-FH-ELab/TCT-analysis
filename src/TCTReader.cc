@@ -11,8 +11,9 @@
 
 //ClassImp(TCTReader);
 
-TCTReader::TCTReader(char *FileName, Float_t time0, Int_t Bin)
+TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
 {
+    FileName = FileNameInp;
     ////////////////////////////////////////////////////////////////////////////
     // Class for manipulation of the 3D/Position Sensitive TCT Measurements
     //
@@ -33,6 +34,11 @@ TCTReader::TCTReader(char *FileName, Float_t time0, Int_t Bin)
     // strcpy(wf.prefix,"Y=");
     // //Draw waveforms and substract the 0 waveform from the rest (cancel oscilations
     // wf.DrawMulti(-1,40,1,40,4,0,0);
+
+    histo1 = NULL;
+    histo2 = NULL;
+    histo3 = NULL;
+    histo4 = NULL;
 
     Int_t i,j,Cs,Us,Ss,ofs=0;
     Char_t filef[5];

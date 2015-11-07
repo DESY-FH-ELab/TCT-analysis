@@ -49,10 +49,10 @@ class TCTReader
 
         FILE *in;
         TArrayI 	 Date;		//Date of the Measurement (or simulation)
-        TClonesArray   *histo1 = NULL;        //->
-        TClonesArray   *histo2 = NULL;        //->
-        TClonesArray   *histo3 = NULL;        //->
-        TClonesArray   *histo4 = NULL;        //->
+        TClonesArray   *histo1;        //->
+        TClonesArray   *histo2;        //->
+        TClonesArray   *histo3;        //->
+        TClonesArray   *histo4;        //->
         Float_t *xyz[8];             // x coordinates coresponing to histo array
         TArrayF ta;                  // ta coordinates coresponing to histo array
         Int_t abstime;
@@ -73,6 +73,7 @@ class TCTReader
         Char_t *User;                 // user taking the measurements
         Char_t *Sample;               // Sample name
         Char_t *Comment;              // Comment
+        Char_t *FileName;             // The name of the input file
 
         TCTReader(Char_t *, Float_t=0,Int_t=0);
         ~TCTReader();
