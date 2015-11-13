@@ -22,6 +22,7 @@ public:
         tbrowser = new QPushButton("Run TBrowser");
         //tbrowser->setGeometry(10,300,120,31);
         tbrowser->setMaximumHeight(23);
+        tbrowser->setEnabled(false);
 
         layout1 = new QGridLayout();
         layout1->addWidget(console,0,0,9,4);
@@ -48,6 +49,7 @@ public:
         delete layout1;
     }
     QTextEdit* Console() {return console;}
+    void finished1(int result) {finished(result);}
 
 signals:
     void OpenTBrowser();
@@ -62,6 +64,7 @@ private slots:
         this->reject();
     }
     void rename() {
+        tbrowser->setEnabled(true);
         setCancelButtonText("Close");
     }
 

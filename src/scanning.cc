@@ -742,8 +742,8 @@ namespace TCT {
         TGraph *TotalCg=GraphBuilder(numVolt,sq_volt,total_charge,"Sqrt(Voltage) [sqrt(V)]","total charge [.arb]","total charge");
         depl_fit1->SetParameter(0,total_charge[i_start]);
         depl_fit2->SetParameter(0,total_charge[i_plato]);
-        TotalCg->Fit("depl_fit1","R");
-        TotalCg->Fit("depl_fit2","R+");
+        TotalCg->Fit("depl_fit1","RQ");
+        TotalCg->Fit("depl_fit2","RQ+");
 
         char depl[100];
         Float_t depl_volt = (depl_fit2->GetParameter(0)-depl_fit1->GetParameter(0))/(depl_fit1->GetParameter(1)-depl_fit2->GetParameter(1));

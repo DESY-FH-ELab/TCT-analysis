@@ -63,7 +63,7 @@ TimeDiodeHigh         =       51
 #Save charge, normed charge and photodiode charge for each Z, voltage
 SaveSeparateCharges	=	1
 #Save waveforms for each position and voltage
-SaveSeparateWaveforms   =       1
+SaveSeparateWaveforms   =       0
 #!!!
 #search for depletion voltage
 EdgeDepletionVoltage    =   1

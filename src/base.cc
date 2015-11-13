@@ -436,7 +436,7 @@ void base::start_tct() {
         }
     }
     progress->setValue(names.length()*nOps);
-    progress->finished(names.length()*nOps);
+    progress->finished1(names.length()*nOps);
     print_run(false);
     delete debug;
     connect(progress,SIGNAL(canceled()),this,SLOT(deleteprogress()));

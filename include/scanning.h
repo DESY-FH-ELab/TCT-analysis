@@ -18,9 +18,9 @@
 //#include "TCTScan.h"
 #include "tct_config.h"
 
-//#ifdef USE_GUI
+#ifdef USE_GUI
 #include "gui_consoleoutput.h"
-//#endif
+#endif
 
 class TCTReader;
 
