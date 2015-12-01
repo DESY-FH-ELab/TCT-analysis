@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the analysis class.
+ * \brief Definition of the TCT::analysis class.
  */
 
 #ifndef __ANALYSIS_H__

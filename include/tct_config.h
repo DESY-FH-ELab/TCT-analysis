@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Definition of the TCT::tct_config class.
+ * \details Responsible for configuration of the TCT analysis.
+ */
 // Standard includes
 #include <iostream>
 #include <vector>

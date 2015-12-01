@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of util methods
+ * \brief Implementation of TCT::util methods
  */
 
 //  includes from standard libraries

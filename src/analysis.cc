@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of analysis methods
+ * \brief Implementation of TCT:analysis methods
  */
 
 // STD includes

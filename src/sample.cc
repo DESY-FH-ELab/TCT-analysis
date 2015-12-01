@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of sample methods
+ * \brief Implementation of TCT::sample methods
  */
 
 //  STD includes

@@ -1,4 +1,9 @@
-﻿#include "base.h"
+﻿/**
+ * \file
+ * \brief Implementation of Ui::base methods.
+ */
+
+#include "base.h"
 #include <fstream>
 
 //Qt includes

@@ -1,6 +1,8 @@
-//################
-//# qdebugstream.h  #
-//################
+/**
+ * \file
+ * \brief Definition of the QDebugStream class.
+ * \details Responsible for output redirect to the log file and console.
+ */
 
 #ifndef Q_DEBUG_STREAM_H
 #define Q_DEBUG_STREAM_H

@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the sample class.
+ * \brief Definition of the TCT::acquisition_base class.
  */
 
 #ifndef __ACQUISITION_H__

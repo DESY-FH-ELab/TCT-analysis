@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Main file for GUI application
+ */
+
 #include "base.h"
 #include <QApplication>
 

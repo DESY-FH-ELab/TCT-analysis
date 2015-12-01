@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of daq reading methods
+ * \brief Implementation of TCT::Scanning methods.
  */
 
 // STD includes
@@ -30,11 +30,18 @@
 #include "TCTReader.h"
 
 namespace TCT {
+/// Analysis manager
 #ifndef USE_GUI
         bool Scanning::ReadTCT(char* filename, tct_config* config1) {
 #else
+/// Analysis manager
         bool Scanning::ReadTCT(char* filename, tct_config* config1, Ui::ConsoleOutput *progress) {
 #endif
+            /** Opens TCT data file, checks it, creates root file, runs analysis according to the config file.
+             *  \param[in] filename Name of the TCT data file
+             *  \param[in] config1 Pointer to the TCT::tct_config class
+             *  \param[in] progress Pointer to the progress bar
+              */
         config = config1;
 
         // -3 is the time shift, you can shift a signal to start at t=0. FIXME
@@ -144,7 +151,7 @@ namespace TCT {
 
         return true;
     }
-
+/// Top-TCT Focusing Method
     bool Scanning::DoTopFocus() {
 
         if(!CheckFocus()) {std::cout<<"No data for focusing. Skipping..."<<std::endl; return false;}
@@ -391,6 +398,7 @@ namespace TCT {
         return true;
     }
 
+/// Edge-TCT Focusing Method
     bool Scanning::DoEdgeFocus() {
 
         if(!CheckFocus()) {std::cout<<"No data for focusing. Skipping..."<<std::endl; return false;}
@@ -599,6 +607,7 @@ namespace TCT {
         return true;
     }
 
+/// Edge-TCT Depletion Voltage Calculation Method
     bool Scanning::DoEdgeDepletion() {
 
         if(!CheckEdgeDepletion()) {std::cout<<"No data for depletion voltage search. Skipping..."<<std::endl; return false;}
@@ -801,6 +810,7 @@ namespace TCT {
         return true;
     }
 
+/// Edge-TCT Velocity and Electric Field Profiles Method
     bool Scanning::DoEdgeVelocity() {
 
         if(!CheckEdgeVelocity()) {std::cout<<"No data for velocity profile. Skipping..."<<std::endl; return false;}
@@ -1072,8 +1082,9 @@ namespace TCT {
 
     }
 
-    // this is independent of the sensor (and hence position), as it only uses the photo diode
+/// Laser charge with time
     bool Scanning::LaserPowerDrop() {
+        /// This method is independent of the sensor (and hence position), as it only uses the photo diode
         f_rootfile->cd();
 
         Double_t dt;
@@ -1126,9 +1137,9 @@ namespace TCT {
         return true;
     }
 
-    // this is independent of the sensor (and hence position), as it only uses the photo diode
+/// Laser Charge spread
     bool Scanning::BeamSigma() {
-
+        /// this is independent of the sensor (and hence position), as it only uses the photo diode
         Double_t dt = config->Movements_dt();
         f_rootfile->cd();
         Int_t photo_channel = config->CH_PhDiode();
@@ -1210,7 +1221,7 @@ namespace TCT {
 
         return true;
     }
-
+/// Checks channels configuration
     bool Scanning::CheckData() {
 
         std::cout<<"Checking Channels set:"<<std::endl;
@@ -1246,7 +1257,7 @@ namespace TCT {
         std::cout<<"Channel test passed. Processing..."<<std::endl;
         return true;
     }
-
+/// Check before Focusing
     bool Scanning::CheckFocus() {
 
         std::cout<<"\t- DO Find Focus: "<< config->DO_focus() <<std::endl;
@@ -1279,7 +1290,7 @@ namespace TCT {
         std::cout<<"FocusSearch Data Test Passed. Processing..."<<std::endl;
         return true;
     }
-
+/// Check before depletion voltage search
     bool Scanning::CheckEdgeDepletion() {
 
         std::cout<<"\t- DO Edge Depletion: "<< config->DO_EdgeDepletion() <<std::endl;
@@ -1311,7 +1322,7 @@ namespace TCT {
         std::cout<<"EdgeDepletionVoltage Data Test Passed. Processing..."<<std::endl;
         return true;
     }
-
+/// Check before profiles building
     bool Scanning::CheckEdgeVelocity() {
 
         std::cout<<"\t- DO Edge Velocity profile: "<< config->DO_EdgeDepletion() <<std::endl;
@@ -1340,7 +1351,7 @@ namespace TCT {
         return true;
     }
 
-    // to set number of scanning points, step and x0 for each axis.
+    /// To set number of scanning points, step and x0 for each axis.
     void Scanning::SwitchAxis(Int_t sw, Int_t& nPoints, Float_t& step, Float_t& p0) {
         switch(sw)
           {
@@ -1350,6 +1361,7 @@ namespace TCT {
           }
     }
 
+    /// Calculate Charges for given Waveforms
     void Scanning::CalculateCharges(Int_t Channel, Int_t Ax, Int_t numAx, Int_t scanning, Int_t numS, TGraph **charges, Float_t tstart, Float_t tfinish) {
         TCTWaveform **wf = new TCTWaveform*[numAx];
         for(int j=0;j<numAx;j++)
@@ -1371,6 +1383,7 @@ namespace TCT {
         delete wf;
     }
 
+    /// Calculate Normed Charges
     TGraph** Scanning::NormedCharge(TGraph** sensor, TGraph** photodiode, Int_t numP) {
 
         TGraph** normed_charge = new TGraph*[numP];
@@ -1407,6 +1420,7 @@ namespace TCT {
 
     }
 
+    /// Correlation between sensor and photo-diode charge
     void Scanning::ChargeCorrelationHist(TGraph** sensor, TGraph** photodetector, Int_t numO) {
 
         Double_t *temp_phdiode;
@@ -1445,7 +1459,7 @@ namespace TCT {
     }
 
 
-    // find position of two edge for a fixed voltage (at least fully depleted) and for one optical distance
+    /// Find position of two edge for a fixed voltage (at least fully depleted) and for one optical distance
     void Scanning::FindEdges(TGraph* gr, Int_t numS, Float_t dx, Double_t& left_edge, Double_t& right_edge) {
 
         TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])-[3]",0,dx*numS);
@@ -1498,7 +1512,7 @@ namespace TCT {
 
     }
 
-    // find position of two edge for a fixed voltage (at least fully depleted) and for all optical distances
+    /// Find position of two edge for a fixed voltage (at least fully depleted) and for all optical distances
     void Scanning::FindEdges(TGraph** gr, Int_t numP, Int_t numS, Float_t dx, Float_t* left_pos, Float_t* left_width, Float_t* right_pos, Float_t* right_width) {
 
         TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])-[3]",0,dx*numS);
@@ -1561,6 +1575,7 @@ namespace TCT {
 
     }
 
+    /// Build graph and return pointer
     TGraph* Scanning::GraphBuilder(Int_t N, Float_t* x, Float_t* y,const char* namex,const char* namey, const char* title) {
         TGraph *temp=new TGraph(N,x,y);
         temp->SetMarkerStyle(21);
@@ -1571,6 +1586,7 @@ namespace TCT {
         return temp;
     }
 
+    /// Build graph, write to file, and clean memory
     void Scanning::GraphBuilder(Int_t N, Float_t* x, Float_t* y,const char* namex,const char* namey, const char* title, const char* write_name) {
         TGraph *temp=new TGraph(N,x,y);
         temp->SetMarkerStyle(21);
@@ -1583,6 +1599,7 @@ namespace TCT {
         //return temp;
     }
 
+    /// Build graph and return pointer
     TGraph* Scanning::GraphBuilder(Int_t N, Double_t* x, Double_t* y,const char* namex,const char* namey, const char* title) {
         TGraph *temp=new TGraph(N,x,y);
         temp->SetMarkerStyle(21);
@@ -1593,6 +1610,7 @@ namespace TCT {
         return temp;
     }
 
+    /// Build graph, write to file, and clean memory
     void Scanning::GraphBuilder(Int_t N, Double_t* x, Double_t* y,const char* namex,const char* namey, const char* title, const char* write_name) {
         TGraph *temp=new TGraph(N,x,y);
         temp->SetMarkerStyle(21);
@@ -1605,6 +1623,7 @@ namespace TCT {
         //return temp;
     }
 
+    /// Write separate waveforms to the file
     void Scanning::GraphSeparate(Int_t N, TGraph **gr, const char *dir_name, const char *namex, const char *namey, const char *title, const char *name_0, Double_t *name_1) {
 
         TDirectory* main = TDirectory::CurrentDirectory();
@@ -1628,6 +1647,7 @@ namespace TCT {
 
     }
 
+    /// Write separate waveforms to the file
     void Scanning::GraphSeparate(Int_t N, TGraph **gr, const char *dir_name, const char *namex, const char *namey, const char *title, const char *name_0, Float_t *name_1) {
 
         TDirectory* main = TDirectory::CurrentDirectory();
@@ -1651,6 +1671,7 @@ namespace TCT {
 
     }
 
+    /// Write multigraph to the file
     void Scanning::MultiGraphWriter(Int_t N, TGraph **gr, const char *namex, const char *namey, const char *title, const char *write_name) {
 
         //TCanvas *canva = new TCanvas(write_name,title,640,480);
@@ -1678,6 +1699,7 @@ namespace TCT {
 
     }
 
+    /// Brief setting of the fit parameters.
     void Scanning::SetFitParameters(TF1* ff,Double_t p0,Double_t p1,Double_t p2,Double_t p3) {
         ff->SetParameter(0,p0);
         ff->SetParameter(1,p1);
@@ -1685,6 +1707,7 @@ namespace TCT {
         ff->SetParameter(3,p3);
     }
 
+    /// Integrate graph in the interval.
     Double_t Scanning::GraphIntegral(TGraph *gr, Double_t x1, Double_t x2) {
         Int_t Nall = gr->GetN();
         Double_t *x = gr->GetX();
@@ -1705,17 +1728,27 @@ namespace TCT {
         return sum;
     }
 
+    /// Mobility with energy
     Double_t Scanning::Mu(Double_t E, Int_t Type) {
+
+        /** \param[in] E Energy
+         *  \param[in] type Charge carrier type. 1 - hole, 0 - electron.
+          */
 
         if(Type==1) return config->mu0_holes()/(1.+config->mu0_holes()*E/config->v_sat());
         if(Type==0) return config->mu0_els()/sqrt(1.+config->mu0_els()*E/config->v_sat()*config->mu0_els()*E/config->v_sat());
 
     }
 
+    /// Function used in the bisection method
     Double_t Scanning::ff(Double_t E, Double_t Uuu, Double_t a) {
+        /**   Based on formula \f$U = A*(\mu_{els}+\mu_{holes})*E\f$.
+         *    Where U - measured charge, E - electric field.
+          */
         return Uuu-a*(Mu(E,1)+Mu(E,0))*E;
     }
 
+    /// Implements bisection method for solving the equation
     Double_t Scanning::BiSectionMethod(Double_t eps, Double_t x1, Double_t x2, Double_t Uuu, Double_t a) {
         if(ff(x1,Uuu,a)==0) return x1;
         if(ff(x2,Uuu,a)==0) return x2;
@@ -1731,9 +1764,12 @@ namespace TCT {
         return xi;
     }
 
+    /// Sgn implementation
     template <typename T> int Scanning::sgn(T val) {
         return (T(0) < val) - (val < T(0));
     }
+
+    /// Quick abs implementation
     Double_t Scanning::abs(Double_t x) {
         if(x<0) return -x;
         return x;

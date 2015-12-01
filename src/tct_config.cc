@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Implementation of TCT::tct_config methods
+ */
+
 // STD includes
 #include<string>
 

@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Implementation of Ui::Sample methods
+ */
+
 #include "gui_sample.h"
 #include "ui_form_sample.h"
 #include "QFileDialog"

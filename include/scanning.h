@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the sample class.
+ * \brief Definition of the TCT::Scanning class.
  */
 
 #ifndef __SCANNING_H__
@@ -56,7 +56,6 @@ namespace TCT {
         bool DoEdgeVelocity();
         bool LaserPowerDrop();
         bool BeamSigma();
-        bool SimulateDoFocus();
         bool CheckData();
         bool CheckFocus();
         bool CheckEdgeDepletion();

@@ -1,3 +1,9 @@
+/**
+ * \file
+ * \brief Definition of the Ui::Sample class.
+ * \details Responsible for Sample file changing.
+ */
+
 #ifndef GUI_SAMPLE_H
 #define GUI_SAMPLE_H
 

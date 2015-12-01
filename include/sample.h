@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the sample class.
+ * \brief Definition of the TCT::sample class.
  */
 
 #ifndef __SAMPLE_H__

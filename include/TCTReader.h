@@ -1,5 +1,7 @@
-/*
- * The code below was originally written by © Particulars d.o.o. and was called TCTAnalyse.
+/**
+ * \file
+ * \brief Definition of the TCTReader and TCTWaveform classes. © Particulars d.o.o.
+ * \details The code below was originally written by © Particulars d.o.o. and was called TCTAnalyse.
  * If needed one can download the original version from particulars.si.
  *
  */

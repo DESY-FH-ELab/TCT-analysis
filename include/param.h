@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the parameter class.
+ * \brief Definition of the TCT::param class.
  */
 
 #ifndef __PARAM_H__

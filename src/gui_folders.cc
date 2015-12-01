@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Implementation of Ui::Folders methods.
+ */
+
 #include "gui_folders.h"
 #include "ui_form_folders.h"
 #include "base.h"

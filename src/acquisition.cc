@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of acquisition methods
+ * \brief Implementation of TCT::acquisition_base methods
  */
 
 // STD includes

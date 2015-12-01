@@ -1,3 +1,8 @@
+/**
+ * \file
+ * \brief Definition of the Ui::ConsoleOutput and Ui::ConsoleOsc classes. Responsible for progress bars in GUI.
+ */
+
 #ifndef GUI_CONSOLEOUTPUT_H
 #define GUI_CONSOLEOUTPUT_H
 

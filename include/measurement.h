@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the measurement class.
+ * \brief Definition of the TCT::measurement class.
  */
 
 #ifndef __MEASUREMENT_H__

@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the util class.
+ * \brief Definition of the TCT::util class.
  */
 
 #ifndef __UTIL_H__

@@ -1,3 +1,9 @@
+/**
+ * \file
+ * \brief Definition of the Ui::Folders class.
+ * \details Responsible for Folders dialog.
+ */
+
 #ifndef FOLDERS_H
 #define FOLDERS_H
 

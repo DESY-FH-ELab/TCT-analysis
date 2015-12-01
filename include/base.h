@@ -1,3 +1,9 @@
+/**
+ * \file
+ * \brief Definition of the Ui::base class.
+ * \details This class is the Main GUI File.
+ */
+
 #ifndef BASE_H
 #define BASE_H
 
