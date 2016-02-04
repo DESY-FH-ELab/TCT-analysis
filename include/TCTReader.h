@@ -55,7 +55,7 @@ class TCTReader
         TClonesArray   *histo2;        //->
         TClonesArray   *histo3;        //->
         TClonesArray   *histo4;        //->
-        Float_t *xyz[8];             // x coordinates coresponing to histo array
+        Float_t *xyz[9];             // x coordinates coresponing to histo array
         TArrayF ta;                  // ta coordinates coresponing to histo array
         Int_t abstime;
         Int_t Nx,Ny,Nz;

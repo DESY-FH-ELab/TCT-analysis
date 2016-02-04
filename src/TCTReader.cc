@@ -44,7 +44,7 @@ TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
 
     Int_t i,j,Cs,Us,Ss,ofs=0;
     Char_t filef[5];
-    float header[100];
+    float header[200];
     for(i=0;i<4;i++) WFOnOff[i]=0;
     Date=TArrayI(6);
     User=NULL;
@@ -59,7 +59,7 @@ TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
     if(!Bin)  // read ASCII file
     {
         fscanf(in,"%d",&type); // check the file type
-        if(!(type==11 || type==22 || type==33 ))  // if it is something else exit
+        if(!(type==11 || type==22 || type==33 || type==51))  // if it is something else exit
         {
             printf("Can not read other formats than waveform: %d!\n",type);
         }
@@ -72,7 +72,7 @@ TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
             fscanf(in,"%f %f %d\n",&z0,&dz,&Nz);
 
             if(type==22) fscanf(in,"%d %d %d\n",&WFOnOff[0],&WFOnOff[1],&WFOnOff[2]); //Read in the wafeform off on
-            if(type==33) fscanf(in,"%d %d %d %d\n",&WFOnOff[0],&WFOnOff[1],&WFOnOff[2],&WFOnOff[3]); //Read in the wafeform off on
+            if(type==33 || type==51) fscanf(in,"%d %d %d %d\n",&WFOnOff[0],&WFOnOff[1],&WFOnOff[2],&WFOnOff[3]); //Read in the wafeform off on
 
             fscanf(in,"%d",&NU1); U1=TArrayF(NU1);
             for(i=0;i<NU1;i++) fscanf(in,"%f",&U1[i]); // printf("%d %d %f\n",NU1,i,U1[i]);}
@@ -109,7 +109,7 @@ TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
 
         //read in the buffer
         rewind(in);
-        read=fread((void *)header,sizeof(float),100,in);
+        read=fread((void *)header,sizeof(float),200,in);
 
         //     for(int ii=0;ii<50;ii++) printf("%d %f\n",ii,header[ii]);
         if(BLE_CODE) swooip(header,read);
@@ -124,7 +124,7 @@ TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
         z0=header[14]; dz=header[15]; Nz=(int)header[16];
 
         //adjust the reading of the header
-        if(type==33) ofs=1; else ofs=0;
+        if(type==33 || type==51) ofs=1; else ofs=0;
         //get the on/off channels
         for(i=0;i<3+ofs;i++) WFOnOff[i]=(int)header[17+i];
         //get number of voltage steps for the first power source
@@ -143,6 +143,7 @@ TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
         //////    Header information coded from type=30 on
         switch(type)
         {
+        case 51:
         case 33:
             T=header[25+ofs+NU1+NU2];
             Source=(int)header[26+ofs+NU1+NU2];
@@ -173,7 +174,7 @@ TCTReader::TCTReader(char *FileNameInp, Float_t time0, Int_t Bin)
         I1=TArrayF(NU2*NU1);
         //number of steps
         numxyz=Nx*Ny*Nz;
-        for(i=0;i<8;i++) xyz[i]=new Float_t [numxyz*NU1*NU2];
+        for(i=0;i<9;i++) xyz[i]=new Float_t [numxyz*NU1*NU2];
         //intitialize histograms
         if(WFOnOff[0]) {histo1 =new TClonesArray("TH1F",numxyz*NU1*NU2); histo1->BypassStreamer(kFALSE);}
         if(WFOnOff[1]) {histo2 =new TClonesArray("TH1F",numxyz*NU1*NU2); histo2->BypassStreamer(kFALSE);}
@@ -209,7 +210,7 @@ TCTReader::~TCTReader()
     delete User;
     delete Sample;
     delete Comment;
-    for(int i=0;i<8;i++) delete xyz[i];
+    for(int i=0;i<9;i++) delete xyz[i];
 }
 
 void  TCTReader::ReadWFsBin(Float_t time0)
@@ -226,7 +227,7 @@ void  TCTReader::ReadWFsBin(Float_t time0)
     TClonesArray &entryp3 = *histo3;
     TClonesArray &entryp4 = *histo4;
 
-    Float_t buf[10000];
+    Float_t buf[33000];
 
     for(q=0;q<NU1;q++)
     {
@@ -244,11 +245,18 @@ void  TCTReader::ReadWFsBin(Float_t time0)
 
                 ii=i+numxyz*r+(NU2*numxyz)*q;
 
-                fread((void *)buf,sizeof(Float_t),4,in);  if(BLE_CODE) swooip(buf,4);
+                if(type==33 || type==22) fread((void *)buf,sizeof(Float_t),4,in);
+                if(type==51) fread((void *)buf,sizeof(Float_t),5,in);
+                if(BLE_CODE) swooip(buf,5);  // changed from buf,4
                 // printf("%d :: %f %f %f %f\n",ii,buf[0],buf[1],buf[2],buf[3]);
 
-                for(j=0;j<4;j++) xyz[j][ii]=buf[j];
+                /*for(j=0;j<4;j++) xyz[j][ii]=buf[j];
                 xyz[7][ii]=xyz[3][ii];
+                xyz[3][ii]=tU1; xyz[4][ii]=tU2;
+                xyz[5][ii]=tI1; xyz[6][ii]=tI2;*/
+                for(j=0;j<3;j++) xyz[j][ii]=buf[j];
+                xyz[7][ii]=buf[3];
+                if(type==51) xyz[8][ii]=buf[4];
                 xyz[3][ii]=tU1; xyz[4][ii]=tU2;
                 xyz[5][ii]=tI1; xyz[6][ii]=tI2;
 
