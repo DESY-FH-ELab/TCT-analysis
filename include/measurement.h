@@ -50,8 +50,8 @@ namespace TCT {
 	}
 
       // Default copy constructer should be fine
-      measurement(const measurement &)               = default;
-      measurement & operator = (const measurement &) = default;
+      measurement(const measurement &)              ;
+      measurement & operator = (const measurement &);
 
       std::string DataInFolder() {return _DataInFolder;}
       void SetDataInFolder(std::string string) { _DataInFolder = string;}

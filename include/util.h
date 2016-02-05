@@ -24,7 +24,7 @@ namespace TCT {
     private :
 
       std::map<std::string, std::string> _id_val;
-      bool _IsRead = false;
+      bool _IsRead;
 
     public:
 

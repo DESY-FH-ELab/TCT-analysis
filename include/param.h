@@ -36,7 +36,7 @@ namespace TCT {
 			// no copy constructor needed
 
 			// Dectructor
-			~param() = default;
+            //~param();
 
 			uint32_t & MaxAcqs(){ return _MaxAcqs;}
 			const uint32_t & MaxAcqs() const { return _MaxAcqs;}

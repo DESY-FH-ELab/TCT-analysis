@@ -18,6 +18,7 @@ namespace TCT {
 
   void util::parse(std::ifstream & cfgfile) {
     std::string id, eq, val;
+    _IsRead = false;
 
     while(cfgfile >> id ){
 

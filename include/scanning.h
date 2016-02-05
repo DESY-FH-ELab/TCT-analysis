@@ -40,11 +40,11 @@ namespace TCT {
         Scanning() {};
 
         // Default copy constructer should be fine
-        Scanning(const Scanning &)               = default;
-        Scanning & operator = (const Scanning &) = default;
+        Scanning(const Scanning &)              ;
+        Scanning & operator = (const Scanning &);
 
         // Destructor
-        ~Scanning() = default;
+        //~Scanning();
 #ifndef USE_GUI
         bool ReadTCT(char* filename, tct_config* config1);
 #else

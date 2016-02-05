@@ -47,11 +47,11 @@ namespace TCT {
       }
 
       // Default copy constructer should be fine
-      sample(const sample &)               = default;
-      sample & operator = (const sample &) = default;
+      sample(const sample &)              ;
+      sample & operator = (const sample &);
 
       // Dectructor
-      ~sample() = default;
+      //~sample();
 
       double Thickness(){ return _Thickness;}
       void SetThickness(float val) {_Thickness = val;}

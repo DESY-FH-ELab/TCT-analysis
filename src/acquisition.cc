@@ -340,7 +340,9 @@ namespace TCT {
     std::cout << " S2n_Cut = " << S2n_Cut << " Width_Cut = " << Width_Cut << " Amplitude_Cut = " << Amplitude_Cut << std::endl;
 #endif
 
-    Float_t s2n[Nsamples()];
+    //FIXME need to be size of Nsamples
+    //Float_t s2n[Nsamples()];
+    Float_t s2n[10000];
     Int_t temp_start[1000];
     Int_t temp_end[1000];
     Float_t temp_sig[1000];
