@@ -45,6 +45,7 @@ private :
     bool _FSeparateWaveforms;
     float _Movements_dt;
     float _EV_Time;
+    float _CorrectBias;
 
     //coefficients
     float _mu0_els;
@@ -71,6 +72,7 @@ public:
         _DO_EdgeVelocity(false),
         _Movements_dt(0),
         _EV_Time(0.3),
+        _CorrectBias(5.0),
         _FFWHM(10.),
         _TCT_Mode(0)
     {
@@ -161,6 +163,10 @@ public:
     float EV_Time() { return _EV_Time;}
     void SetEV_Time(float val) { _EV_Time = val;}
     const float & EV_Time() const { return _EV_Time;}
+
+    float CorrectBias() { return _CorrectBias;}
+    void SetCorrectBias(float val) { _CorrectBias = val;}
+    const float & CorrectBias() const { return _CorrectBias;}
 
     //end scanning section
 

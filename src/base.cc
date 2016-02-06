@@ -181,6 +181,7 @@ void base::fill_config() {
     ui->save_sep_chrges->setChecked(config_tct->FSeparateCharges());
     ui->save_sep_waveforms->setChecked(config_tct->FSeparateWaveforms());
     ui->timebetween->setValue(config_tct->Movements_dt());
+    ui->bias_line->setValue(config_tct->CorrectBias());
 
     ui->buttonGroup_mode->button(config_tct->TCT_Mode())->setChecked(true);
     on_buttonGroup_mode_buttonClicked(config_tct->TCT_Mode());
@@ -260,6 +261,7 @@ void base::tovariables_config() {
     config_tct->SetFSeparateWaveforms(ui->save_sep_waveforms->isChecked());
 
     config_tct->SetMovements_dt(ui->timebetween->value());
+    config_tct->SetCorrectBias(ui->bias_line->value());
 
     config_tct->SetTCT_Mode(ui->buttonGroup_mode->checkedId());
 
@@ -635,6 +637,8 @@ void base::on_actionSave_config_triggered()
     conf_file<<"\nVoltage_Source\t=\t"<<config_tct->VoltSource();
     conf_file<<"\n#Time between stage movements in seconds.";
     conf_file<<"\nMovements_dt\t=\t"<<config_tct->Movements_dt();
+    conf_file<<"\n#Set the integration time in ns to correct the bias line. Program averages the signal in range (0,value) and then shifts the signal by the mean value.";
+    conf_file<<"\nCorrectBias\t=\t"<<config_tct->CorrectBias();
 
     conf_file<<"\n#Perform next operations. Analysis will start only if all needed data is present:";
     conf_file<<"\n# 0-top,1-edge,2-bottom";

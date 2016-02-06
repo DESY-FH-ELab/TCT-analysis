@@ -51,7 +51,7 @@ namespace TCT {
         // Float_t xc ; time denoting the start of the pulse
         //              correction factor is calculated from all the bins before xc
         // it integrates from first bin to bin with t=10, and then shifts by the mean value
-        stct->CorrectBaseLine(5.);
+        stct->CorrectBaseLine(config->CorrectBias());
 
         // CheckData: check if channels are set in config file 
         if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; delete stct; return false;}

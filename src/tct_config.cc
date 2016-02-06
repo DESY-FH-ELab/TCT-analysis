@@ -37,6 +37,7 @@ void tct_config::SetParameters(std::map<std::string, std::string> id_val){
         if(i.first == "EdgeDepletionVoltage")		_DO_EdgeDepletion = static_cast<bool>(atoi((i.second).c_str()));
         if(i.first == "EdgeVelocityProfile")		_DO_EdgeVelocity = static_cast<bool>(atoi((i.second).c_str()));
         if(i.first == "EV_Time")          _EV_Time = atof((i.second).c_str());
+        if(i.first == "CorrectBias")          _CorrectBias = atof((i.second).c_str());
 
         //coefficients, constants, parameters
         if(i.first == "Mu0_Electrons")                _mu0_els = atof((i.second).c_str());
