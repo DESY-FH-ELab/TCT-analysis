@@ -34,6 +34,7 @@ void tct_config::SetParameters(std::map<std::string, std::string> id_val){
         if(i.first == "Movements_dt")     _Movements_dt = atof((i.second).c_str());
         if(i.first == "TCT_Mode")         _TCT_Mode = atoi((i.second).c_str());
         if(i.first == "Voltage_Source")   _VoltSource = atoi((i.second).c_str());
+        if(i.first == "TopDepletionVoltage")		_DO_TopDepletion = static_cast<bool>(atoi((i.second).c_str()));
         if(i.first == "EdgeDepletionVoltage")		_DO_EdgeDepletion = static_cast<bool>(atoi((i.second).c_str()));
         if(i.first == "EdgeVelocityProfile")		_DO_EdgeVelocity = static_cast<bool>(atoi((i.second).c_str()));
         if(i.first == "EV_Time")          _EV_Time = atof((i.second).c_str());

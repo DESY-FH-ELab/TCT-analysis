@@ -187,6 +187,7 @@ void base::fill_config() {
     on_buttonGroup_mode_buttonClicked(config_tct->TCT_Mode());
 
     ui->top_focus->setChecked(config_tct->DO_focus());
+    ui->top_depl->setChecked(config_tct->DO_TopDepletion());
     ui->edge_focus->setChecked(config_tct->DO_focus());
     ui->edge_depl->setChecked(config_tct->DO_EdgeDepletion());
     ui->edge_profiles->setChecked(config_tct->DO_EdgeVelocity());
@@ -266,6 +267,7 @@ void base::tovariables_config() {
     config_tct->SetTCT_Mode(ui->buttonGroup_mode->checkedId());
 
     config_tct->SetDO_focus(ui->edge_focus->isChecked());
+    config_tct->SetDO_TopDepletion(ui->top_depl->isChecked());
     config_tct->SetDO_EdgeDepletion(ui->edge_depl->isChecked());
     config_tct->SetDO_EdgeVelocity(ui->edge_profiles->isChecked());
     config_tct->SetEV_Time(ui->ev_time->value());
@@ -418,6 +420,7 @@ void base::start_tct() {
     int nOps = 0;
     if(config_tct->FSeparateWaveforms()) nOps++;
     if(config_tct->DO_focus()) nOps++;
+    if(config_tct->DO_TopDepletion()) nOps++;
     if(config_tct->DO_EdgeDepletion()) nOps++;
     if(config_tct->DO_EdgeVelocity()) nOps++;
 
@@ -647,6 +650,7 @@ void base::on_actionSave_config_triggered()
 
     conf_file<<"\nFocus_Search\t=\t"<<config_tct->DO_focus();
     conf_file<<"\n#search for depletion voltage";
+    conf_file<<"\nTopDepletionVoltage\t=\t"<<config_tct->DO_TopDepletion();
     conf_file<<"\nEdgeDepletionVoltage\t=\t"<<config_tct->DO_EdgeDepletion();
     conf_file<<"\n#extracting the velocity and electric field profiles";
     conf_file<<"\nEdgeVelocityProfile\t=\t"<<config_tct->DO_EdgeVelocity();

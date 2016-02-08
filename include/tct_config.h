@@ -33,6 +33,7 @@ private :
     uint32_t _OptAxis;
     uint32_t _VoltSource;
     bool _DO_focus;
+    bool _DO_TopDepletion;
     bool _DO_EdgeDepletion;
     bool _DO_EdgeVelocity;
     uint32_t _ScAxis;
@@ -115,6 +116,10 @@ public:
     bool DO_focus() { return _DO_focus;}
     void SetDO_focus(bool val) { _DO_focus = val;}
     const bool & DO_focus() const { return _DO_focus;}
+
+    bool DO_TopDepletion() { return _DO_TopDepletion;}
+    void SetDO_TopDepletion(bool val) { _DO_TopDepletion = val;}
+    const bool & DO_TopDepletion() const { return _DO_TopDepletion;}
 
     bool DO_EdgeDepletion() { return _DO_EdgeDepletion;}
     void SetDO_EdgeDepletion(bool val) { _DO_EdgeDepletion = val;}

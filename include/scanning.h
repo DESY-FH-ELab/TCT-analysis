@@ -51,6 +51,7 @@ namespace TCT {
         bool ReadTCT(char* filename, tct_config* config1, Ui::ConsoleOutput *progress);
 #endif
         bool DoTopFocus();
+        bool DoTopDepletion();
         bool DoEdgeFocus();
         bool DoEdgeDepletion();
         bool DoEdgeVelocity();
@@ -58,6 +59,7 @@ namespace TCT {
         bool BeamSigma();
         bool CheckData();
         bool CheckFocus();
+        bool CheckTopDepletion();
         bool CheckEdgeDepletion();
         bool CheckEdgeVelocity();
         void SwitchAxis(Int_t sw, Int_t& nPoints, Float_t& step, Float_t& p0);
