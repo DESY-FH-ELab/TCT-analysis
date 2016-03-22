@@ -52,6 +52,7 @@ namespace TCT {
 #endif
         bool DoTopFocus();
         bool DoTopDepletion();
+        bool DoTopMobility();
         bool DoEdgeFocus();
         bool DoEdgeDepletion();
         bool DoEdgeVelocity();
@@ -60,6 +61,7 @@ namespace TCT {
         bool CheckData();
         bool CheckFocus();
         bool CheckTopDepletion();
+        bool CheckTopMobility();
         bool CheckEdgeDepletion();
         bool CheckEdgeVelocity();
         void SwitchAxis(Int_t sw, Int_t& nPoints, Float_t& step, Float_t& p0);

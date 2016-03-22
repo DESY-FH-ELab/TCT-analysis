@@ -188,6 +188,7 @@ void base::fill_config() {
 
     ui->top_focus->setChecked(config_tct->DO_focus());
     ui->top_depl->setChecked(config_tct->DO_TopDepletion());
+    ui->top_mobility->setChecked(config_tct->DO_TopMobility());
     ui->edge_focus->setChecked(config_tct->DO_focus());
     ui->edge_depl->setChecked(config_tct->DO_EdgeDepletion());
     ui->edge_profiles->setChecked(config_tct->DO_EdgeVelocity());
@@ -268,6 +269,7 @@ void base::tovariables_config() {
 
     config_tct->SetDO_focus(ui->edge_focus->isChecked());
     config_tct->SetDO_TopDepletion(ui->top_depl->isChecked());
+    config_tct->SetDO_TopMobility(ui->top_mobility->isChecked());
     config_tct->SetDO_EdgeDepletion(ui->edge_depl->isChecked());
     config_tct->SetDO_EdgeVelocity(ui->edge_profiles->isChecked());
     config_tct->SetEV_Time(ui->ev_time->value());
@@ -421,6 +423,7 @@ void base::start_tct() {
     if(config_tct->FSeparateWaveforms()) nOps++;
     if(config_tct->DO_focus()) nOps++;
     if(config_tct->DO_TopDepletion()) nOps++;
+    if(config_tct->DO_TopMobility()) nOps++;
     if(config_tct->DO_EdgeDepletion()) nOps++;
     if(config_tct->DO_EdgeVelocity()) nOps++;
 
@@ -649,6 +652,8 @@ void base::on_actionSave_config_triggered()
     conf_file<<"\n\n#Scanning over optical and perpendiculr to strip axes (or along the detector depth in case of edge-tct), fitting the best position.";
 
     conf_file<<"\nFocus_Search\t=\t"<<config_tct->DO_focus();
+    conf_file<<"\n#search charge carrier mobilities";
+    conf_file<<"\nTopMobility\t=\t"<<config_tct->DO_TopMobility();
     conf_file<<"\n#search for depletion voltage";
     conf_file<<"\nTopDepletionVoltage\t=\t"<<config_tct->DO_TopDepletion();
     conf_file<<"\nEdgeDepletionVoltage\t=\t"<<config_tct->DO_EdgeDepletion();

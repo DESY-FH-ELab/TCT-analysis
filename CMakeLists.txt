@@ -179,7 +179,7 @@ endif()
 # now set up the installation directory
 if(WITH_GUI)
     # creating and installing default config file
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/default.conf "DefaultFile = ../testanalysis/test_ana.txt")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/default.conf "DefaultFile = ../testanalysis/lpnhe_top.txt")
     INSTALL(TARGETS ${PROJECT_NAME} tct-analysis tbrowser
             RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib

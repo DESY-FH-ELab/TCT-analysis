@@ -34,6 +34,7 @@ private :
     uint32_t _VoltSource;
     bool _DO_focus;
     bool _DO_TopDepletion;
+    bool _DO_TopMobility;
     bool _DO_EdgeDepletion;
     bool _DO_EdgeVelocity;
     uint32_t _ScAxis;
@@ -120,6 +121,10 @@ public:
     bool DO_TopDepletion() { return _DO_TopDepletion;}
     void SetDO_TopDepletion(bool val) { _DO_TopDepletion = val;}
     const bool & DO_TopDepletion() const { return _DO_TopDepletion;}
+
+    bool DO_TopMobility() { return _DO_TopMobility;}
+    void SetDO_TopMobility(bool val) { _DO_TopMobility = val;}
+    const bool & DO_TopMobility() const { return _DO_TopMobility;}
 
     bool DO_EdgeDepletion() { return _DO_EdgeDepletion;}
     void SetDO_EdgeDepletion(bool val) { _DO_EdgeDepletion = val;}
