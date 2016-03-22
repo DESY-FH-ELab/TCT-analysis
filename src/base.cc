@@ -47,6 +47,8 @@ base::base(QWidget *parent) :
     progress_osc = NULL;
     browserProcess = NULL;
 
+    FillBoxes();
+
     //on_comboBox_activated(0);
     ui->buttonGroup_mode->setId(ui->mode_top,0);
     ui->buttonGroup_mode->setId(ui->mode_edge,1);
@@ -105,12 +107,12 @@ base::~base()
 
 void base::on_buttonGroup_mode_buttonClicked(int index)
 {
-    ui->group_0->setVisible(!(bool)abs(index-0));
-    ui->group_0->setGeometry(300,230,360,230);
-    ui->group_1->setVisible(!(bool)abs(index-1));
-    ui->group_1->setGeometry(300,230,360,230);
-    ui->group_2->setVisible(!(bool)abs(index-2));
-    ui->group_2->setGeometry(300,230,360,230);
+    ui->group_top->setVisible(!(bool)abs(index-0));
+    ui->group_top->setGeometry(300,230,360,230);
+    ui->group_edge->setVisible(!(bool)abs(index-1));
+    ui->group_edge->setGeometry(300,230,360,230);
+    ui->group_bottom->setVisible(!(bool)abs(index-2));
+    ui->group_bottom->setGeometry(300,230,360,230);
 }
 void base::read_config(const char *config_file) {
 
@@ -730,13 +732,30 @@ void base::on_tbrowser_clicked()
 void base::kill_tbrowser() {
     if(browserProcess != NULL && browserProcess->isOpen()) browserProcess->kill();
 }
+void base::FillBoxes() {
+
+    QVBoxLayout *bottom_layout = new QVBoxLayout;
+    bottom_widgets.push_back(new QCheckBox("Find Focus"));
+    bottom_widgets.push_back(new QCheckBox("Find Depletion"));
+    bottom_widgets.push_back(new QCheckBox("Find Mobility"));
+    bottom_widgets.push_back(new QCheckBox("Find Nothing"));
+    for(int i=0;i<bottom_widgets.size();i++) {
+        ((QWidget*)bottom_widgets[i])->setMaximumHeight(20);
+        bottom_layout->addWidget(bottom_widgets[i]);
+    }
+    bottom_layout->addStretch(1);
+    ui->group_bottom->setLayout(bottom_layout);
+
+}
 
 void base::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About, version 05.02.2016"),
+    QDateTime datetime;
+    QMessageBox::about(this, tr("About"),
             tr("<h2>TCT Data Analysis Framework. Graphical Version.</h2>"
                "<p>-> <b>Mykyta Haranko, 2015-2016</b>"
                "<p>-> Oscilloscope data analysis by <b>Hendrik Jansen</b>"
                "<p>-> TCT Data files readout system by <b>particulars.si</b>"
-               "<p><center><img src=\"../icons/knu.png\" width=\"87\"/> <img src=\"../icons/desy.png\" width=\"87\"/> <img src=\"../icons/particulars.png\" width=\"50\"/></center>"));
+               "<p><center><img src=\"../icons/knu.png\" width=\"87\"/> <img src=\"../icons/desy.png\" width=\"87\"/> <img src=\"../icons/particulars.png\" width=\"50\"/></center>"
+               "<p><b>Compiled on: </b>%1").arg(datetime.currentDateTime().toString()));
 }

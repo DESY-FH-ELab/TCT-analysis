@@ -464,7 +464,7 @@
      <attribute name="title">
       <string>TCT Data</string>
      </attribute>
-     <widget class="QGroupBox" name="group_1">
+     <widget class="QGroupBox" name="group_edge">
       <property name="geometry">
        <rect>
         <x>300</x>
@@ -1047,7 +1047,7 @@
        <item row="0" column="2">
         <widget class="QRadioButton" name="mode_bottom">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="font">
           <font>
@@ -1100,7 +1100,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="group_0">
+     <widget class="QGroupBox" name="group_top">
       <property name="geometry">
        <rect>
         <x>300</x>
@@ -1152,7 +1152,7 @@
        </property>
       </widget>
      </widget>
-     <widget class="QGroupBox" name="group_2">
+     <widget class="QGroupBox" name="group_bottom">
       <property name="geometry">
        <rect>
         <x>300</x>
@@ -1165,7 +1165,7 @@
        <string>Bottom TCT Options Available</string>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="group_others">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1801,9 +1801,9 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_scanning"/>
+  <buttongroup name="buttonGroup_optical"/>
   <buttongroup name="buttonGroup_input_type"/>
   <buttongroup name="buttonGroup_mode"/>
-  <buttongroup name="buttonGroup_optical"/>
+  <buttongroup name="buttonGroup_scanning"/>
  </buttongroups>
 </ui>

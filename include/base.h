@@ -26,6 +26,9 @@ class base : public QMainWindow
 
 public:
     explicit base(QWidget *parent = 0);
+    std::vector<QWidget*> top_widgets;
+    std::vector<QWidget*> edge_widgets;
+    std::vector<QWidget*> bottom_widgets;
     ~base();
 
 private slots:
@@ -71,6 +74,7 @@ private:
     void print_run(bool start);
     void start_tct();
     void start_osc();
+    void FillBoxes();
 
 };
 
