@@ -468,128 +468,14 @@
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>330</y>
+        <y>300</y>
         <width>360</width>
-        <height>131</height>
+        <height>50</height>
        </rect>
       </property>
       <property name="title">
        <string>Edge TCT Options Available</string>
       </property>
-      <widget class="QCheckBox" name="edge_focus">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>30</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Find Focus</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="edge_depl">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>50</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Find Depletion Voltage</string>
-       </property>
-      </widget>
-      <widget class="QGroupBox" name="edge_profiles">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>70</y>
-         <width>331</width>
-         <height>80</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QGroupBox { font-style:normal; }</string>
-       </property>
-       <property name="title">
-        <string>Build Field and Velocity Profiles</string>
-       </property>
-       <property name="flat">
-        <bool>true</bool>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <widget class="QLabel" name="label_evtime">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>30</y>
-          <width>100</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Averaging time</string>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="ev_time">
-        <property name="geometry">
-         <rect>
-          <x>160</x>
-          <y>30</y>
-          <width>131</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="decimals">
-         <number>4</number>
-        </property>
-        <property name="maximum">
-         <double>1000.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_evtime_2">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>294</x>
-          <y>30</y>
-          <width>30</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>ns</string>
-        </property>
-       </widget>
-      </widget>
      </widget>
      <widget class="QGroupBox" name="group_ch">
       <property name="geometry">
@@ -1106,59 +992,20 @@
         <x>300</x>
         <y>230</y>
         <width>360</width>
-        <height>101</height>
+        <height>50</height>
        </rect>
       </property>
       <property name="title">
        <string>Top TCT Options Available</string>
       </property>
-      <widget class="QCheckBox" name="top_focus">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>30</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Find Focus</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="top_depl">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>50</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Find Depletion Voltage</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="top_mobility">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>70</y>
-         <width>201</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Charge Carriers Mobility</string>
-       </property>
-      </widget>
      </widget>
      <widget class="QGroupBox" name="group_bottom">
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>460</y>
+        <y>370</y>
         <width>360</width>
-        <height>31</height>
+        <height>50</height>
        </rect>
       </property>
       <property name="title">
@@ -1576,38 +1423,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>top_focus</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>edge_focus</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>407</x>
-     <y>341</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>422</x>
-     <y>411</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>edge_focus</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>top_focus</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>422</x>
-     <y>411</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>407</x>
-     <y>341</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cc_ch_1</sender>
    <signal>toggled(bool)</signal>
    <receiver>tlow_1</receiver>
@@ -1801,9 +1616,9 @@
   </connection>
  </connections>
  <buttongroups>
+  <buttongroup name="buttonGroup_scanning"/>
+  <buttongroup name="buttonGroup_mode"/>
   <buttongroup name="buttonGroup_optical"/>
   <buttongroup name="buttonGroup_input_type"/>
-  <buttongroup name="buttonGroup_mode"/>
-  <buttongroup name="buttonGroup_scanning"/>
  </buttongroups>
 </ui>

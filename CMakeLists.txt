@@ -103,6 +103,7 @@ INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/include )
 
 # GUI Option, if yes - Qt installation needed
 OPTION(WITH_GUI "Setting the compiler to build GUI" OFF)
+AUX_SOURCE_DIRECTORY(src/modules TCTMODULES)
 if(WITH_GUI)
     add_definitions(-DUSE_GUI)
     # Qt4
@@ -121,6 +122,8 @@ if(WITH_GUI)
       "src/tct_config.cc"
       "src/scanning.cc"
       "src/TCTReader.cc"
+      "src/TCTModule.cc"
+      ${TCTMODULES}
       "src/base.cc"
       "src/gui_folders.cc"
       "src/gui_sample.cc"
@@ -138,6 +141,8 @@ else()
       "src/tct_config.cc"
       "src/scanning.cc"
       "src/TCTReader.cc"
+      "src/TCTModule.cc"
+      ${TCTMODULES}
       )
 endif()
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )

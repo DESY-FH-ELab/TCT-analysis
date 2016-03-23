@@ -26,9 +26,12 @@ class base : public QMainWindow
 
 public:
     explicit base(QWidget *parent = 0);
-    std::vector<QWidget*> top_widgets;
+    /*std::vector<QWidget*> top_widgets;
     std::vector<QWidget*> edge_widgets;
-    std::vector<QWidget*> bottom_widgets;
+    std::vector<QWidget*> bottom_widgets;*/
+    std::map<QWidget*,int> top_widgets;
+    std::map<QWidget*,int> edge_widgets;
+    std::map<QWidget*,int> bottom_widgets;
     ~base();
 
 private slots:

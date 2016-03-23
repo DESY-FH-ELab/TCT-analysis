@@ -11,6 +11,7 @@
 
 namespace TCT {
 
+class TCTModule;
 #ifndef TCT_CONFIG_H
 #define TCT_CONFIG_H
 
@@ -26,17 +27,14 @@ private :
     std::string _OutSample_ID;
     std::string _DataFolder; //
 
+    std::vector<TCTModule*> tct_modules;
+
     //scanning parameters
     uint32_t _CH_Det;
     uint32_t _CH_PhDiode;
     uint32_t _CH_Trig;
     uint32_t _OptAxis;
     uint32_t _VoltSource;
-    bool _DO_focus;
-    bool _DO_TopDepletion;
-    bool _DO_TopMobility;
-    bool _DO_EdgeDepletion;
-    bool _DO_EdgeVelocity;
     uint32_t _ScAxis;
     float _FFWHM;
     float _FTlow;
@@ -46,7 +44,6 @@ private :
     bool _FSeparateCharges;
     bool _FSeparateWaveforms;
     float _Movements_dt;
-    float _EV_Time;
     float _CorrectBias;
 
     //coefficients
@@ -69,24 +66,25 @@ public:
         _CH_PhDiode(0),
         _CH_Trig(0),
         _OptAxis(3),
-        _DO_focus(false),
-        _DO_EdgeDepletion(false),
-        _DO_EdgeVelocity(false),
         _Movements_dt(0),
-        _EV_Time(0.3),
         _CorrectBias(5.0),
         _FFWHM(10.),
         _TCT_Mode(0)
     {
         //std::cout << "\n   *** No parameter map passes, using default cut values! ***" << std::endl;
     }
-
+    ~tct_config();
 
     tct_config(std::map<std::string, std::string> id_val) :
         tct_config()
     {
         SetParameters(id_val);
     }
+
+    TCTModule* GetModule(const char* name);
+    TCTModule* GetModule(int index);
+    int GetNumberOfModules() { return tct_modules.size(); }
+    void RegisterModule(TCTModule* module, bool enabled);
 
 
     uint32_t TCT_Mode() { return _TCT_Mode;}
@@ -113,26 +111,6 @@ public:
     uint32_t VoltSource() { return _VoltSource;}
     void SetVoltSource(uint32_t val) { _VoltSource = val;}
     const uint32_t & VoltSource() const { return _VoltSource;}
-
-    bool DO_focus() { return _DO_focus;}
-    void SetDO_focus(bool val) { _DO_focus = val;}
-    const bool & DO_focus() const { return _DO_focus;}
-
-    bool DO_TopDepletion() { return _DO_TopDepletion;}
-    void SetDO_TopDepletion(bool val) { _DO_TopDepletion = val;}
-    const bool & DO_TopDepletion() const { return _DO_TopDepletion;}
-
-    bool DO_TopMobility() { return _DO_TopMobility;}
-    void SetDO_TopMobility(bool val) { _DO_TopMobility = val;}
-    const bool & DO_TopMobility() const { return _DO_TopMobility;}
-
-    bool DO_EdgeDepletion() { return _DO_EdgeDepletion;}
-    void SetDO_EdgeDepletion(bool val) { _DO_EdgeDepletion = val;}
-    const bool & DO_EdgeDepletion() const { return _DO_EdgeDepletion;}
-
-    bool DO_EdgeVelocity() { return _DO_EdgeVelocity;}
-    void SetDO_EdgeVelocity(bool val) { _DO_EdgeVelocity = val;}
-    const bool & DO_EdgeVelocity() const { return _DO_EdgeVelocity;}
 
     uint32_t ScAxis() { return _ScAxis;}
     void SetScAxis(uint32_t val) { _ScAxis = val;}
@@ -169,10 +147,6 @@ public:
     float Movements_dt() { return _Movements_dt;}
     void SetMovements_dt(float val) { _Movements_dt = val;}
     const float & Movements_dt() const { return _Movements_dt;}
-
-    float EV_Time() { return _EV_Time;}
-    void SetEV_Time(float val) { _EV_Time = val;}
-    const float & EV_Time() const { return _EV_Time;}
 
     float CorrectBias() { return _CorrectBias;}
     void SetCorrectBias(float val) { _CorrectBias = val;}

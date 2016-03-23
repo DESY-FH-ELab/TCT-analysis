@@ -29,6 +29,8 @@
 #include <sample.h>
 #include <util.h>
 
+#include <TCTModule.h>
+
 //ROOT includes
 #include <TSystem.h>
 
@@ -46,8 +48,6 @@ base::base(QWidget *parent) :
     progress = NULL;
     progress_osc = NULL;
     browserProcess = NULL;
-
-    FillBoxes();
 
     //on_comboBox_activated(0);
     ui->buttonGroup_mode->setId(ui->mode_top,0);
@@ -93,6 +93,7 @@ base::base(QWidget *parent) :
     read_config(_DefConfigName.c_str());
     fill_config();
 
+
 }
 
 base::~base()
@@ -121,6 +122,13 @@ void base::read_config(const char *config_file) {
     if(config_analysis) delete config_analysis;
     if(config_sample) delete config_sample;
 
+    qDeleteAll(ui->group_top->children());
+    qDeleteAll(ui->group_edge->children());
+    qDeleteAll(ui->group_bottom->children());
+    top_widgets.clear();
+    edge_widgets.clear();
+    bottom_widgets.clear();
+
     TCT::util analysis_card;
     std::ifstream ana_file(config_file);
 
@@ -146,6 +154,8 @@ void base::read_config(const char *config_file) {
 
     config_tct->SetSampleThickness(config_sample->Thickness());
     config_tct->SetOutSample_ID(config_sample->SampleID());
+
+    FillBoxes();
 
     ui->statusBar->showMessage(tr("Config File Opened"), 2000);
 
@@ -188,13 +198,18 @@ void base::fill_config() {
     ui->buttonGroup_mode->button(config_tct->TCT_Mode())->setChecked(true);
     on_buttonGroup_mode_buttonClicked(config_tct->TCT_Mode());
 
-    ui->top_focus->setChecked(config_tct->DO_focus());
-    ui->top_depl->setChecked(config_tct->DO_TopDepletion());
-    ui->top_mobility->setChecked(config_tct->DO_TopMobility());
-    ui->edge_focus->setChecked(config_tct->DO_focus());
-    ui->edge_depl->setChecked(config_tct->DO_EdgeDepletion());
-    ui->edge_profiles->setChecked(config_tct->DO_EdgeVelocity());
-    ui->ev_time->setValue(config_tct->EV_Time());
+    for(auto i: top_widgets) {
+        ((QCheckBox*)i.first)->setChecked(config_tct->GetModule(i.second)->isEnabled());
+        config_tct->GetModule(i.second)->FillParameters();
+    }
+    for(auto i: edge_widgets) {
+        ((QCheckBox*)i.first)->setChecked(config_tct->GetModule(i.second)->isEnabled());
+        config_tct->GetModule(i.second)->FillParameters();
+    }
+    for(auto i: bottom_widgets) {
+        ((QCheckBox*)i.first)->setChecked(config_tct->GetModule(i.second)->isEnabled());
+        config_tct->GetModule(i.second)->FillParameters();
+    }
 
     // oscilloscope config
 
@@ -269,12 +284,18 @@ void base::tovariables_config() {
 
     config_tct->SetTCT_Mode(ui->buttonGroup_mode->checkedId());
 
-    config_tct->SetDO_focus(ui->edge_focus->isChecked());
-    config_tct->SetDO_TopDepletion(ui->top_depl->isChecked());
-    config_tct->SetDO_TopMobility(ui->top_mobility->isChecked());
-    config_tct->SetDO_EdgeDepletion(ui->edge_depl->isChecked());
-    config_tct->SetDO_EdgeVelocity(ui->edge_profiles->isChecked());
-    config_tct->SetEV_Time(ui->ev_time->value());
+    for(auto i: top_widgets) {
+        config_tct->GetModule(i.second)->setEnabled(((QCheckBox*)i.first)->isChecked());
+        config_tct->GetModule(i.second)->ToVariables();
+    }
+    for(auto i: edge_widgets) {
+        config_tct->GetModule(i.second)->setEnabled(((QCheckBox*)i.first)->isChecked());
+        config_tct->GetModule(i.second)->ToVariables();
+    }
+    for(auto i: bottom_widgets) {
+        config_tct->GetModule(i.second)->setEnabled(((QCheckBox*)i.first)->isChecked());
+        config_tct->GetModule(i.second)->ToVariables();
+    }
 
     // oscilloscope part
 
@@ -423,11 +444,9 @@ void base::start_tct() {
     ui->statusBar->showMessage(QString("Number of files selected: %1").arg(names.length()),500);
     int nOps = 0;
     if(config_tct->FSeparateWaveforms()) nOps++;
-    if(config_tct->DO_focus()) nOps++;
-    if(config_tct->DO_TopDepletion()) nOps++;
-    if(config_tct->DO_TopMobility()) nOps++;
-    if(config_tct->DO_EdgeDepletion()) nOps++;
-    if(config_tct->DO_EdgeVelocity()) nOps++;
+    for(int i=0;i<config_tct->GetNumberOfModules();i++) {
+        if(config_tct->GetModule(i)->isEnabled() && config_tct->TCT_Mode()==(int)config_tct->GetModule(i)->GetType()) nOps++;
+    }
 
     progress = new Ui::ConsoleOutput(names.length()*nOps,this);
     progress->setValue(0);
@@ -651,16 +670,28 @@ void base::on_actionSave_config_triggered()
     conf_file<<"\n#Perform next operations. Analysis will start only if all needed data is present:";
     conf_file<<"\n# 0-top,1-edge,2-bottom";
     conf_file<<"\nTCT_Mode\t=\t"<<config_tct->TCT_Mode();
-    conf_file<<"\n\n#Scanning over optical and perpendiculr to strip axes (or along the detector depth in case of edge-tct), fitting the best position.";
 
-    conf_file<<"\nFocus_Search\t=\t"<<config_tct->DO_focus();
-    conf_file<<"\n#search charge carrier mobilities";
-    conf_file<<"\nTopMobility\t=\t"<<config_tct->DO_TopMobility();
-    conf_file<<"\n#search for depletion voltage";
-    conf_file<<"\nTopDepletionVoltage\t=\t"<<config_tct->DO_TopDepletion();
-    conf_file<<"\nEdgeDepletionVoltage\t=\t"<<config_tct->DO_EdgeDepletion();
-    conf_file<<"\n#extracting the velocity and electric field profiles";
-    conf_file<<"\nEdgeVelocityProfile\t=\t"<<config_tct->DO_EdgeVelocity();
+    bool focus_top = false;
+    bool focus_edge = false;
+    for(int i=0; i<config_tct->GetNumberOfModules(); i++) {
+        TCT::TCTModule* module = config_tct->GetModule(i);
+        if(strcmp(module->GetName(),"Focus_Search")==0) {
+            if((int)module->GetType()==0) focus_top = module->isEnabled();
+            if((int)module->GetType()==1) focus_edge = module->isEnabled();
+        }
+    }
+    conf_file<<"\n\n#Scanning over optical and perpendiculr to strip axes (or along the detector depth in case of edge-tct), fitting the best position.";
+    conf_file<<"\n"<<"Focus_Search"<<"\t=\t"<<(focus_top || focus_edge);
+
+
+    for(int i=0; i<config_tct->GetNumberOfModules(); i++) {
+        TCT::TCTModule* module = config_tct->GetModule(i);
+        if(strcmp(module->GetName(),"Focus_Search")!=0) {
+            conf_file<<"\n#"<<module->GetTitle();
+            conf_file<<"\n"<<module->GetName()<<"\t=\t"<<module->isEnabled();
+            module->PrintConfig(conf_file);
+        }
+    }
 
     conf_file<<"\n\n#Integrate sensor signal from TimeSensorLow to TimeSensorHigh - ns";
     conf_file<<"\nTimeSensorLow\t=\t"<<config_tct->FTlow();
@@ -672,8 +703,8 @@ void base::on_actionSave_config_triggered()
     conf_file<<"\nSaveSeparateCharges\t=\t"<<config_tct->FSeparateCharges();
     conf_file<<"\n#Save waveforms for each position and voltage";
     conf_file<<"\nSaveSeparateWaveforms\t=\t"<<config_tct->FSeparateWaveforms();
-    conf_file<<"\n#Averaging the current for electric field profile from F_TLow to F_TLow+EV_Time";
-    conf_file<<"\nEV_Time\t=\t"<<config_tct->EV_Time();
+    //conf_file<<"\n#Averaging the current for electric field profile from F_TLow to F_TLow+EV_Time";
+    //conf_file<<"\nEV_Time\t=\t"<<config_tct->EV_Time();
 
 
     conf_file<<"\n\n[Parameters]";
@@ -734,14 +765,36 @@ void base::kill_tbrowser() {
 }
 void base::FillBoxes() {
 
+    for(int i=0;i<config_tct->GetNumberOfModules();i++) {
+        TCT::TCT_Type type = config_tct->GetModule(i)->GetType();
+        if(type == TCT::_Top) top_widgets[new QCheckBox(config_tct->GetModule(i)->GetTitle())] = i;
+        if(type == TCT::_Edge) edge_widgets[new QCheckBox(config_tct->GetModule(i)->GetTitle())] = i;
+        if(type == TCT::_Bottom) bottom_widgets[new QCheckBox(config_tct->GetModule(i)->GetTitle())] = i;
+    }
+
+    QVBoxLayout *top_layout = new QVBoxLayout;
+    for(auto i: top_widgets) {
+        ((QWidget*)i.first)->setMaximumHeight(20);
+        top_layout->addWidget(i.first);
+        config_tct->GetModule(i.second)->AddParameters(top_layout);
+    }
+    top_layout->addStretch(1);
+    ui->group_top->setLayout(top_layout);
+
+    QVBoxLayout *edge_layout = new QVBoxLayout;
+    for(auto i: edge_widgets) {
+        ((QWidget*)i.first)->setMaximumHeight(20);
+        edge_layout->addWidget(i.first);
+        config_tct->GetModule(i.second)->AddParameters(edge_layout);
+    }
+    edge_layout->addStretch(1);
+    ui->group_edge->setLayout(edge_layout);
+
     QVBoxLayout *bottom_layout = new QVBoxLayout;
-    bottom_widgets.push_back(new QCheckBox("Find Focus"));
-    bottom_widgets.push_back(new QCheckBox("Find Depletion"));
-    bottom_widgets.push_back(new QCheckBox("Find Mobility"));
-    bottom_widgets.push_back(new QCheckBox("Find Nothing"));
-    for(int i=0;i<bottom_widgets.size();i++) {
-        ((QWidget*)bottom_widgets[i])->setMaximumHeight(20);
-        bottom_layout->addWidget(bottom_widgets[i]);
+    for(auto i: bottom_widgets) {
+        ((QWidget*)i.first)->setMaximumHeight(20);
+        bottom_layout->addWidget(i.first);
+        config_tct->GetModule(i.second)->AddParameters(bottom_layout);
     }
     bottom_layout->addStretch(1);
     ui->group_bottom->setLayout(bottom_layout);
