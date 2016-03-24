@@ -145,7 +145,6 @@ else()
       ${TCTMODULES}
       )
 endif()
-ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
 MESSAGE(STATUS ${ROOT_LIBRARIES})
 
 
@@ -163,35 +162,35 @@ endif()
 
 # build main TCT-ANALYSIS executable
 if(WITH_GUI)
-    add_executable(tct-analysis  src/main_gui.cxx )
+    add_executable(tct-analysis  src/main.cxx ${LIB_SOURCE_FILES})
     add_executable(tbrowser  src/tbrowser.cxx )
 else()
-    add_executable(tct-analysis  src/main.cxx )
+    add_executable(tct-analysis  src/main.cxx ${LIB_SOURCE_FILES})
 endif()
 #target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
 if(WITH_LECROY_RAW AND WITH_GUI)
-        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${QT_LIBRARIES} ${LCR_LIBRARY})
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES} ${QT_LIBRARIES} ${LCR_LIBRARY})
         target_link_libraries(tbrowser ${ROOT_LIBRARIES})
 elseif(WITH_GUI)
-        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${QT_LIBRARIES})
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES} ${QT_LIBRARIES})
         target_link_libraries(tbrowser ${ROOT_LIBRARIES})
 elseif(WITH_LECROY_RAW)
-        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${LCR_LIBRARY})
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES} ${LCR_LIBRARY})
 else()
-        target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES})
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES})
 endif()
 
 # now set up the installation directory
 if(WITH_GUI)
     # creating and installing default config file
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/default.conf "DefaultFile = ../testanalysis/lpnhe_top.txt")
-    INSTALL(TARGETS ${PROJECT_NAME} tct-analysis tbrowser
+    INSTALL(TARGETS tct-analysis tbrowser
             RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib)
     INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/default.conf DESTINATION bin)
 else()
-    INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
+    INSTALL(TARGETS tct-analysis
             RUNTIME DESTINATION bin
             LIBRARY DESTINATION lib
             ARCHIVE DESTINATION lib)

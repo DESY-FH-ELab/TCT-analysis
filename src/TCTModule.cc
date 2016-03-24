@@ -56,6 +56,7 @@ bool TCTModule::Do(TCTReader *in_stct, TFile *in_rootfile) {
 /// Analyse data (should be reimplemented by developer)
 bool TCTModule::Analysis() {
     stct->PrintInfo();
+    return true;
 }
 
 /// Check before analysis (should be reimplemented by developer)

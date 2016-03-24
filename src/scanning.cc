@@ -145,6 +145,7 @@ bool Scanning::CreateOutputFile() {
         }
         f_rootfile->cd();
 
+        return true;
     }
 
 /// Checks channels configuration
