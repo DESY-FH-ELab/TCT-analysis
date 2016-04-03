@@ -162,7 +162,7 @@ endif()
 
 # build main TCT-ANALYSIS executable
 if(WITH_GUI)
-    add_executable(tct-analysis  src/main.cxx ${LIB_SOURCE_FILES})
+    add_executable(tct-analysis  src/main_gui.cxx ${LIB_SOURCE_FILES})
     add_executable(tbrowser  src/tbrowser.cxx )
 else()
     add_executable(tct-analysis  src/main.cxx ${LIB_SOURCE_FILES})
