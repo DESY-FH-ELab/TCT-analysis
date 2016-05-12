@@ -30,7 +30,7 @@ Minimal requirements are: a C++11 compliant compiler, ROOT v5.x or later (includ
   * Now compile:
   * `> make install`
 
-The program assumes the following folder structure for the data files to be read:
+The oscilloscope data analysis part of program assumes the following folder structure for the data files to be read:
 `<path-to-data>/<sample-name>/<temperature>/<bias-volt>/<data-file.txt>`
 
 
@@ -41,7 +41,7 @@ here, a subfolder structure is created: `<sample-name>/<temperature>/<root-file.
 Look at the header of the sample files included in the repository.
 If your headers differ from that, change the Read() method in acquisition.cc accordingly
 
-  * Execute the binary from the TCT-analysis/build folder: `> ./tct-analysis -af <path-to-analysis-file>`
+  * (console version) Execute the binary from the TCT-analysis/build folder: `> ./tct-analysis -af <path-to-analysis-file>`
 e.g.
  ./tct-analysis -af ../testanalysis/test_ana.txt
 
@@ -52,5 +52,6 @@ e.g.
 -------------------------------
 
 The test data files are located at .../TCT-analysis/testdata/S57/295K/500V/.
+The test data file in TCT data format is located at .../TCT-analysis/testdata/lpnhe/.
 The test sensor files are located at .../TCT-analysis/testsensor/.
 

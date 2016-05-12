@@ -803,12 +803,12 @@ void base::FillBoxes() {
 
 void base::on_actionAbout_triggered()
 {
-    QDateTime datetime;
+    //QDateTime datetime;
     QMessageBox::about(this, tr("About"),
             tr("<h2>TCT Data Analysis Framework. Graphical Version.</h2>"
                "<p>-> <b>Mykyta Haranko, 2015-2016</b>"
                "<p>-> Oscilloscope data analysis by <b>Hendrik Jansen</b>"
                "<p>-> TCT Data files readout system by <b>particulars.si</b>"
-               "<p><center><img src=\"../icons/knu.png\" width=\"87\"/> <img src=\"../icons/desy.png\" width=\"87\"/> <img src=\"../icons/particulars.png\" width=\"50\"/></center>"
-               "<p><b>Compiled on: </b>%1").arg(datetime.currentDateTime().toString()));
+               "<p><center><img src=\"../icons/knu.png\" width=\"87\"/> <img src=\"../icons/desy.png\" width=\"87\"/> <img src=\"../icons/lpnhe.png\" height=\"87\"/> <img src=\"../icons/particulars.png\" width=\"50\"/></center>"
+               "<p><b>Compiled on: </b>%1").arg(QString("Thu 12 May 2016, 12.45")));
 }
