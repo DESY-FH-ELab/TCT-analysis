@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>TCT-Analyse</string>
+   <string>TCT-Analysis</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -1616,9 +1616,9 @@
   </connection>
  </connections>
  <buttongroups>
+  <buttongroup name="buttonGroup_optical"/>
   <buttongroup name="buttonGroup_scanning"/>
   <buttongroup name="buttonGroup_mode"/>
-  <buttongroup name="buttonGroup_optical"/>
   <buttongroup name="buttonGroup_input_type"/>
  </buttongroups>
 </ui>
