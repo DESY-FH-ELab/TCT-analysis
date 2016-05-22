@@ -16,6 +16,10 @@ namespace TCT {
 /// Analyse data (should be reimplemented by developer)
 bool ModuleEdgeField::Analysis() {
 
+    //creating of the folders Velocity, Velocity_Normed and Velocity_Diode
+    //containing velocity profiles not normed (through solving numerical
+    //equation with bias voltage), normed with photodiode data and
+    //calculated from physical assumptions(not finished yet)
     TDirectory *dir_vel = f_rootfile->mkdir("Velocity");
     TDirectory *dir_vel_normed;
     if(config->CH_PhDiode()) dir_vel_normed = f_rootfile->mkdir("Velocity_Normed");
@@ -23,6 +27,7 @@ bool ModuleEdgeField::Analysis() {
     if(config->CH_PhDiode()) dir_vel_diode = f_rootfile->mkdir("Velocity_Diode");
     dir_vel->cd();
 
+    //memory allocation and setting of variables corresponding to IDs of the axis
     Int_t numVolt,numS;
     Float_t Ss,Sc0;
 
@@ -37,6 +42,7 @@ bool ModuleEdgeField::Analysis() {
       case 2: numVolt=stct->NU2; voltages=stct->U2.fArray; break; //u2
       }
 
+    //memory allocation for charge, velocity and field profiles
     TGraph **cc = new TGraph*[numVolt];
     TGraph **cc_norm; // charge collection graph
     TGraph **ph_charge = new TGraph*[numVolt];
@@ -51,13 +57,15 @@ bool ModuleEdgeField::Analysis() {
     TGraph **velocity_diode = new TGraph*[numVolt];
     TGraph **field_diode = new TGraph*[numVolt];
 
+    // setting the scanning axis
     SwitchAxis(scanning_axis,numS,Ss,Sc0);
 
 
     //calculate charge profiles for different voltages
     CalculateCharges(ChNumber,volt_source+2,numVolt,scanning_axis,numS,cc,config->FTlow(),config->FTlow()+GetEV_Time());
 
-    //find integration ranges
+    //find integration ranges (for the maximal voltage in scan, hope that sensor is fully depleted
+    //otherwise may be a problem with right edge
     TCTWaveform *wf0;
     switch(volt_source)
       {
@@ -73,6 +81,8 @@ bool ModuleEdgeField::Analysis() {
     std::cout<<"\tIntegrating in the range "<<left_edge<<" - "<<right_edge<<std::endl;
     std::cout<<std::endl;
 
+
+    //looking for integration ranges (Int)
     Double_t *temp_max_bias_charge = charge_max_bias->GetX();
     Int_t ix1=-1;
     Int_t ix2=-1;
@@ -82,6 +92,7 @@ bool ModuleEdgeField::Analysis() {
     }
     if(ix1==-1) ix1=0;
     if(ix2==-1) ix2=numS-1;
+    delete temp_max_bias_charge;
 
     //calculate laser charge profiles
     if(config->CH_PhDiode()) CalculateCharges(config->CH_PhDiode()-1,volt_source+2,numVolt,scanning_axis,numS,ph_charge,config->FDLow(),config->FDHigh());
@@ -117,6 +128,7 @@ bool ModuleEdgeField::Analysis() {
             temp_vel_h[i] = 1e4*temp_field[i]*Mu(temp_field[i],1)/(1+Mu(temp_field[i],1)*1e4*temp_field[i]/config->v_sat());
             temp_vel_el[i] = 1e4*temp_field[i]*Mu(temp_field[i],0)/(1+Mu(temp_field[i],0)*1e4*temp_field[i]/config->v_sat());
         }
+        // building of the graphs
         field[j] = GraphBuilder(numS,cc[0]->GetX(),temp_field,"scanning distance [#mum]", "Electric Field, [V/#mum]","Electric Field");
         velocity_holes[j] = GraphBuilder(numS,cc[0]->GetX(),temp_vel_h,"scanning distance [#mum]", "Velocity [cm/s]","Holes Velocity Profile");
         velocity_electrons[j] = GraphBuilder(numS,cc[0]->GetX(),temp_vel_el,"scanning distance [#mum]", "Velocity [cm/s]","Electrons Velocity Profile");
@@ -265,6 +277,7 @@ bool ModuleEdgeField::Analysis() {
         dir_vel->cd();
     }
 
+    //freeing the memory
     delete normcoeff;
 
     delete velocity_holes;

@@ -42,7 +42,7 @@ Thumbs.db
 #ignore certain template files
 src/template.cc
 testdata/*
-developers_guide/*
+developers_guide/*.*
 
 #ignore qt project files
 *.pro.user
