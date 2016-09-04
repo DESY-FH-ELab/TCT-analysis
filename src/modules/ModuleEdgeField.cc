@@ -105,20 +105,18 @@ bool ModuleEdgeField::Analysis() {
     Double_t *temp_field=new Double_t[numS];
     for(int j=0;j<numVolt;j++) { // FIXME constants seems to prefer smaller values towards low electric fields , why?
         temp_sensor = cc[j]->GetY();
-
         Double_t a=1;
         if(GraphIntegral(cc[j],left_edge,right_edge)<0) a = -a;
         Double_t dx = 0.5*a;
         Double_t sum = 0;
-        while(abs(voltages[j]-sum)>eps) {
-
+        while(abs(abs(voltages[j])-sum)>eps) {
             for(int i=0; i<numS; i++) {
                 temp_field[i] = BiSectionMethod(eps,-5e3,1e6,temp_sensor[i],a);
             }
             sum=0;
             for(int i=ix1;i<=ix2;i++) sum+=temp_field[i];
             sum*=1e-4*Ss; // conversion from um to cm
-            if(voltages[j]-sum>0) a-=dx;
+            if(abs(voltages[j])-sum>0) a-=dx;
             else a+=dx;
             dx=dx/2;
         }
@@ -149,7 +147,7 @@ bool ModuleEdgeField::Analysis() {
             if(GraphIntegral(cc_norm[j],left_edge,right_edge)<0) a = -a;
             Double_t dx = 0.5*a;
             Double_t sum = 0;
-            while(abs(voltages[j]-sum)>eps) {
+            /*while(abs(abs(voltages[j])-sum)>eps) {
 
                 for(int i=0; i<numS; i++) {
                     temp_field[i] = BiSectionMethod(eps,-5e3,1e6,temp_sensor[i],a);
@@ -157,10 +155,10 @@ bool ModuleEdgeField::Analysis() {
                 sum=0;
                 for(int i=ix1;i<=ix2;i++) sum+=temp_field[i];
                 sum*=1e-4*Ss;
-                if(voltages[j]-sum>0) a-=dx;
+                if(abs(voltages[j])-sum>0) a-=dx;
                 else a+=dx;
                 dx=dx/2;
-            }
+            }*/
             if(GraphIntegral(cc_norm[j],left_edge,right_edge)<0) normcoeff[j]=-a;
             else normcoeff[j]=a;
             //std::cout<<"U = "<<voltages[j]<<" norm const: "<<a<<std::endl;
@@ -220,7 +218,7 @@ bool ModuleEdgeField::Analysis() {
             temp_sensor_charge = cc[j]->GetY();
             temp_diode_charge = ph_charge[j]->GetY();
             for(int i=0;i<numS;i++) {
-                temp_velocity_avg[i] = -1e9*0.624*temp_sr_general*temp_sensor_charge[i]/(GetEV_Time()*temp_diode_charge[i]*Eweight*ampl*Res_sensor*Neh);
+                temp_velocity_avg[i] = 1e9*0.624*temp_sr_general*temp_sensor_charge[i]/(GetEV_Time()*temp_diode_charge[i]*Eweight*ampl*Res_sensor*Neh);
                 temp_field[i] = 1e-4*temp_velocity_avg[i]/(config->mu0_els()+config->mu0_holes());
             }
             velocity_diode[j] = GraphBuilder(numS,cc[0]->GetX(),temp_velocity_avg,"scanning distance [#mum]", "Velocity [cm/s]","Velocity Profile");

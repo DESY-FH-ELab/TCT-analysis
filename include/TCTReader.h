@@ -94,6 +94,7 @@ class TCTReader
         void DrawList(Int_t, Int_t*, Int_t *);
         void PrintInfo();
         void CorrectBaseLine(Float_t=0.0);
+        void CorrectPolarity(Int_t=0);
 
         TCTWaveform *Projection(int ch, int dir,int x,int y,int z, int nu1, int nu2, int num);
         TCTWaveform *Projection(int , int *);

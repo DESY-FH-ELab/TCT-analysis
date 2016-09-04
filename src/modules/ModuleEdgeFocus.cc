@@ -231,7 +231,7 @@ bool ModuleEdgeFocus::CheckModuleData() {
     case 2: NOpt = stct->Ny; break;
     case 3: NOpt = stct->Nz; break;
     }
-    if(NOpt>=1) std::cout<<"\t\t\tOptical axis scan contains "<<NOpt<<" points. OK"<<std::endl;
+    if(NOpt>=3) std::cout<<"\t\t\tOptical axis scan contains "<<NOpt<<" points. OK"<<std::endl;
     else {
         std::cout<<"\t\t\tOptical axis contains only "<<NOpt<<" points. Not enough for focusing."<<std::endl;
         return false;

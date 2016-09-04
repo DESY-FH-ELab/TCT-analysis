@@ -15,7 +15,7 @@
 
 // ROOT includes
 #include "TH1F.h"
-#include "TSystem.h"t
+#include "TSystem.h"
 
 // External includes
 
@@ -45,6 +45,9 @@ namespace TCT {
 
         // CheckData: check if channels are set in config file 
         if(!CheckData()) {std::cout<<"File "<<filename<<" contains not enough data for selected operations. Skipping."<<std::endl; delete stct; return false;}
+
+        //If detector signal is positive, make in negative
+        stct->CorrectPolarity((config->CH_Det())-1);
 
         //create output file
         CreateOutputFile();

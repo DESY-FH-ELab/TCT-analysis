@@ -868,6 +868,62 @@ void TCTReader::CorrectBaseLine(Float_t xc)
 
 }
 
+void TCTReader::CorrectPolarity(Int_t ChId)
+{
+    // Function corrects the polarity of the signal (makes it negative)
+    Int_t i,j,k;
+    TH1F *his;
+    Double_t avg,min,max = 0;
+    Double_t binval;
+    Int_t Num=numxyz*NU1*NU2; //number of all waveforms
+
+    Int_t polarity;
+
+    for(j=0;j<Num;j++)
+    {
+        max = -1e9;
+        min = 1e9;
+        if(ChId==0) his=((TH1F *)histo1->At(j));
+        if(ChId==1) his=((TH1F *)histo2->At(j));
+        if(ChId==2) his=((TH1F *)histo3->At(j));
+        if(ChId==3) his=((TH1F *)histo4->At(j));
+
+        avg=his->Integral(1,his->GetNbinsX()-1)/(his->GetNbinsX()-1);
+        for(i=1;i<his->GetNbinsX();i++)
+        {
+            binval = his->GetBinContent(i);
+            if(binval>max) max = binval;
+            if(binval<min) min = binval;
+        }
+        //if(j<100) std::cout<<max<<" "<<avg<<" "<<min<<std::endl;
+        if((max-avg)>=(avg-min)) polarity+=1;
+        else polarity-=1;
+
+    }
+
+    if(polarity<0) {
+
+        for(j=0;j<Num;j++)
+        {
+            if(j==0)  std::cout<<"Polarity correction ("<<Num<<" waveforms) :: ";
+
+            if(ChId==0) his=((TH1F *)histo1->At(j));
+            if(ChId==1) his=((TH1F *)histo2->At(j));
+            if(ChId==2) his=((TH1F *)histo3->At(j));
+            if(ChId==3) his=((TH1F *)histo4->At(j));
+
+            for(i=1;i<his->GetNbinsX();i++)
+                his->SetBinContent(i,-(his->GetBinContent(i)));
+
+        }
+        std::cout<<" finished\n";
+    }
+    else {
+        std::cout<<"Polarity correction not needed\n";
+    }
+
+}
+
 
 void TCTReader::PrintInfo()
 {

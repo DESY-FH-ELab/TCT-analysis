@@ -123,7 +123,7 @@ bool ModuleEdgeDepletion::Analysis() {
 
     Float_t *sq_volt = new Float_t[numVolt];
     Float_t *derivative = new Float_t[numVolt];
-    for(int i=0;i<numVolt;i++) sq_volt[i] = sqrt(voltages[i]);
+    for(int i=0;i<numVolt;i++) sq_volt[i] = sqrt(abs(voltages[i]));
 
     derivative[0]=0;
     derivative[1]=0;
@@ -143,12 +143,12 @@ bool ModuleEdgeDepletion::Analysis() {
         if(!f_finish && f_start && derivative[i]<=DEPL_THRESHOLD*max_der) {i_finish=i-1; f_finish=true;}
         if(f_finish && derivative[i]<=DEPL_THRESHOLD*max_der) {i_plato=i; break;}
     }
-    Float_t dv = voltages[1]-voltages[0];
+    Float_t dv = abs(voltages[1]-voltages[0]);
     depl_fit1->SetRange(sqrt(i_start*dv),sqrt(i_finish*dv));
     depl_fit2->SetRange(sqrt(i_plato*dv),sqrt(voltages[numVolt-1]));
 
     // Plotting the charge
-    TGraph *TotalCg=GraphBuilder(numVolt,sq_volt,total_charge,"Sqrt(Voltage) [sqrt(V)]","total charge [.arb]","total charge");
+    TGraph *TotalCg=GraphBuilder(numVolt,sq_volt,total_charge,"Sqrt(abs(Voltage)) [sqrt(V)]","total charge [.arb]","total charge");
     depl_fit1->SetParameter(0,total_charge[i_start]);
     depl_fit2->SetParameter(0,total_charge[i_plato]);
     TotalCg->Fit("depl_fit1","RQ");

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file
  * \brief Implementation of TCT::TCTModule methods.
  */
@@ -143,43 +143,37 @@ TGraph** TCTModule::NormedCharge(TGraph** sensor, TGraph** photodiode, Int_t num
 /// Find position of two edge for a fixed voltage (at least fully depleted) and for one optical distance
 void TCTModule::FindEdges(TGraph* gr, Int_t numS, Float_t dx, Double_t& left_edge, Double_t& right_edge) {
 
-    TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])-[3]",0,dx*numS);
-    TF1 *ff_right=new TF1("ff_right","[2]*TMath::Erf((x-[0])/[1])-[3]",0,dx*numS);
+    TF1 *ff_left=new TF1("ff_left","-[2]*TMath::Erfc((x-[0])/[1])+[3]",0,dx*numS);
+    TF1 *ff_right=new TF1("ff_right","-[2]*TMath::Erf((x-[0])/[1])+[3]",0,dx*numS);
 
     double *yy_temp;
     Float_t FWHM = config->FFWHM();
-    Float_t *yy = new Float_t[numS];
-    Int_t i_max, i_min;
-    Float_t max, min, der_max, der_min;
+    Int_t i_left, i_right, i_max_val;
+    Float_t max, min;
     Float_t FitHeight;
 
     yy_temp = gr->GetY();
     max = yy_temp[0];
     min = yy_temp[0];
-    der_max = yy_temp[1]-yy_temp[0];
-    der_min = yy_temp[1]-yy_temp[0];
-    yy[0] = 0;
-    for(int i=1;i<numS;i++) {
-        yy[i-1] = yy_temp[i]-yy_temp[i-1];
-        if(yy_temp[i]>max) max=yy_temp[i];
-        if(yy_temp[i]<min) min=yy_temp[i];
-        if(yy[i-1]>der_max) {
-            der_max = yy[i-1];
-            i_max = i;
-        }
-        if(yy[i-1]<der_min) {
-            der_min = yy[i-1];
-            i_min = i;
-        }
 
+    for(int i=0;i<numS;i++) {
+        if(yy_temp[i]>max) {
+            max=yy_temp[i];
+            i_max_val=i;
+        }
+        if(yy_temp[i]<min) min=yy_temp[i];
+    }
+    for(int i=0;i<numS;i++) {
+        if(i<=i_max_val && yy_temp[i]<=max/2.0) i_left=i;
+        if(i>=i_max_val && yy_temp[i]>=max/2.0) i_right=i;
     }
 
     FitHeight = (max-min)/2;
-    SetFitParameters(ff_left,i_min*dx,FWHM,FitHeight,FitHeight);
-    ff_left->SetRange(0,(i_max+i_min)/2*dx);
+    SetFitParameters(ff_left,i_left*dx,FWHM,FitHeight,FitHeight);
+    ff_left->SetRange(0,(i_left+i_right)/2*dx);
 
-    SetFitParameters(ff_right,i_max*dx,FWHM,FitHeight,FitHeight);
-    ff_right->SetRange((i_max+i_min)/2*dx,dx*numS);
+    SetFitParameters(ff_right,i_right*dx,FWHM,FitHeight,FitHeight);
+    ff_right->SetRange((i_left+i_right)/2*dx,dx*numS);
 
     gr->Fit("ff_left","NRq");
     gr->Fit("ff_right","NRq+");
@@ -189,26 +183,24 @@ void TCTModule::FindEdges(TGraph* gr, Int_t numS, Float_t dx, Double_t& left_edg
 
     delete ff_left;
     delete ff_right;
-    delete yy;
 
 }
 
 /// Find position of two edge for a fixed voltage (at least fully depleted) and for all optical distances
 void TCTModule::FindEdges(TGraph** gr, Int_t numP, Int_t numS, Float_t dx, Float_t* left_pos, Float_t* left_width, Float_t* right_pos, Float_t* right_width) {
 
-    TF1 *ff_left=new TF1("ff_left","[2]*TMath::Erfc((x-[0])/[1])-[3]",0,dx*numS);
+    TF1 *ff_left=new TF1("ff_left","-[2]*TMath::Erfc((x-[0])/[1])+[3]",0,dx*numS);
     ff_left->SetParName(0,"Left edge");
     ff_left->SetParName(1,"#sigma_left");
 
-    TF1 *ff_right=new TF1("ff_right","[2]*TMath::Erf((x-[0])/[1])-[3]",0,dx*numS);
+    TF1 *ff_right=new TF1("ff_right","-[2]*TMath::Erf((x-[0])/[1])+[3]",0,dx*numS);
     ff_right->SetParName(0,"Right edge");
     ff_right->SetParName(1,"#sigma_right");
 
     double *yy_temp;
     Float_t FWHM = config->FFWHM();
-    Float_t *yy = new Float_t[numS];
-    Int_t i_max, i_min;
-    Float_t max, min, der_max, der_min;
+    Int_t i_left, i_right, i_max_val;
+    Float_t max, min;
     Float_t FitHeight;
 
     for(Int_t j=0;j<numP;j++) {
@@ -216,30 +208,25 @@ void TCTModule::FindEdges(TGraph** gr, Int_t numP, Int_t numS, Float_t dx, Float
         yy_temp = gr[j]->GetY();
         max = yy_temp[0];
         min = yy_temp[0];
-        der_max = yy_temp[1]-yy_temp[0];
-        der_min = yy_temp[1]-yy_temp[0];
-        yy[0] = 0;
-        for(int i=1;i<numS;i++) {
-            yy[i-1] = yy_temp[i]-yy_temp[i-1];
-            if(yy_temp[i]>max) max=yy_temp[i];
-            if(yy_temp[i]<min) min=yy_temp[i];
-            if(yy[i-1]>der_max) {
-                der_max = yy[i-1];
-                i_max = i;
-            }
-            if(yy[i-1]<der_min) {
-                der_min = yy[i-1];
-                i_min = i;
-            }
 
+        for(int i=0;i<numS;i++) {
+            if(yy_temp[i]>max) {
+                max=yy_temp[i];
+                i_max_val=i;
+            }
+            if(yy_temp[i]<min) min=yy_temp[i];
+        }
+        for(int i=0;i<numS;i++) {
+            if(i<=i_max_val && yy_temp[i]<=max/2.0) i_left=i;
+            if(i>=i_max_val && yy_temp[i]>=max/2.0) i_right=i;
         }
 
         FitHeight = (max-min)/2;
-        SetFitParameters(ff_left,i_min*dx,FWHM,FitHeight,FitHeight);
-        ff_left->SetRange(0,(i_max+i_min)/2*dx);
+        SetFitParameters(ff_left,i_left*dx,FWHM,FitHeight/2,FitHeight);
+        ff_left->SetRange(0,(i_left+i_right)/2.0*dx);
 
-        SetFitParameters(ff_right,i_max*dx,FWHM,FitHeight,FitHeight);
-        ff_right->SetRange((i_max+i_min)/2*dx,dx*numS);
+        SetFitParameters(ff_right,i_right*dx,FWHM,FitHeight/2,FitHeight);
+        ff_right->SetRange((i_left+i_right)/2.0*dx,dx*numS);
 
         gr[j]->Fit("ff_left","Rq");
         gr[j]->Fit("ff_right","Rq+");
@@ -251,8 +238,6 @@ void TCTModule::FindEdges(TGraph** gr, Int_t numP, Int_t numS, Float_t dx, Float
         right_pos[j]=ff_right->GetParameter(0);
 
     }
-
-    delete yy;
 
 }
 
@@ -382,6 +367,7 @@ void TCTModule::MultiGraphWriter(Int_t N, TGraph **gr, const char *namex, const 
 
 /// Brief setting of the fit parameters.
 void TCTModule::SetFitParameters(TF1* ff,Double_t p0,Double_t p1,Double_t p2,Double_t p3) {
+    //std::cout<<"Fit Param Check: "<<p0<<" "<<p1<<" "<<p2<<" "<<p3<<" "<<std::endl;
     ff->SetParameter(0,p0);
     ff->SetParameter(1,p1);
     ff->SetParameter(2,p2);
