@@ -9,7 +9,7 @@ SET( TCTANALYSIS_VERSION_MAJOR 0 )
 SET( TCTANALYSIS_VERSION_MINOR 1 )
 SET( TCTANALYSIS_VERSION_PATCH 1 )
 
-# some macros are redefined to keep compatability with CMake 2.6
+# some macros are redefined to keep compatability with CMake 2.8.12
 include(${PROJECT_SOURCE_DIR}/cmake/CMakeCompatibility.cmake)
 
 # Determine platform- and compiler-specific settings
@@ -106,11 +106,23 @@ OPTION(WITH_GUI "Setting the compiler to build GUI" OFF)
 AUX_SOURCE_DIRECTORY(src/modules TCTMODULES)
 if(WITH_GUI)
     add_definitions(-DUSE_GUI)
-    # Qt4
-    FIND_PACKAGE(Qt4 REQUIRED)
-    INCLUDE(${QT_USE_FILE})
-    QT4_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui forms/form_folders.ui )
-    QT4_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h include/gui_consoleoutput.h)
+
+    FIND_PACKAGE(Qt5Widgets)
+    if(!Qt5Widgets_FOUND)
+    	FIND_PACKAGE(Qt4 REQUIRED)
+    endif()
+    if(Qt5Widgets_FOUND)
+    	QT5_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui forms/form_folders.ui )
+    	QT5_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h include/gui_consoleoutput.h)
+	SET(QT_VERSION 5)
+    else(Qt4_FOUND)    
+    	INCLUDE(${QT_USE_FILE})
+    	QT4_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui forms/form_folders.ui )
+    	QT4_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h include/gui_consoleoutput.h)
+	SET(QT_VERSION 4)
+    else()
+	MESSAGE(ERROR "Neither Qt5 or Qt4 were not found")
+    endif()
 
     # CORE LIBRARY:
     SET(LIB_SOURCE_FILES
@@ -167,7 +179,15 @@ if(WITH_GUI)
 else()
     add_executable(tct-analysis  src/main.cxx ${LIB_SOURCE_FILES})
 endif()
-#target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
+
+if(WITH_GUI)
+	if(QT_VERSION EQUAL 5) 
+		MESSAGE(STATUS "Linking against Qt5")
+		set(QT_LIBRARIES "Qt5::Widgets")
+	else(QT_VERSION EQUAL 4)
+		MESSAGE(STATUS "Linking against Qt4")
+	endif()
+endif()
 if(WITH_LECROY_RAW AND WITH_GUI)
         target_link_libraries(tct-analysis ${ROOT_LIBRARIES} ${QT_LIBRARIES} ${LCR_LIBRARY})
         target_link_libraries(tbrowser ${ROOT_LIBRARIES})
