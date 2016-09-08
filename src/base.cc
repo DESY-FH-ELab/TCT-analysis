@@ -30,6 +30,7 @@
 #include <util.h>
 
 #include <TCTModule.h>
+#include <TCTReader.h>
 
 //ROOT includes
 #include <TSystem.h>
@@ -810,4 +811,30 @@ void base::on_actionAbout_triggered()
                "<p><img src=\"../icons/arrow.png\" width=\"15\"/> TCT Data files readout system by <b>Particulars</b>"
                "<p><center><img src=\"../icons/knu.png\" width=\"87\"/> <img src=\"../icons/desy.png\" width=\"87\"/> <img src=\"../icons/lpnhe.png\" height=\"87\"/> <img src=\"../icons/particulars.png\" width=\"50\"/></center>"
                "<p><b>Compiled on: </b>%1, %2").arg(QString(__DATE__)).arg(QString(__TIME__)));
+}
+
+void base::on_actionFile_Info_triggered()
+{
+    QStringList names;
+
+    QFileDialog dialog(this);
+    dialog.setNameFilter(tr("TCT Files (*.tct)"));
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setDirectory(QString(config_tct->DataFolder().c_str()));
+    dialog.setModal(true);
+    if(dialog.exec()) {
+        names = dialog.selectedFiles();
+    }
+    else {
+        ui->statusBar->showMessage(tr("No files selected"));
+        return;
+    }
+    char pathandfile[250];
+    strcpy(pathandfile,names.at(0).toStdString().c_str());
+    TCTReader *file = new TCTReader(pathandfile,-3,2);
+    QMessageBox::about(this, tr("TCT File Info"),
+            tr("<h2>File Info</h2>"
+               "<b>Name:</b> %1"
+               "<p>%2").arg(names.at(0)).arg(file->StringInfo().c_str()));
+    delete file;
 }

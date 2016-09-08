@@ -93,6 +93,7 @@ class TCTReader
         void DrawList(Int_t, Int_t *);
         void DrawList(Int_t, Int_t*, Int_t *);
         void PrintInfo();
+        std::string StringInfo();
         void CorrectBaseLine(Float_t=0.0);
         void CorrectPolarity(Int_t=0);
 

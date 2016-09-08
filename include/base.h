@@ -60,6 +60,8 @@ private slots:
 
     void on_actionAbout_triggered();
 
+    void on_actionFile_Info_triggered();
+
 private:
     Ui::base *ui;
     std::string _DefConfigName;

@@ -950,8 +950,54 @@ void TCTReader::PrintInfo()
         for(j=0;j<NU2;j++)
             printf("U1,U2(%f,%f)::I1,I2(%e,%e)\n",U1[i],U2[j],I1[j+NU2*i],I2[j+NU2*i]); printf("\n");
 
+}
 
+std::string TCTReader::StringInfo() {
+    std::string output;
+    output = "<b>Format of the file: </b>";
+    output += type;
+    if(User!=NULL){
+        output += "<p><b>User: </b>";
+        output += User;
+    }
+    if(Sample!=NULL){
+        output += "<p><b>Sample: </b>";
+        output += Sample;
+    }
+    if(Comment!=NULL){
+        output += "<p><b>Comment: </b>";
+        output += Comment;
+    }
 
+    char buffer [250];
+    sprintf(buffer,"<p><b>Date and time of the meaurement:</b> %d.%d.%d %d:%d:%d",Date[0],Date[1],Date[2],Date[3],Date[4],Date[5]);
+    output += std::string(buffer);
+    sprintf(buffer,"<p><b>Active osciloscope channels:</b> Ch1=%d Ch2=%d Ch3=%d Ch4=%d",WFOnOff[0],WFOnOff[1],WFOnOff[2],WFOnOff[3]);
+    output += std::string(buffer);
+
+    sprintf(buffer,"<p><b>Number of points:</b> %d (X=%d, Y=%d, Z=%d)",Nx*Ny*Nz,Nx,Ny,Nz);
+    output += std::string(buffer);
+    sprintf(buffer,"<p><b>Positions:</b> r0=(%f,%f,%f) dr=(%f,%f,%f) ",x0,y0,z0,dx,dy,dz);
+    output += std::string(buffer);
+    sprintf(buffer,"<p><b>Time scale:</b> points=%d, t0=%e, dt=%e",NP,t0,dt);
+    output += std::string(buffer);
+    sprintf(buffer,"<p><b>Temperature:</b> %f",T);
+    output += std::string(buffer);
+    sprintf(buffer,"<p><b>Type of generation:</b> %4.0f",Source);
+    output += std::string(buffer);
+
+    sprintf(buffer,"<p><b>Voltages:</b> NU1=%d , NU2=%d:",NU1,NU2);
+    output += std::string(buffer);
+    int i,j;
+    for(i=0;i<NU1;i++)
+    {
+        for(j=0;j<NU2;j++){
+            sprintf(buffer,"<p>U1,U2(%f,%f)::I1,I2(%e,%e)\n",U1[i],U2[j],I1[j+NU2*i],I2[j+NU2*i]);
+            output += std::string(buffer);
+        }
+    }
+
+    return output;
 }
 
 

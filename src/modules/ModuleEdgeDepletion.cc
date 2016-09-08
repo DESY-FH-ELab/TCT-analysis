@@ -222,7 +222,7 @@ bool ModuleEdgeDepletion::CheckModuleData() {
     case 1: NSource = stct->NU1; break;
     case 2: NSource = stct->NU2; break;
     }
-    if(NSource>=7) std::cout<<"\t\t\tVoltage scan contains "<<NSource<<" points. OK"<<std::endl;
+    if(NSource>=6) std::cout<<"\t\t\tVoltage scan contains "<<NSource<<" points. OK"<<std::endl;
     else {
         std::cout<<"\t\t\tVoltage scan contains only "<<NSource<<" points. Not enough for depletion voltage search."<<std::endl;
         return false;

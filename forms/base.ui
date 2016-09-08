@@ -1350,7 +1350,7 @@
      <x>0</x>
      <y>0</y>
      <width>671</width>
-     <height>27</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1360,6 +1360,7 @@
     <addaction name="separator"/>
     <addaction name="actionChange_config"/>
     <addaction name="actionSave_config"/>
+    <addaction name="actionFile_Info"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -1400,6 +1401,14 @@
    </property>
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionFile_Info">
+   <property name="text">
+    <string>TCT File Info</string>
+   </property>
+   <property name="toolTip">
+    <string>Prints the *.tct file info header</string>
    </property>
   </action>
  </widget>
@@ -1616,9 +1625,9 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_optical"/>
-  <buttongroup name="buttonGroup_scanning"/>
   <buttongroup name="buttonGroup_mode"/>
   <buttongroup name="buttonGroup_input_type"/>
+  <buttongroup name="buttonGroup_optical"/>
+  <buttongroup name="buttonGroup_scanning"/>
  </buttongroups>
 </ui>
