@@ -82,7 +82,7 @@ There are two options available - console and graphical version of the framework
 The pre-compiled version is distributed only for Windows, for the other operating systems it has to be compiled from source. TCT-Analysis requires ROOT 5.34.XX to be installed. Download needed version from \url{https://root.cern.ch/} and add it to the PATH environmental variable (usually offered by ROOT installer).
 \\ \indent The next step is downloading the latest release of the framework from:
 \begin{displayquote}
-\url{https://github.com/garankonic/TCT-analysis/releases}
+\url{https://github.com/DESY-FH-ELab/TCT-analysis/releases}
 \end{displayquote}
 Windows pre-compiled versions are stored in *.zip file. To install the program one needs to unzip the archive to the desired directory.
 To start the program run \textbf{TCT-Analysis-QT.exe} in the \textbf{TCT-Analysis/bin} folder.
@@ -102,11 +102,11 @@ After satisfying dependencies, follow the next steps for both Windows and Linux 
 \begin{enumerate}
 \item Checkout the latest release of the program from the Github repository:
 \begin{displayquote}
-\url{https://github.com/garankonic/TCT-analysis/releases}
+\url{https://github.com/DESY-FH-ELab/TCT-analysis/releases}
 \end{displayquote}
 Or go to the master branch to get the latest version in development
 \begin{displayquote}
-\url{https://github.com/garankonic/TCT-analysis}
+\url{https://github.com/DESY-FH-ELab/TCT-analysis}
 \end{displayquote}
 \item Go to the \textbf{TCT-Analysis/build} directory.
 \item Run "\textbf{cmake $\langle$options$\rangle$ ..}" command with the next available options.
@@ -123,6 +123,7 @@ Or go to the master branch to get the latest version in development
 
 To compile the framework from source using qmake next prerequisites have to be satisfied (compilation with GUI):
 \begin{itemize}
+\item For Linux: gcc 4.6 or later. For Windows: MSVC2015 or later.
 \item ROOT 5.X or 6.X has to be installed.
 \item Install Qt4 or Qt5.
 \end{itemize}
@@ -131,11 +132,11 @@ After satisfying dependencies, follow next steps for both Windows and Linux oper
 \begin{enumerate}
 \item Checkout the latest release of the program from the Github repository:
 \begin{displayquote}
-\url{https://github.com/garankonic/TCT-analysis/releases}
+\url{https://github.com/DESY-FH-ELab/TCT-analysis/releases}
 \end{displayquote}
 Or go to the master branch to get the latest version in development
 \begin{displayquote}
-\url{https://github.com/garankonic/TCT-analysis}
+\url{https://github.com/DESY-FH-ELab/TCT-analysis}
 \end{displayquote}
 \item Open \textbf{TCT-Analysis.pro} file in \textbf{Qt Creator}.
 \item Follow instructions to configure compilation of the program.
