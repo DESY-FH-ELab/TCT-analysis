@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the sample class.
+ * \brief Definition of the TCT::acquisition_base class.
  */
 
 #ifndef __ACQUISITION_H__
@@ -9,6 +9,7 @@
 // STD includes
 #include <iostream>
 #include <vector>
+#include <cstdint>
 
 // ROOT includes
 #include "TH1F.h"
@@ -66,11 +67,11 @@ namespace TCT {
       };
 
       // Default copy constructer should be fine
-      acquisition_base(const acquisition_base &)               = default;
-      acquisition_base & operator = (const acquisition_base &) = default;
+      //acquisition_base(const acquisition_base &)              ;
+      //acquisition_base & operator = (const acquisition_base &);
 
       // Dectructor
-      ~acquisition_base() = default;
+      //~acquisition_base();
 
 
       virtual double GetSNR() const = 0;
@@ -125,7 +126,7 @@ namespace TCT {
 
     public :
 
-      //acquisition_avg() = default;
+      //acquisition_avg();
 
       acquisition_avg(uint32_t nsamples) :
 	acquisition_base(nsamples){
@@ -151,8 +152,8 @@ namespace TCT {
       //{}
 
       // Default copy constructer should be fine
-      acquisition_avg(const acquisition_avg &)               = default;
-      acquisition_avg & operator = (const acquisition_avg &) = default;
+      acquisition_avg(const acquisition_avg &)              ;
+      acquisition_avg & operator = (const acquisition_avg &);
 
       // Dectructor
       ~acquisition_avg(){
@@ -277,11 +278,11 @@ namespace TCT {
 
 
       // Default copy constructer should be fine
-      acquisition_single(const acquisition_single &)               = default;
-      acquisition_single & operator = (const acquisition_single &) = default;
+      //acquisition_single(const acquisition_single &)              ;
+     // acquisition_single & operator = (const acquisition_single &);
 
       // Dectructor
-      ~acquisition_single() = default;
+      //~acquisition_single();
       //{
         //delete _H_acquisition;		// dont delete here, need them for writting still
         //delete _H_acquisitionFILTERED;	// 
@@ -406,16 +407,16 @@ namespace TCT {
   class acquisition_multi_single : public acquisition_base {
 
     public :
-      acquisition_multi_single() = default;//:
+      acquisition_multi_single();//:
       //_Nsamples(1996),
       //{}
 
       // Default copy constructer should be fine
-      acquisition_multi_single(const acquisition_multi_single &)               = default;
-      acquisition_multi_single & operator = (const acquisition_multi_single &) = default;
+      acquisition_multi_single(const acquisition_multi_single &)              ;
+      acquisition_multi_single & operator = (const acquisition_multi_single &);
 
       // Dectructor
-      ~acquisition_multi_single() = default;
+      //~acquisition_multi_single();
       virtual double GetSNR() const {
 	return 1.0;
       }
@@ -431,16 +432,16 @@ namespace TCT {
       TProfile* _Profile;
 
     public :
-      acquisition_multi_avg() = default; //:
+      acquisition_multi_avg(); //:
       //_Nsamples(1996),
       //{}
 
       // Default copy constructer should be fine
-      acquisition_multi_avg(const acquisition_multi_avg &)               = default;
-      acquisition_multi_avg & operator = (const acquisition_multi_avg &) = default;
+      acquisition_multi_avg(const acquisition_multi_avg &)              ;
+      acquisition_multi_avg & operator = (const acquisition_multi_avg &);
 
       // Dectructor
-      ~acquisition_multi_avg() = default;
+      //~acquisition_multi_avg();
 
       virtual double GetSNR() const {
 	return 1.0;

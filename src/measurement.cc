@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of measurement methods
+ * \brief Implementation of TCT::measurement methods
  */
 
 #include<string>

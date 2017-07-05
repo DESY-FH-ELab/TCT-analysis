@@ -9,7 +9,7 @@ SET( TCTANALYSIS_VERSION_MAJOR 0 )
 SET( TCTANALYSIS_VERSION_MINOR 1 )
 SET( TCTANALYSIS_VERSION_PATCH 1 )
 
-# some macros are redefined to keep compatability with CMake 2.6
+# some macros are redefined to keep compatability with CMake 2.8.12
 include(${PROJECT_SOURCE_DIR}/cmake/CMakeCompatibility.cmake)
 
 # Determine platform- and compiler-specific settings
@@ -99,37 +99,122 @@ INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIR} )
 ADD_DEFINITIONS(-DROOT_FOUND)
 
 # include directories
-INCLUDE_DIRECTORIES( ./include )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/include )
 
-# CORE LIBRARY:
-SET(LIB_SOURCE_FILES
-  "src/sample.cc"
-  "src/acquisition.cc"
-  "src/measurement.cc"
-  "src/util.cc"
-  "src/analysis.cc"
-  "src/scanning.cc"
-  )
-ADD_LIBRARY(${PROJECT_NAME} SHARED ${LIB_SOURCE_FILES} )
+# GUI Option, if yes - Qt installation needed
+OPTION(WITH_GUI "Setting the compiler to build GUI" OFF)
+AUX_SOURCE_DIRECTORY(src/modules TCTMODULES)
+if(WITH_GUI)
+    add_definitions(-DUSE_GUI)
+
+    FIND_PACKAGE(Qt5Widgets)
+    if(!Qt5Widgets_FOUND)
+    	FIND_PACKAGE(Qt4 REQUIRED)
+    endif()
+    if(Qt5Widgets_FOUND)
+    	QT5_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui forms/form_folders.ui )
+    	QT5_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h include/gui_consoleoutput.h)
+	SET(QT_VERSION 5)
+    else(Qt4_FOUND)    
+    	INCLUDE(${QT_USE_FILE})
+    	QT4_WRAP_UI(UISrcs forms/base.ui forms/form_parameters.ui forms/form_sample.ui forms/form_folders.ui )
+    	QT4_WRAP_CPP(MOCSrcs include/base.h include/gui_folders.h include/gui_sample.h include/gui_consoleoutput.h)
+	SET(QT_VERSION 4)
+    else()
+	MESSAGE(ERROR "Neither Qt5 or Qt4 were not found")
+    endif()
+
+    # CORE LIBRARY:
+    SET(LIB_SOURCE_FILES
+      "src/sample.cc"
+      "src/acquisition.cc"
+      "src/measurement.cc"
+      "src/util.cc"
+      "src/analysis.cc"
+      "src/tct_config.cc"
+      "src/scanning.cc"
+      "src/TCTReader.cc"
+      "src/TCTModule.cc"
+      ${TCTMODULES}
+      "src/base.cc"
+      "src/gui_folders.cc"
+      "src/gui_sample.cc"
+      ${MOCSrcs}
+      ${UISrcs}
+      )
+else()
+    # CORE LIBRARY:
+    SET(LIB_SOURCE_FILES
+      "src/sample.cc"
+      "src/acquisition.cc"
+      "src/measurement.cc"
+      "src/util.cc"
+      "src/analysis.cc"
+      "src/tct_config.cc"
+      "src/scanning.cc"
+      "src/TCTReader.cc"
+      "src/TCTModule.cc"
+      ${TCTMODULES}
+      )
+endif()
 MESSAGE(STATUS ${ROOT_LIBRARIES})
 
-# Check for LCR Library
-FIND_PACKAGE ( LCR REQUIRED )
-INCLUDE_DIRECTORIES( ${LCR_INCLUDE_DIR} )
+
+# Setting the LeCroy Library Requierment
+OPTION(WITH_LECROY_RAW "Setting the LeCroy Library to read RAW files from the oscilloscope" OFF)
+if(WITH_LECROY_RAW)
+	add_definitions(-DUSE_LECROY_RAW)
+	FIND_PACKAGE ( LCR REQUIRED )
+	INCLUDE_DIRECTORIES( ${LCR_INCLUDE_DIR} )
+endif()
 
 # Check for TCTAnalyze library by particulars.si
-FIND_PACKAGE ( TCTAnalyze REQUIRED )
-INCLUDE_DIRECTORIES( ${TCTAnalyze_INCLUDE} )
+#FIND_PACKAGE ( TCTAnalyze REQUIRED )
+#INCLUDE_DIRECTORIES( ${TCTAnalyze_INCLUDE} )
 
 # build main TCT-ANALYSIS executable
-add_executable(tct-analysis  src/main.cxx )
-target_link_libraries(tct-analysis ${PROJECT_NAME} ${ROOT_LIBRARIES} ${TCTAnalyze_LIBRARIES} ${LCR_LIBRARY})
+if(WITH_GUI)
+    add_executable(tct-analysis  src/main_gui.cxx ${LIB_SOURCE_FILES})
+    add_executable(tbrowser  src/tbrowser.cxx )
+else()
+    add_executable(tct-analysis  src/main.cxx ${LIB_SOURCE_FILES})
+endif()
+
+if(WITH_GUI)
+	if(QT_VERSION EQUAL 5) 
+		MESSAGE(STATUS "Linking against Qt5")
+		set(QT_LIBRARIES "Qt5::Widgets")
+	else(QT_VERSION EQUAL 4)
+		MESSAGE(STATUS "Linking against Qt4")
+	endif()
+endif()
+if(WITH_LECROY_RAW AND WITH_GUI)
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES} ${QT_LIBRARIES} ${LCR_LIBRARY})
+        target_link_libraries(tbrowser ${ROOT_LIBRARIES})
+elseif(WITH_GUI)
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES} ${QT_LIBRARIES})
+        target_link_libraries(tbrowser ${ROOT_LIBRARIES})
+elseif(WITH_LECROY_RAW)
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES} ${LCR_LIBRARY})
+else()
+        target_link_libraries(tct-analysis ${ROOT_LIBRARIES})
+endif()
+
 # now set up the installation directory
-INSTALL(TARGETS ${PROJECT_NAME} tct-analysis
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+if(WITH_GUI)
+    # creating and installing default config file
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/default.conf "DefaultFile = ../testanalysis/lpnhe_top.txt")
+    INSTALL(TARGETS tct-analysis tbrowser
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
+    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/default.conf DESTINATION bin)
+else()
+    INSTALL(TARGETS tct-analysis
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
+endif()
 
 
 
@@ -152,5 +237,21 @@ ENDIF(DOXYGEN_FOUND)
 # Print out system information useful for bug reports #
 ############################################### #######
 include(PrintSystemInformation)
+
+#######################
+# Print configuration #
+#######################
+if(NOT WIN32)
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(ColourBold  "${Esc}[1m")
+  set(Red         "${Esc}[31m")
+  set(Green       "${Esc}[32m")
+  set(BoldRed     "${Esc}[1;31m")
+  set(BoldGreen   "${Esc}[1;32m")
+endif()
+message(STATUS "${BoldRed}Build options:${ColourReset}")
+message(STATUS "${Green}WITH_LECROY_RAW: " ${BoldGreen} ${WITH_LECROY_RAW} ${ColourReset})
+message(STATUS "${Green}WITH_GUI: " ${BoldGreen} ${WITH_GUI} ${ColourReset})
 
 

@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of acquisition methods
+ * \brief Implementation of TCT::acquisition_base methods
  */
 
 // STD includes
@@ -16,7 +16,9 @@
 #include "TRandom3.h" 
 
 // External includes
-#include "LeCroy.h"
+#ifdef USE_LECROY_RAW
+    #include "LeCroy.h"
+#endif
 
 //#define DEBUG
 
@@ -118,7 +120,7 @@ namespace TCT {
 
     return kTRUE;
   }
-
+#ifdef USE_LECROY_RAW
   bool acquisition_single::ReadRAW(std::string fullfname, uint32_t iFile){
 
 	#ifdef DEBUG 
@@ -175,6 +177,14 @@ namespace TCT {
 
 	
   }
+#else
+  bool acquisition_single::ReadRAW(std::string fullfname, uint32_t iFile){
+
+    std::cout<<"Impossible without LeCroy Library. Recompile Application with -DWITH_LECROY_RAW=ON flag."<<std::endl;
+
+    return kFALSE;
+  }
+#endif
 
   void acquisition_single::SetName(std::string name){
 
@@ -330,7 +340,9 @@ namespace TCT {
     std::cout << " S2n_Cut = " << S2n_Cut << " Width_Cut = " << Width_Cut << " Amplitude_Cut = " << Amplitude_Cut << std::endl;
 #endif
 
-    Float_t s2n[Nsamples()];
+    //FIXME need to be size of Nsamples
+    //Float_t s2n[Nsamples()];
+    Float_t s2n[10000];
     Int_t temp_start[1000];
     Int_t temp_end[1000];
     Float_t temp_sig[1000];

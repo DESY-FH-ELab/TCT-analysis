@@ -12,15 +12,16 @@
 
 //  includes from TCT classes
 #include "sample.h"
-#include "config.h"
 //#include "param.h"
 #include "util.h"
 #include "acquisition.h"
 #include "measurement.h"
 #include "analysis.h"
 #include "scanning.h"
+#include "tct_config.h"
 
 //  includes from ROOT libraries
+#include "config.h"
 #include "TCanvas.h"
 #include "TGraph.h"
 #include "TROOT.h"
@@ -77,12 +78,6 @@ int main(int argc, char* argv[])
     // !! add check for certain vital options, if not passed, break
   }
 
-
-
-  // create analysis object to stear the analysis. only one at the moment, no vector of objects. should be sufficient if analysis parameters are the same for every analysed folder
-  TCT::analysis ana(ana_card.ID_val());
-  //std::cout << ana << std::endl;
-
   for( auto i : ana_card.ID_val()){
     if(i.first == "ProjectFolder") {
       if(proj_folder != "def") std::cout << " Project folder from command line overwritten by value from analysis card. " << std:: endl;
@@ -101,14 +96,16 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
+  TCT::mode_selector check_mode(ana_card.ID_val());
+
   // create sample object from sample card
-  if(ana.SampleCard() == "def") {
+  if(check_mode.SampleCard() == "def") {
     std::cout << "   *** No SampleCard was passed, check your analysis card, if \"SampleCard = ...\" is specified " << std::endl;
     exit(1);
-  } else std::cout << "\n Try to read sample card from : " << ana.SampleCard() << std::endl;
+  } else std::cout << "\n Try to read sample card from : " << check_mode.SampleCard() << std::endl;
 
   TCT::util sample_card;
-  std::ifstream sample_file (ana.SampleCard());
+  std::ifstream sample_file (check_mode.SampleCard());
   sample_card.parse(sample_file);
 
   if(sample_card.ID_val().size() == 0) {
@@ -124,249 +121,247 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  // find all subfolders in datafolder
-  if(ana.DataFolder() == "def") {
-    std::cout << "   * No data folder was specified in analysis card. Check your analysis card, that \"DataFolder = ...\" is specified correctly" << std::endl;
-    exit(1);
-  }
-  std::cout << "The sample's data folder is = " << ana.DataFolder() << ", searching data in subfolder(s) " <<  std::endl;
-  std::map<std::string, std::vector<std::string>> folder_struc;
-  std::vector<std::string> dirs;
-  std::vector<std::string> dirs2;	// push folder for every subfolder (linearisation of folder matrix)
-  std::vector<std::string> subdirs2;	// push folder for every subfolder (linearisation of folder matrix)
-  std::vector<std::string> pathndirs;
-  std::vector<int> Nsubdirs;
+  if(check_mode.Mode()==0) {
 
-  void *dirp = gSystem->OpenDirectory(ana.DataFolder().c_str());
-  if (!dirp) {
-    std::cout << "   *** Data Folder not found. Check \"DataFolder\" in analysis card." << std::endl;
-    exit(1);
-  }
-  char *direntry;
-  uint32_t counterdir   = 0;
-  uint32_t countersubdir= 0;
-  while ((direntry = (char*)gSystem->GetDirEntry(dirp))) {
-    if ( strstr(direntry,"..") || strstr(direntry,".") ) continue;
-    counterdir++;
-    //std::cout << "- " << direntry << std::endl;
-    dirs.push_back((std::string)direntry);
+      // create analysis object to stear the analysis. only one at the moment, no vector of objects. should be sufficient if analysis parameters are the same for every analysed folder
+      TCT::analysis ana(ana_card.ID_val());
+      //std::cout << ana << std::endl;
 
+#ifndef USE_LECROY_RAW
+      if(ana.LeCroyRAW()) {
+          std::cout<<"   *** Config says to process LeCroy RAW files. Impossible without LeCroy Library. Recompile Application with -DWITH_LECROY_RAW=ON flag."<<std::endl;
+          exit(1);
+      }
+#endif
 
-    std::string subDataFolder	= ana.DataFolder() + "/" + direntry;
-    //std::cout << "Subdir = " << subDataFolder << std::endl;
-    std::vector<std::string> subdirs;
-    void *subdirp = gSystem->OpenDirectory(subDataFolder.c_str());
-    char *subdirentry;
-    while ((subdirentry = (char*)gSystem->GetDirEntry(subdirp))) {
-      if ( strstr(subdirentry,"..") || strstr(subdirentry,"." ) ) continue;
-      countersubdir++;
-      //std::cout << "-- " << subdirentry << std::endl;
-      subdirs.push_back(subdirentry);
-      dirs2.push_back((std::string)direntry);
-      subdirs2.push_back((std::string)subdirentry);
-      std::string fullpath = ana.DataFolder() + "/" + direntry + "/" + subdirentry + "/";
-      //std::cout << fullpath << std::endl;
-      pathndirs.push_back(fullpath);
+      // find all subfolders in datafolder
+      if(ana.DataFolder() == "def") {
+          std::cout << "   * No data folder was specified in analysis card. Check your analysis card, that \"DataFolder = ...\" is specified correctly" << std::endl;
+          exit(1);
+      }
+      std::cout << "The sample's data folder is = " << ana.DataFolder() << ", searching data in subfolder(s) " <<  std::endl;
+      std::map<std::string, std::vector<std::string>> folder_struc;
+      std::vector<std::string> dirs;
+      std::vector<std::string> dirs2;	// push folder for every subfolder (linearisation of folder matrix)
+      std::vector<std::string> subdirs2;	// push folder for every subfolder (linearisation of folder matrix)
+      std::vector<std::string> pathndirs;
+      std::vector<int> Nsubdirs;
 
-    }
-    Nsubdirs.push_back(countersubdir);
-    countersubdir = 0;
-
-    folder_struc[dirs[counterdir-1]] = subdirs;
+      void *dirp = gSystem->OpenDirectory(ana.DataFolder().c_str());
+      if (!dirp) {
+          std::cout << "   *** Data Folder not found. Check \"DataFolder\" in analysis card." << std::endl;
+          exit(1);
+      }
+      char *direntry;
+      uint32_t counterdir   = 0;
+      uint32_t countersubdir= 0;
+      while ((direntry = (char*)gSystem->GetDirEntry(dirp))) {
+          if ( strstr(direntry,"..") || strstr(direntry,".") ) continue;
+          counterdir++;
+          //std::cout << "- " << direntry << std::endl;
+          dirs.push_back((std::string)direntry);
 
 
-  }
+          std::string subDataFolder	= ana.DataFolder() + "/" + direntry;
+          //std::cout << "Subdir = " << subDataFolder << std::endl;
+          std::vector<std::string> subdirs;
+          void *subdirp = gSystem->OpenDirectory(subDataFolder.c_str());
+          char *subdirentry;
+          while ((subdirentry = (char*)gSystem->GetDirEntry(subdirp))) {
+              if ( strstr(subdirentry,"..") || strstr(subdirentry,"." ) ) continue;
+              countersubdir++;
+              //std::cout << "-- " << subdirentry << std::endl;
+              subdirs.push_back(subdirentry);
+              dirs2.push_back((std::string)direntry);
+              subdirs2.push_back((std::string)subdirentry);
+              std::string fullpath = ana.DataFolder() + "/" + direntry + "/" + subdirentry + "/";
+              //std::cout << fullpath << std::endl;
+              pathndirs.push_back(fullpath);
 
-  for (auto i : Nsubdirs) {
-    countersubdir +=i;
-    //std::cout << " i = " << i << std::endl;
-  }
+          }
+          Nsubdirs.push_back(countersubdir);
+          countersubdir = 0;
 
-  std::cout << " Found the following folder structure: " << std::endl;
-  for(auto i : folder_struc) {
-    for(auto j : i.second)
-      std::cout << i.first << " " <<  j << " " << "\n";
-  }
-
-  std::cout << " In total, found " << countersubdir << " subfolder(s) " << std::endl;
-
-
-
-  uint32_t counter;
-  switch(ana.Mode()) {
-      case 0:
-          //if(countersubdir > 0) {
-          counter=0;
-          while(1){
+          folder_struc[dirs[counterdir-1]] = subdirs;
 
 
-    #ifdef DEBUG
-              std::cout << " Start with subfolder # " << counter << std::endl;
-    #endif
-              //int i = 0; i < countersubdir; i++) {
-              // create vec with acq_singles in it
-              std::vector<TCT::acquisition_single> AllAcqs;
+      }
 
-              if(countersubdir == 0) {
-                  // check if DataFolder() ends on "/", if not, add it
-                  std::string path = ana.DataFolder();
-                  if (path.length() > 0) {
-                      std::string::iterator it = path.end() - 1;
-                      if (*it != '/') {
-                          path.append("/");
-                      }
+      for (auto i : Nsubdirs) {
+          countersubdir +=i;
+          //std::cout << " i = " << i << std::endl;
+      }
+
+      std::cout << " Found the following folder structure: " << std::endl;
+      for(auto i : folder_struc) {
+          for(auto j : i.second)
+              std::cout << i.first << " " <<  j << " " << "\n";
+      }
+
+      std::cout << " In total, found " << countersubdir << " subfolder(s) " << std::endl;
+
+      uint32_t counter;
+      //if(countersubdir > 0) {
+      counter=0;
+      while(1){
+
+
+#ifdef DEBUG
+          std::cout << " Start with subfolder # " << counter << std::endl;
+#endif
+          //int i = 0; i < countersubdir; i++) {
+          // create vec with acq_singles in it
+          std::vector<TCT::acquisition_single> AllAcqs;
+
+          if(countersubdir == 0) {
+              // check if DataFolder() ends on "/", if not, add it
+              std::string path = ana.DataFolder();
+              if (path.length() > 0) {
+                  std::string::iterator it = path.end() - 1;
+                  if (*it != '/') {
+                      path.append("/");
                   }
-                  ana.SetDataFolder(path);
-                  // push DataFolder to pathndirs (this is a hack to cope with Nsubdir == 0...)
-                  pathndirs.push_back(ana.DataFolder());
               }
-              // create measurement object from one subdir for each cycle
-              TCT::measurement meas(pathndirs[counter]);
+              ana.SetDataFolder(path);
+              // push DataFolder to pathndirs (this is a hack to cope with Nsubdir == 0...)
+              pathndirs.push_back(ana.DataFolder());
+          }
+          // create measurement object from one subdir for each cycle
+          TCT::measurement meas(pathndirs[counter]);
 
-              if(!meas.AcqsLoader(&AllAcqs, ana.MaxAcqs(),ana.LeCroyRAW())) {
-                  std::cout << " Folder empty! Skipping folder" << std::endl;
-                  continue;
-              };
-
-              // now create instance of avg acquisition using Nsamples from loaded files
-              TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
-              AcqAvg.SetPolarity(AllAcqs[0].Polarity());
-
-              //now analyse all acquisitions
-              int Nselected = 0;
-
-    #ifdef DEBUG
-              std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
-    #endif
-
-              AcqAvg.SetNanalysed(AllAcqs.size());
-              for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
-
-    #ifdef DEBUG
-                  std::cout << " - Start with Acq #" << i_acq << std::endl;
-    #endif
-
-                  TCT::acquisition_single* acq = &AllAcqs[i_acq];
-                  if(ana.DoSmearing()) ana.AcqsSmearer(acq, ana.AddNoise(), false);
-                  ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
-                  if(ana.DoSmearing()) ana.AcqsSmearer(acq, false, ana.AddJitter()); // AcqsAnalyser removes jitter by determining each acqs delay. Hence, to add jitter, delay has to be manipulated after AcqsAnalyser (and before filling of profile
-
-    #ifdef DEBUG
-                  std::cout << *acq << std::endl;
-    #endif
-
-                  if( ana.AcqsSelecter(acq) ) {
-                      Nselected++;
-                      acq->SetSelect(true);
-                  }
-                  AcqAvg.SetNselected(Nselected);
-                  ana.AcqsProfileFiller(acq, &AcqAvg);
-
-              } // end fot AllAcqs.size()
-
-              //std::cout << "Mean s2nval = " << AcqAvg.M_V_S2nval() << std::endl;
-
-              ana.SetOutSample_ID(sample.SampleID());
-              ana.SetSampleThickness(sample.Thickness());
-              if(countersubdir > 0) {
-                  ana.SetOutSubFolder(dirs2[counter]);
-                  ana.SetOutSubsubFolder(subdirs2[counter]);
-              } else {
-                  ana.SetOutSubFolder("def");
-                  ana.SetOutSubsubFolder("def");
-              }
-
-
-              if(ana.SaveToFile())
-                  if(countersubdir > 0) ana.AcqsWriter(&AllAcqs, &AcqAvg, true);
-                  else ana.AcqsWriter(&AllAcqs, &AcqAvg, false);
-
-              std::cout << "   Nselected = " << Nselected << std::endl;
-              std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
-
-              // now take care of memory management
-              // delete remaning TH1Fs in acquisition_single and then clear AllAcqs
-              for(int j = 0; j < AllAcqs.size(); j++) {
-                  AllAcqs[j].Clear();
-              }
-              AllAcqs.clear();
-
+          if(!meas.AcqsLoader(&AllAcqs, ana.MaxAcqs(),ana.LeCroyRAW())) {
+              std::cout << " Folder empty! Skipping folder" << std::endl;
               counter++;
               if( countersubdir == 0) break;
               if(counter == countersubdir) break;
-    #ifdef DEBUG
-              std::cout << "   AllAcqs has " << AllAcqs.size() << " objects left" << std::endl;
-    #endif
+              continue;
+          };
 
+          // now create instance of avg acquisition using Nsamples from loaded files
+          TCT::acquisition_avg AcqAvg(AllAcqs[0].Nsamples());
+          AcqAvg.SetPolarity(AllAcqs[0].Polarity());
+
+          //now analyse all acquisitions
+          int Nselected = 0;
+
+#ifdef DEBUG
+          std::cout << "Size of AllAcqs = " << AllAcqs.size() << std::endl;
+#endif
+
+          AcqAvg.SetNanalysed(AllAcqs.size());
+          for(uint32_t i_acq = 0; i_acq < AllAcqs.size(); i_acq++){
+
+#ifdef DEBUG
+              std::cout << " - Start with Acq #" << i_acq << std::endl;
+#endif
+
+              TCT::acquisition_single* acq = &AllAcqs[i_acq];
+              if(ana.DoSmearing()) ana.AcqsSmearer(acq, ana.AddNoise(), false);
+              ana.AcqsAnalyser(acq, i_acq, &AcqAvg);
+              if(ana.DoSmearing()) ana.AcqsSmearer(acq, false, ana.AddJitter()); // AcqsAnalyser removes jitter by determining each acqs delay. Hence, to add jitter, delay has to be manipulated after AcqsAnalyser (and before filling of profile
+
+#ifdef DEBUG
+              std::cout << *acq << std::endl;
+#endif
+
+              if( ana.AcqsSelecter(acq) ) {
+                  Nselected++;
+                  acq->SetSelect(true);
+              }
+              AcqAvg.SetNselected(Nselected);
+              ana.AcqsProfileFiller(acq, &AcqAvg);
+
+          } // end fot AllAcqs.size()
+
+          //std::cout << "Mean s2nval = " << AcqAvg.M_V_S2nval() << std::endl;
+
+          ana.SetOutSample_ID(sample.SampleID());
+          if(countersubdir > 0) {
+              ana.SetOutSubFolder(dirs2[counter]);
+              ana.SetOutSubsubFolder(subdirs2[counter]);
+          } else {
+              ana.SetOutSubFolder("def");
+              ana.SetOutSubsubFolder("def");
           }
-      case 1:
-          counter = 0;
-// Simulation of the tctscan
-/*
-          std::string sim_out = ana.OutFolder() + "/" + "simulated.root";
+
+
+          if(ana.SaveToFile())
+              if(countersubdir > 0) ana.AcqsWriter(&AllAcqs, &AcqAvg, true);
+              else ana.AcqsWriter(&AllAcqs, &AcqAvg, false);
+
+          std::cout << "   Nselected = " << Nselected << std::endl;
+          std::cout << "   ratio of selected acqs = " << Nselected << " / " << AllAcqs.size() << " = " << (float)Nselected/AllAcqs.size()*100. << "%\n\n" << std::endl;
+
+          // now take care of memory management
+          // delete remaning TH1Fs in acquisition_single and then clear AllAcqs
+          for(int j = 0; j < AllAcqs.size(); j++) {
+              AllAcqs[j].Clear();
+          }
+          AllAcqs.clear();
+
+          counter++;
+          if( countersubdir == 0) break;
+          if(counter == countersubdir) break;
+#ifdef DEBUG
+          std::cout << "   AllAcqs has " << AllAcqs.size() << " objects left" << std::endl;
+#endif
+
+      }
+
+  }
+
+  if(check_mode.Mode()==1) {
+
+      TCT::tct_config config(ana_card.ID_val());
+      config.SetOutSample_ID(sample.SampleID());
+      config.SetSampleThickness(sample.Thickness());
+
+      if(config.DataFolder() == "def") {
+          std::cout << "   * No data folder was specified in analysis card. Check your analysis card, that \"DataFolder = ...\" is specified correctly" << std::endl;
+          exit(1);
+      }
+      std::cout << "The sample's data folder is = " << config.DataFolder() << ", searching data in folder " <<  std::endl;
+
+
+      void *dirp = gSystem->OpenDirectory(config.DataFolder().c_str());
+      if (!dirp) {
+          std::cout << "   *** Data Folder not found. Check \"DataFolder\" in analysis card." << std::endl;
+          exit(1);
+      }
+      std::string path = config.DataFolder();
+      if (path.length() > 0) {
+          std::string::iterator it = path.end() - 1;
+          if (*it != '/') {
+              path.append("/");
+          }
+      }
+      config.SetDataFolder(path);
+      // Simulation of the tctscan
+      /*
+          std::string sim_out = config.OutFolder() + "/" + "simulated.root";
           TFile* f_rootfile_1 = new TFile(sim_out.c_str(),"RECREATE","TCTanalyser");
           f_rootfile_1->cd();
           TCT::Scanning daq_data;
-          daq_data.SimulateDoFocus(f_rootfile_1,&ana);
+          daq_data.SimulateDoFocus(f_rootfile_1,&config);
           f_rootfile_1->Close();
-*/
-          while(1) {
-              if(countersubdir == 0) {
-                  // check if DataFolder() ends on "/", if not, add it
-                  std::string path = ana.DataFolder();
-                  if (path.length() > 0) {
-                      std::string::iterator it = path.end() - 1;
-                      if (*it != '/') {
-                          path.append("/");
-                      }
-                  }
-                  ana.SetDataFolder(path);
-                  // push DataFolder to pathndirs (this is a hack to cope with Nsubdir == 0...)
-                  pathndirs.push_back(ana.DataFolder());
-              }
-              const char* filedir = pathndirs[counter].c_str(); // !! change to encapsulation
+      */
+      const char *infile;
+      while((infile = gSystem->GetDirEntry(dirp))) {
 
-              std::cout << " read files from: " << filedir << std::endl;
+          if (strstr(infile,".tct")) {
+              char pathandfile[250];
+              strcpy(pathandfile,config.DataFolder().c_str());
+              strcat(pathandfile,infile);
+              std::cout << "  read file from: " << pathandfile << std::endl;
 
-              // get list of files in filedir
-              void *dir = gSystem->OpenDirectory(filedir);
-              const char *infile;
-              uint32_t nfiles = 0;
-              std::cout<<"Parsing DAQ data"<<std::endl;
-              bool HasSubs = (bool)countersubdir;
-              ana.SetOutSample_ID(sample.SampleID());
-              ana.SetSampleThickness(sample.Thickness());
-              if(countersubdir > 0) {
-                  ana.SetOutSubFolder(dirs2[counter]);
-                  ana.SetOutSubsubFolder(subdirs2[counter]);
-              } else {
-                  ana.SetOutSubFolder("def");
-                  ana.SetOutSubsubFolder("def");
-              }
-              while((infile = gSystem->GetDirEntry(dir))) {
-
-                  if (strstr(infile,".tct")) {
-                      char pathandfile[250];
-                      strcpy(pathandfile,filedir);
-                      strcat(pathandfile,infile);
-                      if(nfiles < 3) std::cout << "  read file from: " << pathandfile << std::endl;
-                      if(nfiles == 3) std::cout << " suppressing further 'read from' info" << std::endl;
-
-                      TCT::Scanning daq_data;
-                      bool read = daq_data.ReadTCT(pathandfile,&ana, HasSubs);
-                      if(!read) {std::cout<<"Processing of file "<<pathandfile<<" failed. Skipping."<<std::endl;  continue;}
-                      nfiles++;
-                      //std::cout << "nfiles: " << nfiles;
-                      if (nfiles > ana.MaxAcqs()-1) break;
-                  }
-
-              }
-              counter++;
-              if( countersubdir == 0) break;
-              if(counter == countersubdir) break;
+              TCT::Scanning daq_data;
+              bool read = daq_data.ReadTCT(pathandfile,&config);
+              if(!read) {std::cout<<"Processing of file "<<pathandfile<<" failed. Skipping."<<std::endl;  continue;}
           }
 
+      }
   }
+
   //theApp.Run(kTRUE); 
   //char key = getchar();
 

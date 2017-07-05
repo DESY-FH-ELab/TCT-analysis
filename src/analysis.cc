@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of analysis methods
+ * \brief Implementation of TCT:analysis methods
  */
 
 // STD includes
@@ -32,7 +32,7 @@ namespace TCT {
       if(i.first == "AmplPosLate_Cut")	_AmplPosLate_Cut = atof((i.second).c_str());
       if(i.first == "AmplNegEarly_Cut")	_AmplNegEarly_Cut = atof((i.second).c_str());
       if(i.first == "AmplPosEarly_Cut")	_AmplPosEarly_Cut = atof((i.second).c_str());
-      if(i.first == "Outfolder")	_OutFolder = i.second;
+      if(i.first == "OutFolder")	_OutFolder = i.second;
       if(i.first == "Noise_Cut")	_Noise_Cut = atof((i.second).c_str());
       if(i.first == "NoiseEnd_Cut")	_NoiseEnd_Cut = atof((i.second).c_str());
       if(i.first == "S2n_Cut")		_S2n_Cut = atof((i.second).c_str());
@@ -41,46 +41,10 @@ namespace TCT {
       if(i.first == "DoSmearing")	_DoSmearing = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "AddNoise")		_AddNoise = atof((i.second).c_str());
       if(i.first == "AddJitter")	_AddJitter = atof((i.second).c_str());
-      if(i.first == "SampleCard")	_SampleCard = i.second;
       if(i.first == "DataFolder")	_DataFolder = i.second;
       if(i.first == "SaveToFile")	_SaveToFile = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "SaveSingles")	_SaveSingles = static_cast<bool>(atoi((i.second).c_str()));
       if(i.first == "LeCroyRAW")	_LeCroyRAW = static_cast<bool>(atoi((i.second).c_str()));
-      //operation mode
-      if(i.first == "Mode")		_Mode = atoi((i.second).c_str());
-
-      //tct scanning mode parameters
-      if(i.first == "CH_Detector")		_CH_Det = atoi((i.second).c_str());
-      if(i.first == "CH_Photodiode")	_CH_PhDiode = atoi((i.second).c_str());
-      if(i.first == "CH_Trigger")		_CH_Trig = atoi((i.second).c_str());
-      if(i.first == "Optical_Axis")		_OptAxis = atoi((i.second).c_str());
-      if(i.first == "Focus_Search")		_DO_focus = static_cast<bool>(atoi((i.second).c_str()));
-      if(i.first == "Scanning_Axis")    _ScAxis = atoi((i.second).c_str());
-      if(i.first == "FWHM")             _FFWHM = atof((i.second).c_str());
-      if(i.first == "TimeSensorLow")    _FTlow = atof((i.second).c_str());
-      if(i.first == "TimeSensorHigh")   _FThigh = atof((i.second).c_str());
-      if(i.first == "TimeDiodeLow")     _FDLow = atof((i.second).c_str());
-      if(i.first == "TimeDiodeHigh")    _FDHigh = atof((i.second).c_str());
-      if(i.first == "SaveSeparateCharges")		_FSeparateCharges = static_cast<bool>(atoi((i.second).c_str()));
-      if(i.first == "SaveSeparateWaveforms")	_FSeparateWaveforms = static_cast<bool>(atoi((i.second).c_str()));
-      if(i.first == "Movements_dt")     _Movements_dt = atof((i.second).c_str());
-      if(i.first == "TCT_Mode")         _TCT_Mode = atoi((i.second).c_str());
-      if(i.first == "Voltage_Source")   _VoltSource = atoi((i.second).c_str());
-      if(i.first == "EdgeDepletionVoltage")		_DO_EdgeDepletion = static_cast<bool>(atoi((i.second).c_str()));
-      if(i.first == "EdgeVelocityProfile")		_DO_EdgeVelocity = static_cast<bool>(atoi((i.second).c_str()));
-      if(i.first == "EV_Time")          _EV_Time = atof((i.second).c_str());
-
-      //coefficients, constants, parameters
-      if(i.first == "Mu0_Electrons")                _mu0_els = atof((i.second).c_str());
-      if(i.first == "Mu0_Holes")                    _mu0_holes = atof((i.second).c_str());
-      if(i.first == "SaturationVelocity")           _v_sat = atof((i.second).c_str());
-      if(i.first == "Amplification")                _ampl = atof((i.second).c_str());
-      if(i.first == "LightSplitter")                _light_split = atof((i.second).c_str());
-      if(i.first == "ResistanceSensor")             _R_sensor = atof((i.second).c_str());
-      if(i.first == "ResistancePhotoDetector")      _R_diode = atof((i.second).c_str());
-      if(i.first == "ResponcePhotoDetector")        _RespPhoto = atof((i.second).c_str());
-      if(i.first == "EnergyPair")                   _E_pair = atof((i.second).c_str());
-
       
     }
 

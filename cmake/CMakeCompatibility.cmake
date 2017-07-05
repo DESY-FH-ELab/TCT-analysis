@@ -6,7 +6,7 @@
 # variables.  Create destination directory if it does not exist.
 # Defined twice: once for CMake > 2.8 and once for 2.6
 # CMake < 2.8 does not know about FILE(COPY ..) function
-if( ${CMAKE_VERSION} VERSION_GREATER 2.8 )
+if( ${CMAKE_VERSION} VERSION_GREATER 2.8.11 )
 # define macro as alias to FILE(COPY ..)
 macro(copy_files srcDir destDir)
   FILE(COPY ${srcDir} DESTINATION ${destDir})

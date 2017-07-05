@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the util class.
+ * \brief Definition of the TCT::util class.
  */
 
 #ifndef __UTIL_H__
@@ -24,7 +24,7 @@ namespace TCT {
     private :
 
       std::map<std::string, std::string> _id_val;
-      bool _IsRead = false;
+      bool _IsRead;
 
     public:
 

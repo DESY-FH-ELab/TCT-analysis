@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Definition of the sample class.
+ * \brief Definition of the TCT::sample class.
  */
 
 #ifndef __SAMPLE_H__
@@ -47,16 +47,18 @@ namespace TCT {
       }
 
       // Default copy constructer should be fine
-      sample(const sample &)               = default;
-      sample & operator = (const sample &) = default;
+      sample(const sample &)              ;
+      sample & operator = (const sample &);
 
       // Dectructor
-      ~sample() = default;
+      //~sample();
 
       double Thickness(){ return _Thickness;}
+      void SetThickness(float val) {_Thickness = val;}
       const double & Thickness() const{ return _Thickness;}
 
       std::string SampleID() {return _SampleID;}
+      void SetSampleID(std::string val) {_SampleID = val;}
       const std::string & SampleID() const {return _SampleID;}
 
       //void SetThickness(double thick) { _Thickness = thick;}

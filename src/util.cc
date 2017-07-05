@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief Implementation of util methods
+ * \brief Implementation of TCT::util methods
  */
 
 //  includes from standard libraries
@@ -14,11 +14,11 @@
 //  includes from TCT classes
 #include "util.h"
 
-
 namespace TCT {
 
   void util::parse(std::ifstream & cfgfile) {
     std::string id, eq, val;
+    _IsRead = false;
 
     while(cfgfile >> id ){
 
@@ -38,11 +38,12 @@ namespace TCT {
       }
 
     }
-
+#ifndef USE_GUI
     std::cout << "\n identifiers and values from passed file" << std::endl; 
     for(auto i : _id_val) {
       std::cout << i.first << " " << i.second << " " << "\n";
     }
+#endif
 
     _IsRead = true;
 
