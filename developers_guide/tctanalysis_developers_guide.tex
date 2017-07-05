@@ -94,7 +94,8 @@ To compile the framework from source using CMake next prerequisites have to be s
 \begin{itemize}
 \item ROOT 5.X or 6.X has to be installed, ROOTSYS variable has to be defined.
 \item CMake 2.6 or older has to be installed and added to the PATH variable.
-\item (if GUI needed, \textbf{recommended}) Install Qt4 (Qt5 building with CMake not implemented for the moment).
+\item (if GUI needed, \textbf{recommended}) Install Qt4 or Qt5.
+\item If you are going to use Qt5, export Qt5 installation dir, for example \lstinline{export CMAKE_PREFIX_PATH=/opt/Qt5/5.7/gcc_64:$CMAKE_PREFIX_PATH}. For Windows you need to set \lstinline{CMAKE_PREFIX_PATH} environmental variable.
 \item (optional, for single waveforms acquisition) If LeCroy RAW data files converter needed - put the external LeCroyConverter lib to the \textit{external/LeCroyConverter/lib/libLeCroy.so}.
 \end{itemize}
 
@@ -797,3 +798,4 @@ SampleCard	=	../testsensor/SC_M2015.txt
 \end{thebibliography}
 
 \end{document}
+\grid
