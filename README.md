@@ -1,5 +1,6 @@
-Content:
-=======
+# TCT-Analysis
+
+### Content:
 
 1 - Requirements
 
@@ -8,18 +9,17 @@ Content:
 3 - Test files, Test sensor data
 
 
+### 1. Requirements
 
-1. Requirements
----------------
-
-Minimal requirements are: a C++11 compliant compiler, ROOT v5.x or later (including v6.x), and CMake 2.6.x or later.
+Minimal requirements are: a C++11 compliant compiler, ROOT v5.x or later (including v6.x), and CMake 2.6.x or later. Also Qt4 or Qt5, in case of GUI compilation.
 
 
-2. Installation instructions
-----------------------------
+### 2. Installation instructions
+
+Following text is the short version of the compilation guide, in case of problems, please check the [Developers Guide](https://github.com/DESY-FH-ELab/TCT-analysis/blob/master/developers_guide/tctanalysis_developers_guide.pdf).
 
   * Install CMake.
-  * IF GUI needed - install Qt4
+  * IF GUI needed - install Qt4 or Qt5
   * Install ROOT. 
   * Source ROOT 5.x before compilation. 
   * IF LeCroyRAW data converter needed - put the external LeCroyConverter lib to the external/LeCroyConverter/lib/libLeCroy.so
@@ -48,8 +48,7 @@ e.g.
 
 
 
-3. Test files, Test Sensor data
--------------------------------
+### 3. Test files, Test Sensor data
 
 The test data files are located at .../TCT-analysis/testdata/S57/295K/500V/.
 The test data file in TCT data format is located at .../TCT-analysis/testdata/lpnhe/.
